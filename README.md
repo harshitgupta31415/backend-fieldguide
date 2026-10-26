@@ -237,3 +237,7 @@ Automated checks cover content integrity, retained lesson identity, progress com
 If port 3000 is occupied, stop the other local server or run `npm run dev -- --port 3001`. Use the printed URL and export progress before changing hostname or port. For an outdated production preview, stop it, build again, restart and reload; use the development server while editing.
 
 For a bug report, include the lesson or mission, expected behavior, observed behavior and reproduction steps. Use synthetic/redacted evidence and primary sources for factual corrections. Preserve existing IDs and update related examples, quizzes, prompts and simulations together when a rule changes. Report actual checks rather than assuming a successful build verifies every interaction.
+
+## License
+
+Copyright 2026 harshitgupta31415. Licensed under the [Apache License, Version 2.0](LICENSE). See [NOTICE](NOTICE) for attribution.

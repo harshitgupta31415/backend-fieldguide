@@ -3,6 +3,7 @@
   "version": "1.4.0",
   "private": true,
   "author": "harshitgupta31415",
+  "license": "Apache-2.0",
   "description": "Interactive ecommerce backend fundamentals and practical service-integration simulations with guided lessons, games and precise AI prompts.",
   "scripts": {
     "dev": "next dev --hostname 127.0.0.1",
