@@ -72,3 +72,19 @@ test('cancelled and unconfigured requests never call a provider', async () => {
   const controller = new AbortController(); controller.abort();
   await assert.rejects(generate(messages, config, controller.signal), e => e.code === 'CANCELLED');
 });
+
+test('an empty completion falls through to the next key rather than showing a blank answer', async () => {
+  let calls = 0;
+  const generate = createProviderRouter({ fetchImpl: async () => ++calls === 1 ? Response.json({ choices: [{ message: { content: '' } }] }) : ok() });
+  assert.ok((await generate(messages, config)).answer);
+  assert.equal(calls, 2);
+});
+
+test('Free.ai uses its documented chat endpoint and bearer authentication', async () => {
+  let seen;
+  const generate = createProviderRouter({ fetchImpl: async (url, options) => { seen = { url, options }; return ok(); } });
+  const result = await generate(messages, readAIConfig({ AI_PROVIDER_ORDER: 'freeai', FREEAI_API_KEY: 'local-test-key' }));
+  assert.equal(result.provider, 'freeai'); assert.equal(seen.url, 'https://api.free.ai/v1/chat/');
+  assert.equal(seen.options.headers.Authorization, 'Bearer local-test-key');
+  assert.equal(JSON.parse(seen.options.body).model, 'qwen7b');
+});

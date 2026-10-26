@@ -1,5 +1,7 @@
 import './globals.css';
 import './experience.css';
+import './tutor.css';
+import './neon.css';
 import { lessons } from '../lib/course.mjs';
 
 export const metadata = {

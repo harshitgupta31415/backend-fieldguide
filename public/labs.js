@@ -3,20 +3,46 @@
 
   var mountCount = 0;
   var mounted = new WeakMap();
+  var translators = new WeakMap();
+
+  function message(template, values) { return { template: template, values: values || {} }; }
+  function translated(panel, value) {
+    var translate = translators.get(panel) || function (text) { return text; };
+    if (value && typeof value === "object" && typeof value.template === "string") {
+      return translate(value.template).replace(/\{([a-zA-Z0-9_]+)\}/g, function (match, key) {
+        return Object.prototype.hasOwnProperty.call(value.values, key) ? String(value.values[key]) : match;
+      });
+    }
+    return translate(String(value));
+  }
+
+  function translatePanel(panel, translate) {
+    translators.set(panel, translate);
+    var walker = document.createTreeWalker(panel, NodeFilter.SHOW_TEXT);
+    var text;
+    while ((text = walker.nextNode())) {
+      if (text.parentElement && !text.parentElement.closest("code, pre") && text.nodeValue.trim()) text.nodeValue = translate(text.nodeValue);
+    }
+    panel.querySelectorAll("[aria-label], [title], [placeholder]").forEach(function (element) {
+      ["aria-label", "title", "placeholder"].forEach(function (attribute) {
+        if (element.hasAttribute(attribute)) element.setAttribute(attribute, translate(element.getAttribute(attribute)));
+      });
+    });
+  }
 
   function read(panel, selector) {
     return panel.querySelector(selector);
   }
 
   function write(panel, selector, value) {
-    read(panel, selector).textContent = String(value);
+    read(panel, selector).textContent = translated(panel, value);
   }
 
   function showLog(target, entries) {
     target.replaceChildren();
     entries.slice(-8).reverse().forEach(function (entry) {
       var item = document.createElement("li");
-      item.textContent = entry;
+      item.textContent = translated(target.closest(".lab-panel"), entry);
       target.appendChild(item);
     });
   }
@@ -31,7 +57,7 @@
     return element && panel.contains(element) ? element.getAttribute("data-action") : null;
   }
 
-  function inventory(container, id) {
+  function inventory(container, id, translate) {
     container.innerHTML = `
       <section class="lab-panel" aria-labelledby="${id}-title">
         <span class="pill">Local simulation · inventory</span>
@@ -62,6 +88,7 @@
       </section>`;
 
     var panel = read(container, ".lab-panel");
+    translatePanel(panel, translate);
     var state;
     var events;
 
@@ -74,7 +101,7 @@
       write(panel, '[data-stat="unpaid"]', state.unpaid);
       write(panel, '[data-stat="paid"]', state.paid);
       write(panel, "[data-status]", message);
-      write(panel, "[data-invariant]", "Rules hold: available is " + available + " (never negative); reserved equals unpaid + paid; expiry releases unpaid holds only.");
+      write(panel, "[data-invariant]", message("Rules hold: available is {available} (never negative); reserved equals unpaid + paid; expiry releases unpaid holds only.", {available: available}));
       showLog(read(panel, "[data-log]"), events);
     }
 
@@ -92,11 +119,11 @@
     function hold(quantity) {
       var available = state.onHand - state.unpaid - state.paid;
       if (quantity > available) {
-        record("Hold rejected: requested " + quantity + ", but only " + available + " available. No quantities changed.");
+        record(message("Hold rejected: requested {quantity}, but only {available} available. No quantities changed.", {quantity: quantity, available: available}));
         return;
       }
       state.unpaid += quantity;
-      record("Held " + quantity + " unit" + (quantity === 1 ? "" : "s") + ": unpaid holds increased; on-hand stayed " + state.onHand + ".");
+      record(message("Held {quantity} units: unpaid holds increased; on-hand stayed {onHand}.", {quantity: quantity, onHand: state.onHand}));
     }
 
     function click(event) {
@@ -114,7 +141,7 @@
             var count = state.unpaid;
             state.paid += count;
             state.unpaid = 0;
-            record("Confirmed " + count + " held units paid. Reserved and on-hand are unchanged; paid allocations are protected from unpaid-hold expiry.");
+            record(message("Confirmed {count} held units paid. Reserved and on-hand are unchanged; paid allocations are protected from unpaid-hold expiry.", {count: count}));
           }
           break;
         case "ship":
@@ -128,11 +155,11 @@
           break;
         case "expire":
           if (state.unpaid === 0) {
-            record("Expiry found no unpaid holds. All " + state.paid + " paid allocations remain reserved.");
+            record(message("Expiry found no unpaid holds. All {paid} paid allocations remain reserved.", {paid: state.paid}));
           } else {
             var expired = state.unpaid;
             state.unpaid = 0;
-            record("Expired " + expired + " unpaid holds: availability increased; on-hand and paid allocations are unchanged.");
+            record(message("Expired {expired} unpaid holds: availability increased; on-hand and paid allocations are unchanged.", {expired: expired}));
           }
           break;
         case "race":
@@ -144,9 +171,9 @@
             var currentAvailable = state.onHand - state.unpaid - state.paid;
             if (currentAvailable >= 1) {
               state.unpaid += 1;
-              events.push("Protected claim " + shopper + " rechecks availability = " + currentAvailable + " and reserves 1 unit.");
+              events.push(message("Protected claim {shopper} rechecks availability = {available} and reserves 1 unit.", {shopper: shopper, available: currentAvailable}));
             } else {
-              events.push("Protected claim " + shopper + " rechecks availability = 0 and rejects the purchase. No second hold is created.");
+              events.push(message("Protected claim {shopper} rechecks availability = 0 and rejects the purchase. No second hold is created.", {shopper: shopper}));
             }
           });
           render("Synthetic race: both shoppers read 1, but only A obtains the unit. This local example serializes protected claims to model atomic allocation; it does not execute a database race.");
@@ -161,7 +188,7 @@
     return listen(panel, "click", click);
   }
 
-  function payments(container, id) {
+  function payments(container, id, translate) {
     container.innerHTML = `
       <section class="lab-panel" aria-labelledby="${id}-title">
         <span class="pill">Local simulation · payment events</span>
@@ -189,6 +216,7 @@
       </section>`;
 
     var panel = read(container, ".lab-panel");
+    translatePanel(panel, translate);
     var state;
     var events;
     var accepted;
@@ -232,7 +260,7 @@
         return;
       }
       if (accepted.has(eventId)) {
-        record("Duplicate " + eventId + " ignored. The stored result is reused; paid transitions remain " + state.effects + ".");
+        record(message("Duplicate {eventId} ignored. The stored result is reused; paid transitions remain {effects}.", {eventId: eventId, effects: state.effects}));
         return;
       }
       accepted.add(eventId);
@@ -307,7 +335,7 @@
     return listen(panel, "click", click);
   }
 
-  function api(container, id) {
+  function api(container, id, translate) {
     container.innerHTML = `
       <section class="lab-panel" aria-labelledby="${id}-title">
         <span class="pill">Local simulation · API explorer</span>
@@ -350,6 +378,7 @@
       </section>`;
 
     var panel = read(container, ".lab-panel");
+    translatePanel(panel, translate);
     var method = read(panel, "[data-method]");
     var owner = read(panel, "[data-owner]");
     var quantity = read(panel, "[data-quantity]");
@@ -395,7 +424,7 @@
       target.replaceChildren();
       trace.forEach(function (entry) {
         var item = document.createElement("li");
-        item.textContent = entry;
+        item.textContent = translated(target.closest(".lab-panel"), entry);
         target.appendChild(item);
       });
     }
@@ -404,7 +433,7 @@
       updatePreview();
       var req = request();
       var trace = [
-        "Route " + req.method + " " + req.path + ".",
+        message("Route {method} {path}.", {method: req.method, path: req.path}),
         "Verify the simulated session: identity is customer_demo.",
         "Load the target cart and check its stored owner."
       ];
@@ -441,7 +470,7 @@
         return;
       }
       trace.push("Load authoritative catalog price: 25000 minor units per item, currency INR.");
-      trace.push("Ignore browser_unit_price_minor; calculate " + count + " × 25000 on the server.");
+      trace.push(message("Ignore browser_unit_price_minor; calculate {count} × 25000 on the server.", {count: count}));
       trace.push("Return a quote only. No stock is reserved, order created, or payment attempted.");
       respond(200, "OK", {
         status: "quoted",
@@ -450,7 +479,7 @@
         subtotal_minor: count * 25000,
         currency: "INR",
         stock_reserved: false
-      }, trace, "200: trusted subtotal is " + (count * 250).toFixed(2) + " INR. The browser's submitted price did not set the amount.");
+      }, trace, message("200: trusted subtotal is {amount} INR. The browser's submitted price did not set the amount.", {amount: (count * 250).toFixed(2)}));
     }
 
     function reset() {
@@ -484,7 +513,8 @@
 
   var factories = { inventory: inventory, payments: payments, api: api };
 
-  function mount(container, labName) {
+  function mount(container, labName, translate) {
+    translate = typeof translate === "function" ? translate : function (text) { return text; };
     if (!container || typeof container.querySelector !== "function") {
       throw new TypeError("BackendLabs.mount needs a container element.");
     }
@@ -494,7 +524,7 @@
     var previous = mounted.get(container);
     if (previous) previous();
     mountCount += 1;
-    var cleanup = factories[labName](container, "backend-lab-" + mountCount);
+    var cleanup = factories[labName](container, "backend-lab-" + mountCount, translate);
     var active = true;
     var dispose = function () {
       if (!active) return;

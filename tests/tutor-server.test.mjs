@@ -28,7 +28,14 @@ test('a public request requires a strong access code even with a configured API 
   assert.equal((await handleMissing(request({ question: 'payment' }, {}, url))).status, 503);
   const handle = createTutorHandler({ env: () => ({ ...env(), VERCEL: '1', TUTOR_ACCESS_CODE: 'long-private-access-code' }), generate: async () => ({ answer: 'Payment is verified server-side.', provider: 'stub', model: 'stub' }) });
   assert.equal((await handle(request({ question: 'payment', accessCode: 'wrong' }, {}, url))).status, 401);
+  assert.equal((await handle(request(null, {}, url))).status, 400);
   assert.equal((await handle(request({ question: 'payment verification', accessCode: 'long-private-access-code' }, {}, url))).status, 200);
+});
+
+test('Next internal localhost URLs accept the matching public Host and Origin pair', async () => {
+  const handle = createTutorHandler({ env, retrieve: () => [] });
+  const response = await handle(request({ question: 'payment' }, { host: '127.0.0.1:3000', origin: 'http://127.0.0.1:3000' }, 'http://localhost:3000/api/tutor'));
+  assert.equal(response.status, 200);
 });
 
 test('grounded generation contains course evidence and bounded conversation, no client-provided notes or key', async () => {

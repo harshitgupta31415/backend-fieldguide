@@ -1,0 +1,501 @@
+/* Light neon: quiet surfaces, vivid wayfinding, and deep ink for reading. */
+:root {
+  --ink: #29253f;
+  --muted: #66637b;
+  --paper: #faf9ff;
+  --white: #fff;
+  --teal: #7150d5;
+  --teal-dark: #5734b5;
+  --lime: #dfff9b;
+  --line: #e4e0f0;
+  --soft: #f0edff;
+  --orange: #a45335;
+  --neon-violet: #8052ef;
+  --neon-cyan: #3e45cc;
+  --neon-pink: #ffacd8;
+  --neon-lime: #dfff9b;
+  --neon-peach: #ffd0b4;
+  --neon-shadow: 0 9px 32px #71608b0a, 0 1px 3px #55427d06;
+}
+
+html { color-scheme: light; }
+body {
+  background:
+    radial-gradient(ellipse at 94% 4%, #c6fbff66, transparent 38%),
+    radial-gradient(ellipse at 32% 25%, #f2d7ff44, transparent 42%),
+    #faf9ff;
+  background-attachment: fixed;
+  color: var(--ink);
+}
+::selection { background: #e7d7ff; color: #3b225f; }
+.app-shell :is(button, a, input, textarea, select, g[role=button]):focus-visible,
+.app-shell .ga-button:focus-visible {
+  outline: 3px solid #8d60ed;
+  outline-offset: 4px;
+}
+.app-shell input, .app-shell textarea, .app-shell select { accent-color: #8155d8; }
+.app-shell :is(.page-title, h1, h2, h3) { color: #2b2542; }
+.app-shell :is(.eyebrow, .journey-eyebrow, .ga-kicker) { color: #7650bd; }
+.app-shell :is(.page-intro, .lesson-question, .reference-intro) { color: #68647b; }
+.app-shell em { color: #7950cf; }
+
+/* The navigation stays light, with a distinct color for each destination. */
+.app-shell .sidebar {
+  color: #625a79;
+  background: linear-gradient(170deg, #f2eaff 0%, #fcfaff 44%, #eafbff 100%);
+  border-right: 1px solid #e2d8f3;
+  box-shadow: 5px 0 24px #7c65a707;
+  scrollbar-color: #c9bae1 transparent;
+}
+.app-shell .brand { color: #332547; }
+.app-shell .brand-symbol {
+  background: linear-gradient(145deg, #c2b0ff, #e6c3ff 55%, #b2f1f5);
+  border-color: #c3afe9;
+  color: #4d327d;
+  box-shadow: 0 3px 15px #a481dc24;
+}
+.app-shell .sidebar-caption { color: #80718d; }
+.app-shell .main-nav { border-color: #e1d7ec; }
+.app-shell .main-nav>button { color: #685d7c; }
+.app-shell .main-nav>button:hover { color: #4d346b; background: #eae0fb; }
+.app-shell .main-nav>button.active {
+  background: #e3d7ff;
+  color: #523281;
+  box-shadow: 0 4px 14px #9873c315;
+}
+.app-shell .main-nav>button:nth-child(2).active { background: #d7f6fa; color: #225e6f; }
+.app-shell .main-nav>button:nth-child(3).active { background: #ffe0f1; color: #883c6d; }
+.app-shell .main-nav>button:nth-child(4).active { background: #e9f8c9; color: #252861; }
+.app-shell .main-nav>button:nth-child(5).active { background: #ffe7d7; color: #8d4e32; }
+.app-shell .main-nav>button:nth-child(6).active { background: #e7e2ff; color: #57438b; }
+.app-shell .main-nav>button:nth-child(7).active { background: #d9f6ff; color: #23627a; }
+.app-shell .main-nav em { color: #725294; border-color: #cab8de; background: #ffffff85; }
+.app-shell .sidebar-section-label, .app-shell .sidebar-section-label>span { color: #8a7c98; }
+.app-shell .part-group>button { color: #6d637e; }
+.app-shell .part-group>button small { color: #8e819e; }
+.app-shell .part-group>button:hover, .app-shell .part-group>button.selected { background: #eae1f9; color: #563475; }
+.app-shell .part-number { color: #8c75a6; border-color: #d7c8e9; background: #ffffff6b; }
+.app-shell .part-number.done { background: #e7f4c4; color: #45306a; border-color: #c5dc98; }
+.app-shell .side-lessons button { color: #8b7e9a; }
+.app-shell .side-lessons button.current { color: #7747bd; font-weight: 650; }
+.app-shell .side-lessons i { background: #cfbce2; }
+.app-shell .side-lessons i.done-dot { background: #5055b9; }
+.app-shell .nav-track { background: #ebe3f4; border-color: #dfd1ec; }
+.app-shell .nav-track button { color: #867393; }
+.app-shell .nav-track button[aria-pressed=true] { background: #fffafd; color: #7853a8; border-color: #d6c4e7; }
+.app-shell .sidebar-progress, .app-shell .sidebar-author { border-color: #dfd7e9; }
+.app-shell .sidebar-progress strong { color: #8350bd; }
+.app-shell .sidebar-progress small, .app-shell .sidebar-author small { color: #8d819d; }
+.app-shell .progress-track { background: #e1d8ec; }
+.app-shell .progress-track span { background: linear-gradient(90deg, #9d7ce9, #e79bc7, #8ddde8); }
+.app-shell .progress-actions button { color: #8a61aa; }
+.app-shell .sidebar-author { color: #695775; }
+.app-shell .avatar { background: #ead9fa; color: #7d4d9d; border: 1px solid #d6bfea; }
+.app-shell .topbar { background: #fffdfff0; border-color: #e6e0f1; }
+.app-shell .breadcrumb, .app-shell .breadcrumb>b { color: #80748e; }
+.app-shell .breadcrumb>span { color: #c3b5d5; }
+.app-shell .searchbox { background: #fbf9ff; border-color: #e2d8ed; color: #a18bb2; }
+.app-shell .searchbox input { color: #52445f; }
+.app-shell .searchbox kbd { color: #9e89ac; border-color: #e6dbef; background: #fff; }
+.app-shell .icon-button { color: #8e76a4; }
+.app-shell .icon-button:hover, .app-shell .icon-button.pressed { color: #8755ca; }
+.app-shell .site-footer { border-color: #e6dff0; color: #918099; }
+.app-shell .site-footer>span:first-child, .app-shell .site-footer>span:first-child>span { color: #86718f; }
+.app-shell .motion-setting { color: #867097; background: #f0e9fa; border-color: #e2d5ef; }
+.app-shell .storage-notice { background: #fff2df; border-color: #efd4ae; color: #896138; }
+.app-shell .toast { background: #f2eaff; border: 1px solid #d4bdf1; color: #6d4295; box-shadow: 0 7px 32px #8f66bd20; }
+.app-shell .menu-shade { background: #30213b42; }
+
+/* Shared actions and reading surfaces. */
+.app-shell .btn, .app-shell .journey-primary {
+  background: #8054d5;
+  border-color: #8054d5;
+  color: #fff;
+  box-shadow: 0 4px 0 #6640a519, 0 6px 18px #956cd61b;
+}
+.app-shell .btn:hover, .app-shell .journey-primary:hover { background: #6d43c2; border-color: #6d43c2; box-shadow: 0 7px 22px #956cd62b; }
+.app-shell .btn.secondary { background: #ffffffbd; color: #85629f; border-color: #dcc9ee; box-shadow: 0 3px 0 #cbb7e10f; }
+.app-shell .btn.secondary:hover { background: #f0e5fd; color: #70478e; }
+.app-shell .btn.lime { background: #dfff9b; color: #2a2d5e; border-color: #c4e480; box-shadow: 0 4px 0 #7750b914; }
+.app-shell .btn.lime:hover { background: #d3f38d; }
+.app-shell .text-button, .app-shell .back-link, .app-shell .journey-back { color: #8b5ab0; }
+.app-shell .pill { color: #8861a7; border-color: #e0cfec; background: #f7edff; }
+.app-shell .lesson-reward { background: #ffe5f4; color: #a34c7d; border-color: #f4c5df; }
+.app-shell .lesson-stage, .app-shell .concept-diagram, .app-shell .quiz-section,
+.app-shell .practical-details, .app-shell .completion-checklist {
+  background: #ffffffc9;
+  border-color: #e4ddee;
+  box-shadow: var(--neon-shadow);
+}
+
+/* The learning map: violet, aqua, rose, lime, and apricot chapters. */
+.app-shell .journey-page { --j-teal: #3b2b55; --j-green: #8b57be; --j-lime: #e2caff; --j-muted: #7e6e8d; --j-line: #e4d9ed; }
+.app-shell .journey-small-star { color: #ba80e4; }
+.app-shell .journey-xp { color: #ad5b96; }
+.app-shell .journey-xp>span { color: #9884a3; border-color: #e6d9ee; }
+.app-shell .journey-hero h1 { color: #302440; }
+.app-shell .journey-hero h1 span { color: #8a53cf; }
+.app-shell .journey-hero h1 span:after { background: linear-gradient(90deg, #d9c6ff, #bff4ef, #ffd4e9); }
+.app-shell .journey-hero-copy>p { color: #817187; }
+.app-shell .journey-hero-facts { color: #9b88a2; }
+.app-shell .journey-hero-facts strong { color: #80608e; }
+.app-shell .journey-hero-facts>i { background: #d6bddf; }
+.app-shell .journey-system {
+  background: linear-gradient(140deg, #f6ebff, #eefcff 72%, #fef7ff);
+  border-color: #ded0ed;
+  box-shadow: 0 10px 38px #a077bd0e, inset 0 0 35px #ffffff8a;
+}
+.app-shell .journey-system-heading { color: #9478a6; }
+.app-shell .journey-system-heading i { background: #b28ce1; }
+.app-shell .journey-live-label { background: #e3faff; color: #5e4190; border-color: #bae9ed; }
+.app-shell .journey-wires path { stroke: #d1c2e0; }
+.app-shell .journey-wires .journey-wire-trace { stroke: #b48bdf; }
+.app-shell .journey-node { background: #fffaff; border-color: #ddc9ec; box-shadow: 0 4px 0 #e8dbf4; }
+.app-shell .journey-node-1 { background: #f0fdff; border-color: #bfe9f0; box-shadow: 0 4px 0 #d8f1f4; }
+.app-shell .journey-node-2 { background: #fff3f9; border-color: #f0cee1; box-shadow: 0 4px 0 #f6e0ed; }
+.app-shell .journey-node-3 { background: #f7fbe8; border-color: #d8e6bc; box-shadow: 0 4px 0 #e8efda; }
+.app-shell .journey-node small { color: #9a7dab; }
+.app-shell .journey-node strong { color: #755489; }
+.app-shell .journey-node code { color: #9b86a8; }
+.app-shell .journey-node-icon { background: #eee0fa; border-color: #e1cbee; color: #a174ba; }
+.app-shell .journey-node.is-active { background: #e4d1ff; border-color: #bb93e1; box-shadow: 0 4px 0 #d8bee9; color: #613a82; }
+.app-shell .journey-node.is-active strong { color: #613a82; }
+.app-shell .journey-node.is-active small, .app-shell .journey-node.is-active code { color: #8b5ba9; }
+.app-shell .journey-node.is-active .journey-node-icon { background: #f7edff; color: #9763bd; border-color: #d4b4e9; }
+.app-shell .journey-system-center { background: #fff1fa; color: #cc91b6; border-color: #efd1e4; }
+.app-shell .journey-system-detail>span { background: #e9def9; color: #956fb3; }
+.app-shell .journey-system-detail p { color: #887092; }
+.app-shell .journey-trace-button { color: #9874aa; border-color: #e1d1ee; }
+.app-shell .journey-trace-button>span { color: #aa8cb9; }
+.app-shell .journey-trace-button:hover { background: #f0e2fa; }
+.app-shell .journey-next {
+  background: linear-gradient(110deg, #eee3ff 0%, #fff1fa 57%, #e8faff 100%);
+  border: 1px solid #ddcbef;
+  box-shadow: 0 9px 28px #c89ce916;
+  color: #65427e;
+}
+.app-shell .journey-next:after { border-color: #ccace3; opacity: .45; }
+.app-shell .journey-next h2 { color: #65427e; }
+.app-shell .journey-next p { color: #94789e; }
+.app-shell .journey-next-copy>span, .app-shell .journey-next-action>span { color: #ae82b6; }
+.app-shell .journey-ring-track { stroke: #e4d7ed; }
+.app-shell .journey-ring-fill { stroke: #bd8ae4; }
+.app-shell .journey-ring strong { color: #9364b1; }
+.app-shell .journey-ring small { color: #b899c7; }
+.app-shell .journey-next-action>button { background: #e5c9ff; color: #74458f; border-color: #cfaae9; }
+.app-shell .journey-next-action>button:hover { background: #dcb7f6; }
+.app-shell .journey-section-heading h2 { color: #684d7b; }
+.app-shell .journey-section-heading p { color: #9c8aa5; }
+.app-shell .journey-map-count { color: #a187b0; background: #f8f1ff; border-color: #e4d3ef; }
+.app-shell .journey-map-count b { color: #976db0; }
+.app-shell .journey-stage-tabs { background: #f0eafa; border-color: #e4d6ef; }
+.app-shell .journey-stage-tabs>button { --phase-bg: #eee1ff; --phase-ink: #8a58b1; --phase-line: #dbc4ec; }
+.app-shell .journey-stage-tabs>button:nth-child(3n+2) { --phase-bg: #dff9fc; --phase-ink: #684d98; --phase-line: #c4eaf0; }
+.app-shell .journey-stage-tabs>button:nth-child(3n+3) { --phase-bg: #ffe8f4; --phase-ink: #b06c95; --phase-line: #f2cfe4; }
+.app-shell .journey-stage-tabs>button.is-active { background: var(--phase-bg); border-color: var(--phase-line); box-shadow: 0 3px 10px #a98bb416; }
+.app-shell .journey-stage-tabs strong, .app-shell .journey-stage-tabs>button.is-active strong { color: var(--phase-ink); }
+.app-shell .journey-stage-tabs small, .app-shell .journey-stage-tabs>button>span:first-child, .app-shell .journey-stage-count { color: #a38aaf; }
+.app-shell .journey-stage-tabs>button:hover { background: #ffffffaa; }
+.app-shell .journey-trail:before { background: #e6d7ef; }
+.app-shell .journey-trail>button { background: #fbf4ff; color: #b39ac0; border-color: #e2ccec; }
+.app-shell .journey-trail>button.in-stage { background: #eedffe; color: #ac85c4; border-color: #d8b9ed; }
+.app-shell .journey-trail>button.is-current { background: #d6b6f1; color: #764a94; border-color: #c29bdc; box-shadow: 0 0 0 4px #f1e5fc; }
+.app-shell .journey-trail>button.is-done { background: #dff5bd; color: #5d418d; border-color: #cce5a4; }
+.app-shell .journey-stage-heading h3, .app-shell .journey-stage-heading>span { color: #a08aaa; }
+.app-shell .journey-part, .app-shell .studio-card {
+  --card-bg: #f6efff; --card-line: #e4d1f4; --card-accent: #8050a5; --card-soft: #edddfc;
+  background: linear-gradient(135deg, #ffffffeb, var(--card-bg));
+  border-color: var(--card-line);
+  box-shadow: var(--neon-shadow);
+}
+.app-shell :is(.journey-part,.studio-card):nth-child(5n+2) { --card-bg: #ebfbff; --card-line: #cceef4; --card-accent: #367e91; --card-soft: #ddf6fa; }
+.app-shell :is(.journey-part,.studio-card):nth-child(5n+3) { --card-bg: #fff0f8; --card-line: #f3d6e7; --card-accent: #a55385; --card-soft: #ffe3f0; }
+.app-shell :is(.journey-part,.studio-card):nth-child(5n+4) { --card-bg: #f4fbe9; --card-line: #deebc7; --card-accent: #553c81; --card-soft: #eaf5d2; }
+.app-shell :is(.journey-part,.studio-card):nth-child(5n+5) { --card-bg: #fff5ec; --card-line: #f4dfcd; --card-accent: #a96940; --card-soft: #ffead7; }
+.app-shell .journey-part.is-current { border-color: #c8a2e5; box-shadow: 0 0 0 2px #e5cdf633, var(--neon-shadow); }
+.app-shell .journey-part:hover, .app-shell .studio-card:hover { border-color: var(--card-accent); box-shadow: 0 12px 30px #9780ad12; }
+.app-shell .journey-part-art { background: var(--card-soft); color: var(--card-accent); border-color: var(--card-line); }
+.app-shell .journey-part h3>button { color: #765e84; }
+.app-shell .journey-part h3>button>span { color: var(--card-accent); }
+.app-shell .journey-part>p, .app-shell .studio-card p { color: #96839d; }
+.app-shell .journey-part-meta, .app-shell .journey-part-meta>span:last-child { color: var(--card-accent); }
+.app-shell .journey-part.is-current .journey-part-meta>span:last-child { background: var(--card-soft); color: var(--card-accent); }
+.app-shell .journey-lesson-dots>button { background: #ffffffb3; color: var(--card-accent); border-color: var(--card-line); }
+.app-shell .journey-lesson-dots>button.is-done { background: #e9f6cc; color: #5a5ea9; border-color: #d4e7b2; }
+.app-shell .journey-part-actions { border-color: var(--card-line); }
+.app-shell .journey-part-actions>button, .app-shell .journey-part-actions>button:last-child { color: var(--card-accent); }
+.app-shell .journey-part-lessons { background: var(--card-bg); border-color: var(--card-line); }
+.app-shell .journey-part-lessons>button { color: #9a80aa; border-color: var(--card-line); }
+.app-shell .journey-part-lessons>button>span { color: var(--card-accent); }
+.app-shell .journey-soft-note, .app-shell .journey-bottom { color: #ad96b4; }
+.app-shell .journey-practice { background: #f1e4ff; border-color: #dfc9ef; color: #a17bb7; }
+.app-shell .journey-labs { background: #e4f9fb; border-color: #c3e9ed; color: #7c64a5; }
+.app-shell .journey-prompts { background: #fff0e4; border-color: #f0d8bf; color: #bb9874; }
+.app-shell .journey-practice h3 { color: #866599; }
+.app-shell .journey-practice p, .app-shell .journey-prompts p { color: #a48ab0; }
+.app-shell .journey-practice-icon { background: #e5d1f7; color: #a47cbd; border-color: #d7bceb; }
+.app-shell .journey-labs .journey-practice-icon { background: #d3f0f4; color: #70a9b7; border-color: #bae3e9; }
+.app-shell .journey-prompts .journey-practice-icon { background: #ffdfc8; color: #bd9676; border-color: #efcdb3; }
+.app-shell .journey-badge { background: #fcf5ff; border-color: #e4d1ef; color: #c3abce; }
+.app-shell .journey-badge small { color: #ac94b6; }
+.app-shell .journey-badge.is-earned { background: #e5f8c7; color: #5358b6; border-color: #d3e9a9; }
+.app-shell .journey-badge.is-earned small { color: #7658aa; }
+.app-shell .journey-achievements>div>p { color: #a08aa9; }
+.app-shell .journey-chapter-hero { background: linear-gradient(115deg, #f1e6ff, #e8faff); border-color: #dfd2f0; }
+.app-shell .journey-chapter-hero p, .app-shell .journey-chapter-progress>span { color: #987ea8; }
+.app-shell .journey-chapter-lessons>button { background: #fffdfefa; border-color: #e6d8ef; box-shadow: var(--neon-shadow); }
+.app-shell .journey-chapter-lessons>button:nth-child(3n+2) { background: #f3fdff; }
+.app-shell .journey-chapter-lessons>button:nth-child(3n+3) { background: #fff5fb; }
+.app-shell .journey-chapter-lessons>button.is-next { border-color: #c7a8e0; background: #f6edff; }
+.app-shell .journey-chapter-stop { background: #f0e3fd; color: #ae87c6; border-color: #ddc5ed; }
+.app-shell .journey-chapter-lessons p, .app-shell .journey-chapter-lessons small { color: #a88eb0; }
+.app-shell .journey-chapter-aside { background: #fff3e8; border-color: #f2d8c0; }
+.app-shell .journey-chapter-aside h2 { color: #b18e70; }
+.app-shell .journey-chapter-aside p, .app-shell .journey-chapter-aside li { color: #b49a83; }
+
+/* Lesson stages each get their own accent, while teaching text stays dark. */
+.app-shell .lesson-steps>button { background: #f1e9fb; color: #a082b0; border-color: #e6d8f0; }
+.app-shell .lesson-steps>button:nth-child(2) { background: #e8f9fc; color: #78a6b3; border-color: #d6eef2; }
+.app-shell .lesson-steps>button:nth-child(3) { background: #fff0f8; color: #c28dad; border-color: #f6dfea; }
+.app-shell .lesson-steps>button:nth-child(4) { background: #f3f8e6; color: #6467a5; border-color: #e3edcc; }
+.app-shell .lesson-steps>button.is-current { background: #e1c8ff; color: #8955ac; border-color: #c7a1e3; }
+.app-shell .lesson-steps>button:nth-child(2).is-current { background: #c7f0f5; color: #598c9a; border-color: #a9dce4; }
+.app-shell .lesson-steps>button:nth-child(3).is-current { background: #ffdaed; color: #b36c96; border-color: #efb9d7; }
+.app-shell .lesson-steps>button:nth-child(4).is-current { background: #e3f3bd; color: #4a4e9b; border-color: #cde39f; }
+.app-shell .step-index, .app-shell .is-current .step-index { background: #ffffff9c; color: inherit; border-color: currentColor; }
+.app-shell .lesson-stage-progress { background: #eee4f7; }
+.app-shell .lesson-stage-progress>span { background: linear-gradient(90deg, #c298eb, #f6b2d8, #9adfe7); }
+.app-shell .stage-caption { color: #a98bb7; }
+.app-shell .idea-grid>section { background: #f9f3ff; border-color: #e6d8f1; }
+.app-shell .idea-grid>section.why-card { background: #effcff; border-color: #d1edf3; }
+.app-shell .idea-grid p { color: #8c7898; }
+.app-shell .worked-example { background: #fff5ec; border-color: #efdecb; }
+.app-shell .worked-example p { color: #a28a76; }
+.app-shell .example-mark { color: #d5ad8d; }
+.app-shell .misconception, .app-shell .assumption-flip { background: #fff4f8; border-color: #f1d8e5; color: #b07f99; }
+.app-shell .misconception p { color: #b18b9f; }
+.app-shell .diagram-toolbar { color: #a58ab6; }
+.app-shell .diagram-node rect { fill: #fbf5ff; stroke: #d3b9e5; }
+.app-shell .diagram-node text { fill: #9e77b4; }
+.app-shell .diagram-node:nth-of-type(3n+2) rect { fill: #effcff; stroke: #c0e6ed; }
+.app-shell .diagram-node:nth-of-type(3n+3) rect { fill: #fff0f8; stroke: #edc5dd; }
+.app-shell .diagram-node.selected rect { fill: #e5ccfb; stroke: #b78cd2; }
+.app-shell .diagram-node.selected text { fill: #8c5aa9; }
+.app-shell .diagram-connection { stroke: #d7c3e6; }
+.app-shell .diagram-caption { color: #af98bd; }
+.app-shell .node-detail { background: #f6eeff; border-color: #e8d8f2; }
+.app-shell .node-detail>span { background: #e9d8f9; color: #ac86c6; }
+.app-shell .node-detail p, .app-shell .step-grid p { color: #a18aaf; }
+.app-shell .quiz-section { background: #fffafe; border-color: #f0daeb; }
+.app-shell .quiz-choices button { background: #fff; border-color: #e8d9ee; color: #9b80ab; }
+.app-shell .quiz-choices button>span { background: #faf1ff; border-color: #e2cfed; color: #ba94ca; }
+.app-shell .quiz-choices button:hover { background: #f9edff; border-color: #d6b7e8; }
+.app-shell .quiz-choices button.correct { background: #edf8d9; border-color: #d3e6b3; color: #595da6; }
+.app-shell .quiz-choices button.incorrect { background: #fff0e9; border-color: #efcdbd; color: #bc957f; }
+.app-shell .quiz-feedback, .app-shell .teaching-answer { color: #aa8bb4; background: #f8efff; border-color: #e9d6f4; }
+.app-shell .quiz-feedback.success { color: #775fa0; background: #f0f8e1; border-color: #dceac7; }
+.app-shell .challenge-note { color: #bd9bc9; }
+.app-shell .topic-prompt, .app-shell .compiled-prompt {
+  background: linear-gradient(135deg, #f4e8ff, #fff1fa 90%);
+  border: 1px solid #dfc9ef;
+  color: #946cab;
+  box-shadow: var(--neon-shadow);
+}
+.app-shell .topic-prompt h2, .app-shell .topic-prompt .eyebrow, .app-shell .compiled-prompt .eyebrow { color: #a57ac0; }
+.app-shell .topic-prompt>p, .app-shell .prompt-footer, .app-shell .prompt-safety { color: #b496c5; }
+.app-shell .topic-prompt textarea, .app-shell .compiled-prompt pre { background: #fffcff; border-color: #e2ccef; color: #9b7caa; }
+.app-shell .topic-prompt .btn.dark-secondary, .app-shell .compiled-prompt .btn.dark-secondary { background: #fbf4ff; color: #a780bf; border-color: #dcc2ec; }
+.app-shell .prompt-footer button { color: #b38ac9; }
+.app-shell .notes-section textarea, .app-shell .prompt-form textarea { background: #fffdff; border-color: #e1d2ed; color: #9780a4; }
+.app-shell .notes-section small { color: #b59ac3; }
+.app-shell .lesson-completion { background: #f3f9e8; border-color: #dbe9c8; }
+.app-shell .lesson-completion p { color: #686ba1; }
+.app-shell .lesson-celebration { background: linear-gradient(135deg, #f3e5ff, #e9fbfa, #f5fbdc); border-color: #dcc7ed; box-shadow: 0 10px 45px #a884c31a; }
+.app-shell .celebration-medal { background: #e6d0ff; color: #ad80c7; border-color: #d0ace9; }
+.app-shell .celebration-sparkles i:nth-child(3n+1) { background: #c5a1ef; }
+.app-shell .celebration-sparkles i:nth-child(3n+2) { background: #9de3ea; }
+.app-shell .celebration-sparkles i:nth-child(3n+3) { background: #f3b8d8; }
+.app-shell .practical-details article { border-color: #e8d7f3; background: #fbf6ff; }
+.app-shell .implementation-example { background: #f4efff; border-color: #dfd0ef; }
+.app-shell .implementation-example pre { background: #fffaff; color: #a286b0; border-color: #e6d3f0; }
+.app-shell .debug-clues { background: #fff4eb; border-color: #efdbca; color: #b59b86; }
+.app-shell .prompt-modes button[aria-pressed=true] { background: #e9d5fb; color: #a175b9; border-color: #cfb0e5; }
+.app-shell .completion-checklist label { color: #aa94b3; }
+.app-shell .lesson-sources a, .app-shell .lesson-mission-link { background: #effbff; border-color: #d5ecf2; color: #8ab3c1; }
+
+/* Practical missions and labs inherit the palette without changing behavior. */
+.app-shell .studio-score { background: #fff0f9; border-color: #efd3e5; box-shadow: 0 8px 22px #e8b7d31a; }
+.app-shell .studio-score>span, .app-shell .studio-score strong { color: #bc87a6; }
+.app-shell .studio-score small { color: #c09bb2; }
+.app-shell .studio-simulation-note { background: #eefcff; border-color: #d3edf3; color: #89abb7; }
+.app-shell .studio-filters button { background: #f6effe; border-color: #e4d6ef; color: #ac8fba; }
+.app-shell .studio-filters button[aria-pressed=true] { background: #e3ccfa; color: #a57cba; border-color: #cfaee6; }
+.app-shell .studio-card>div:first-child>span:last-child, .app-shell .studio-card small { color: var(--card-accent); }
+.app-shell .studio-case, .app-shell .studio-board, .app-shell .studio-experiment { background: #ffffffd9; border-color: #e4d8ed; box-shadow: var(--neon-shadow); }
+.app-shell .studio-case-progress { background: #f1e6fa; }
+.app-shell .studio-case-progress>span { background: linear-gradient(90deg, #b99be7, #e8add6, #9ddfe5); }
+.app-shell .studio-case-steps>span { background: #fbf7ff; border-color: #e4d1ef; color: #bba2c9; }
+.app-shell .studio-case-steps>span.is-current { background: #e5d1fa; border-color: #cfafe5; color: #a57fba; }
+.app-shell .studio-case-steps>span.is-done { background: #eef8d5; border-color: #d5e8b0; color: #6467a5; }
+.app-shell .studio-evidence { background: #f0fbff; border-color: #d2ecf3; }
+.app-shell .studio-evidence details { border-color: #d5eaf0; }
+.app-shell .studio-evidence summary { color: #91adba; }
+.app-shell .studio-evidence p { color: #a3b6c0; }
+.app-shell .studio-choices button { background: #fffaff; border-color: #e8d9ef; color: #b298bf; }
+.app-shell .studio-choices button:hover:not(:disabled) { background: #f4e9ff; border-color: #d9bde9; }
+.app-shell .studio-choices button>span { background: #f8efff; border-color: #e0c9ef; }
+.app-shell .studio-choices button.is-correct { background: #eff9db; color: #6266a7; border-color: #d9e9bb; }
+.app-shell .studio-choices button.needs-work { background: #fff0e6; color: #c4a089; border-color: #edcfb9; }
+.app-shell .studio-feedback { background: #fff2e7; color: #c1a58f; border-color: #efdbc9; }
+.app-shell .studio-feedback.is-correct { background: #f0f9e0; color: #7c63a6; border-color: #dceac6; }
+.app-shell .studio-placement { background: #f9f4ff; border-color: #e8d8f1; }
+.app-shell .studio-placement label>strong, .app-shell .studio-order strong { color: #b297bf; }
+.app-shell .studio-placement p, .app-shell .studio-order p { color: #b9a0c6; }
+.app-shell .studio-placement select, .app-shell .studio-form select { border-color: #dec7ee; color: #af92c0; }
+.app-shell .studio-placement.is-correct { background: #f4fae6; border-color: #dfebc8; }
+.app-shell .studio-placement.needs-work { background: #fff5eb; border-color: #f0ddc9; }
+.app-shell .studio-order li { background: #fcf7ff; border-color: #e8d6f2; }
+.app-shell .studio-order button { background: #f5eaff; border-color: #dcc3ee; color: #b28ec8; }
+.app-shell .studio-stats>div, .app-shell .lab-stat { background: #f3ebff; border-color: #e2d1f1; }
+.app-shell .studio-stats>div:nth-child(3n+2), .app-shell .lab-stat:nth-child(3n+2) { background: #ebfbff; border-color: #d0ebf3; }
+.app-shell .studio-stats>div:nth-child(3n+3), .app-shell .lab-stat:nth-child(3n+3) { background: #fff0f8; border-color: #efd6e5; }
+.app-shell .studio-stats strong, .app-shell .lab-stat strong { color: #ad8fc0; }
+.app-shell .studio-stats small, .app-shell .lab-stat>span { color: #b7a0c3; }
+.app-shell .studio-finish { background: linear-gradient(120deg, #f3e5ff, #e9fbff, #f2fbdc); border-color: #ddcbed; }
+.app-shell .studio-responsibilities>div { background: #f6efff; border-color: #dbc3ed; }
+.app-shell .studio-responsibilities dt, .app-shell .studio-responsibilities dd { color: #b59ac3; }
+.app-shell .lab-panel { background: #fffdfedb; border-color: #e4d7ef; box-shadow: var(--neon-shadow); }
+.app-shell .lab-tabs button { background: #f9f2ff; border-color: #e6d4f0; color: #bba0c9; }
+.app-shell .lab-tabs button.active { background: #e8d4fa; border-color: #cfb0e5; color: #ad86c1; }
+.app-shell .lab-note, .app-shell .event-log li { color: #b6a0c1; }
+.app-shell .lab-code { background: #faf4ff; border: 1px solid #e8d8f2; color: #af93bc; }
+.app-shell .event-log li { border-color: #e8daf0; }
+.app-shell .related-lessons button { background: #f7f1ff; color: #b69ac9; border-color: #e2cdef; }
+
+/* Three games, three personalities. */
+.app-shell .game-arcade { --ga-ink: #483258; --ga-muted: #a18aaf; --ga-teal: #aa7bc7; --ga-dark: #614073; --ga-cream: #fffaff; --ga-lime: #e2f9c0; --ga-line: #e6d5ef; }
+.app-shell .ga-status-dot { background: #bb90d7; box-shadow: 0 0 0 4px #ead9f547; }
+.app-shell .ga-hero h1 em { color: #b384d1; }
+.app-shell .ga-medal-counter { background: linear-gradient(145deg, #f1dcff, #e9f8ef); border-color: #e0c9ef; }
+.app-shell .ga-medal-counter>strong, .app-shell .ga-counter-symbol { color: #ad81c6; }
+.app-shell .ga-medal-counter>strong>span, .app-shell .ga-medal-counter>small { color: #c3a9d1; }
+.app-shell .ga-mini-medals>span { border-color: #dbc4eb; color: #cdb4da; }
+.app-shell .ga-mini-medals>span.is-earned { background: #e7f6cb; color: #565bb3; border-color: #d7e8b4; }
+.app-shell .ga-game-card { background: #fffaff; border-color: #e6d1f4; box-shadow: 0 5px 0 #f0e0fa; }
+.app-shell .ga-game-card-trust { background: #f4fdff; border-color: #ceeff4; box-shadow: 0 5px 0 #e0f5f8; }
+.app-shell .ga-game-card-detective { background: #fff6f8; border-color: #f1d8e1; box-shadow: 0 5px 0 #fae5ed; }
+.app-shell .ga-card-illustration { background-color: #f0e2fc; background-image: radial-gradient(#d4b8e98f .8px,transparent .8px); }
+.app-shell .ga-game-card-trust .ga-card-illustration { background-color: #e5f9fc; background-image: radial-gradient(#bee8ed .8px,transparent .8px); }
+.app-shell .ga-game-card-detective .ga-card-illustration { background-color: #fff0e6; background-image: radial-gradient(#f0d5c4 .8px,transparent .8px); }
+.app-shell .ga-art-node { background: #fff9ff; color: #bc96d2; border-color: #d8bceb; box-shadow: 0 4px 0 #e1ccef; }
+.app-shell .ga-art-node:nth-of-type(2) { background: #e7ccff; }
+.app-shell .ga-card-illustration>b { color: #ceade1; }
+.app-shell .ga-art-boundary { border-color: #b9e4e9; color: #9bcad2; }
+.app-shell .ga-art-card { background: #f5ffff; border-color: #bee8ed; color: #91c3ce; box-shadow: 0 5px 0 #d1edf2; }
+.app-shell .ga-art-folder { background: #ffdfca; border-color: #edc8ac; color: #d0ac90; box-shadow: 4px 5px 0 #f7d4b9; }
+.app-shell .ga-art-folder:before { background: #ffdfca; border-color: #edc8ac; }
+.app-shell .ga-art-search { color: #c6a3bf; }
+.app-shell .ga-button { background: #b28acb; border-color: #b28acb; color: #fff; }
+.app-shell .ga-button:hover { background: #a679c3; }
+.app-shell .ga-game-card-trust>.ga-button { background: #9dccd7; border-color: #9dccd7; color: #477787; }
+.app-shell .ga-game-card-detective>.ga-button { background: #eec3d7; border-color: #eec3d7; color: #a2738a; }
+.app-shell .ga-button-secondary { background: #fffaff; color: #b18fc6; border-color: #e0c9ed; }
+.app-shell .ga-button-secondary:hover { background: #f5eaff; }
+.app-shell .ga-game-label>span:first-child { background: #f2e3ff; color: #bc95d2; border-color: #dfc6ee; }
+.app-shell .ga-round-progress>div[role=progressbar] { background: #f0e6f8; }
+.app-shell .ga-round-progress>div[role=progressbar]>span { background: linear-gradient(90deg, #c6a6e8, #e8b7d9, #addfe7); }
+.app-shell .ga-instruction { background: #edfaff; border-color: #d8edf5; }
+.app-shell .ga-instruction>span, .app-shell .ga-instruction>p { color: #a0bec9; }
+.app-shell .ga-pipeline>li { background: #fffaff; border-color: #e8d6f1; box-shadow: 0 3px 0 #f3e9fa; }
+.app-shell .ga-movers>button { background: #f4e9ff; color: #c09dd5; border-color: #e1c9ee; }
+.app-shell .ga-pipeline.is-solved>li { background: #f3fae9; border-color: #deebcc; }
+.app-shell .ga-trust-card { background: #fff9ff; border-color: #e5cdef; box-shadow: 0 7px 0 #f1e2f7; }
+.app-shell .ga-boundary { background: #fbf7ff; border-color: #e5d5ee; }
+.app-shell .ga-boundary-blue { background: #eefcff; border-color: #d1eef3; }
+.app-shell .ga-boundary-orange { background: #fff4e9; border-color: #f2dcc5; }
+.app-shell .ga-boundary-violet { background: #f7ecff; border-color: #e7d2f4; }
+.app-shell .ga-boundary.is-selected, .app-shell .ga-boundary.is-correct { background: #ecf8de; border-color: #d7e9be; box-shadow: 0 3px 0 #e6f0d8; }
+.app-shell .ga-case-file { background: #fff8ef; border-color: #edddcb; box-shadow: 0 5px 0 #f7eadd; }
+.app-shell .ga-case-report { background: #f5edff; color: #b49ac1; }
+.app-shell .ga-clue { background: #fffcf7; border-color: #eddfd0; }
+.app-shell .ga-clue.is-open { background: #fff4e9; border-color: #e9d1b9; }
+.app-shell .ga-deduction { background: #fffaff; border-color: #e7d5ef; }
+.app-shell .ga-deduction.is-correct { background: #f3fae5; border-color: #dceac2; }
+.app-shell .ga-feedback { background: #fff2e6; color: #c2a58c; border-color: #f0dac6; }
+.app-shell .ga-feedback-success { background: #f0f8e1; color: #6467a5; border-color: #dceac7; }
+.app-shell .ga-case-resolution { background: #f5edff; border-color: #d5b8eb; }
+.app-shell .ga-medal { background: #f0ddff; border-color: #dfc3f3; box-shadow: 0 0 0 10px #f9f0ff, 0 8px 0 10px #eeddF8; }
+.app-shell .ga-medal>span { color: #bd97d2; }
+.app-shell .ga-earned { background: #f2f8df; border-color: #e1ebc2; color: #7b61a8; }
+
+/* Reference desk and writing workshop. */
+.app-shell .vague-precise { background: #fff5ed; border-color: #f0ddcb; }
+.app-shell .vague-precise>div:nth-child(2) { background: #f5eaff; }
+.app-shell .prework-item { background: #fffafe; border-color: #e8d7f1; }
+.app-shell .prework-item:nth-of-type(3n+2) { background: #f1fcff; }
+.app-shell .prework-item:nth-of-type(3n+3) { background: #fff2f9; }
+.app-shell .prework-item summary { color: #b296be; }
+.app-shell .prework-item p { color: #b9a3c3; }
+.app-shell .glossary-grid>div { border-color: #e8d9f0; }
+.app-shell .glossary-grid h3 { color: #a98abd; }
+.app-shell .glossary-grid p { color: #b6a0c2; }
+.app-shell .reference-list>a { border-color: #e6d8ee; background: #fffdfebb; }
+.app-shell .reference-list>a:hover { background: #f8efff; }
+.app-shell .reference-list h3 { color: #ad8fc0; }
+.app-shell .reference-list p { color: #b8a2c5; }
+.app-shell .reference-list>a>span { background: #f2e6ff; color: #bea0d1; border-color: #e1c9f0; }
+.app-shell .lesson-list>button { background: #ffffffc9; border-color: #e5d5ee; }
+.app-shell .lesson-list-num { background: #f0e1ff; color: #ba99ce; border-color: #dfc5ef; }
+
+/* Readability layer: vivid surfaces never require pale body text. */
+.app-shell :is(.journey-hero-copy>p,.journey-part>p,.journey-practice p,.journey-prompts p,.journey-system-detail p,.journey-next p,.journey-stage-heading h3,.journey-chapter-hero p,.journey-chapter-lessons p,.journey-chapter-aside p,.journey-chapter-aside li,.idea-grid p,.worked-example p,.misconception p,.node-detail p,.step-grid p,.quiz-choices button,.quiz-feedback,.teaching-answer,.topic-prompt>p,.topic-prompt textarea,.compiled-prompt pre,.prompt-safety,.notes-section textarea,.prompt-form textarea,.debug-clues,.completion-checklist label,.studio-card p,.studio-evidence p,.studio-evidence summary,.studio-choices button,.studio-feedback,.studio-placement label>strong,.studio-placement p,.studio-order strong,.studio-order p,.studio-form select,.studio-placement select,.studio-responsibilities dd,.lab-note,.event-log li,.lab-code,.prework-item p,.glossary-grid p,.reference-list p) { color: #6d607c; }
+.app-shell :is(.journey-part h3>button,.journey-practice h3,.journey-next h2,.journey-section-heading h2,.journey-chapter-aside h2,.studio-stats strong,.lab-stat strong,.ga-game-card h2,.ga-trust-card h3,.prework-item summary,.glossary-grid h3,.reference-list h3) { color: #574265; }
+.app-shell :is(.studio-feedback.is-correct,.quiz-feedback.success,.ga-feedback-success) { color: #373a6d; }
+.app-shell :is(.studio-choices button.is-correct,.quiz-choices button.correct) { color: #48346b; }
+.app-shell :is(.studio-choices button.needs-work,.quiz-choices button.incorrect) { color: #946746; }
+.app-shell :is(.topic-prompt .eyebrow,.topic-prompt h2,.compiled-prompt .eyebrow,.prompt-footer button,.lesson-sources a,.lesson-mission-link) { color: #80589a; }
+.app-shell .game-arcade { --ga-ink: #50395f; --ga-muted: #786881; --ga-teal: #9163ad; }
+.app-shell :is(.ga-hero p,.ga-game-card>p,.ga-playbook p,.ga-challenge-heading p,.ga-pipeline-text>p,.ga-trust-card>p,.ga-boundary small,.ga-case-report,.ga-clue>div>p,.ga-deduction>strong,.ga-case-resolution>p,.ga-finish>p) { color: #786881; }
+.app-shell .ga-feedback { color: #8e6e50; }
+.app-shell .ga-feedback-success { color: #45487c; }
+.app-shell :is(.ga-medal-counter>strong,.ga-counter-symbol,.ga-medal>span,.ga-hero h1 em) { color: #a174bb; }
+.app-shell :is(.ga-button,.ga-game-card-trust>.ga-button,.ga-game-card-detective>.ga-button) { background: #dec8fb; border-color: #c8a9e4; color: #5d337e; }
+.app-shell .ga-game-card-trust>.ga-button { background: #bbedf4; border-color: #9bd9e2; color: #245f6c; }
+.app-shell .ga-game-card-detective>.ga-button { background: #ffd0e4; border-color: #edb4ce; color: #85385b; }
+.app-shell .ga-button:hover { background: #d1aef1; border-color: #be94dc; color: #5b3477; }
+.app-shell .ga-game-card-trust>.ga-button:hover { background: #a5e4ed; border-color: #7448c1; color: #245f6c; }
+.app-shell .ga-game-card-detective>.ga-button:hover { background: #f4bbd5; border-color: #e6a0bf; color: #85385b; }
+.app-shell .ga-button-secondary { background: #fffaff; border-color: #d8bfe7; color: #8a609e; }
+.app-shell .ga-button-secondary:hover { background: #f2e4fb; }
+
+.app-shell .journey-stage-tabs>button.is-active strong { color: #65437f; }
+.app-shell .journey-stage-tabs>button:nth-child(3n+2).is-active strong { color: #347080; }
+.app-shell .journey-stage-tabs>button:nth-child(3n+3).is-active strong { color: #964b75; }
+.app-shell .journey-node strong { color: #70507f; }
+.app-shell .journey-next-action>button { color: #69437f; }
+.app-shell .lesson-steps>button.is-current { color: #70448d; }
+.app-shell .lesson-steps>button:nth-child(2).is-current { color: #376f7d; }
+.app-shell .lesson-steps>button:nth-child(3).is-current { color: #944d77; }
+.app-shell .lesson-steps>button:nth-child(4).is-current { color: #393c7c; }
+.app-shell :is(.prework-item summary,.reference-list h3,.glossary-grid h3,.studio-placement label>strong,.studio-choices button>strong,.ga-pipeline-text>strong,.ga-boundary strong) { color: #685175; }
+
+@media (max-width: 760px) {
+  body { background-attachment: scroll; }
+  .app-shell .topbar { background: #fffcfff5; }
+  .app-shell .sidebar { box-shadow: 8px 0 32px #77528b25; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .app-shell *, .app-shell *::before, .app-shell *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+.app-shell.motion-quiet *, .app-shell.motion-quiet *::before, .app-shell.motion-quiet *::after {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+}
+
+.app-shell .concept-svg marker path{fill:#a492d9}.settings-page select{width:100%;max-width:480px;padding:15px 18px;border:1px solid #d8ccf5;border-radius:14px;background:#fff;color:#34264f;font:inherit;margin:12px 0 20px}.settings-page .resource-section{background:linear-gradient(120deg,#f4eeff,#e9fbff 55%,#fff0f8);border:1px solid #e2d7fa;border-radius:22px;padding:30px}.settings-page label{display:block}
+

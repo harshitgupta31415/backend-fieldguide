@@ -41,10 +41,10 @@ This starts a local production server. It does not deploy or host the website.
 Ask a backend question from the tutor page (`#tutor`) or a lesson's **Ask the tutor** link. The server retrieves relevant excerpts from the 108 lessons, sends them with your question to a configured model, and returns an explanation with lesson references. Retrieval uses a local keyword index; no vector database or embedding service is required. Read the cited lessons and verify implementation advice: grounding does not guarantee a correct answer.
 
 1. Copy [`.env.example`](.env.example) to `.env.local` in the project root.
-2. Add your own key to `OPENROUTER_API_KEYS`, `GEMINI_API_KEYS` or `GROQ_API_KEYS`. Leave unused providers empty. Each accepts up to six comma-separated keys.
+2. Add your own key to `OPENROUTER_API_KEYS`, `GEMINI_API_KEYS`, `GROQ_API_KEYS` or `FREEAI_API_KEYS`. Leave unused providers empty. Each accepts up to six comma-separated keys.
 3. Restart the local server, open the tutor and ask a course question.
 
-The default provider order is **OpenRouter → Gemini → Groq**. OpenRouter uses `openrouter/free`, whose available models and limits vary. Gemini and Groq fallback can incur charges under your account's plan; configure only providers you intend to use. Review [OpenRouter's free router](https://openrouter.ai/docs/guides/routing/routers/free-router), [Gemini pricing](https://ai.google.dev/gemini-api/docs/pricing) and [Groq models and pricing](https://console.groq.com/docs/models).
+The default provider order is **OpenRouter → Gemini → Groq → Free.ai**. OpenRouter uses `openrouter/free`, whose available models and limits vary. Other configured providers may consume paid quota or token balances; configure only providers you intend to use. Review [OpenRouter's free router](https://openrouter.ai/docs/guides/routing/routers/free-router), [Gemini pricing](https://ai.google.dev/gemini-api/docs/pricing), [Groq models and pricing](https://console.groq.com/docs/models) and [Free.ai's API plans](https://free.ai/api/).
 
 Automatic failover tries another configured key/provider after quota, credential or temporary service errors. It does not create keys or increase shared provider quotas. Keys stay on the server; never use a `NEXT_PUBLIC_` prefix. A shared `TUTOR_ACCESS_CODE` of at least 16 characters is required outside direct localhost access, including Vercel. The checked-in template contains no credentials.
 
@@ -56,7 +56,7 @@ Tutor questions, recent conversation and retrieved excerpts are sent to the sele
 - **Four steps per lesson:** Understand → Explore → Solve → Apply.
 - **Clickable explanations:** diagram nodes, store examples, common mistakes, debugging clues and implementation examples.
 - **Seven AI prompt modes:** Understand, Inspect, Plan, Implement, Debug, Verify and Review, customized to the topic.
-- **Optional course tutor:** ask follow-up questions using retrieved lesson excerpts and OpenRouter, Gemini or Groq.
+- **Optional course tutor:** ask follow-up questions using retrieved lesson excerpts and OpenRouter, Gemini, Groq or Free.ai.
 - **Learning checks:** solve the prediction question and complete three practical self-checks before marking a new lesson complete.
 - **Practice Studio:** sixteen missions using diagnosis, ordering, sorting, configuration decisions and local simulations, ending in the connected capstone.
 - **Backend Arcade:** Request relay, Boundary keeper and Incident detective, with feedback and replay.
@@ -176,8 +176,9 @@ Use **Tab**, **Enter** and **Space** to navigate controls. Ordering activities p
 | `public/labs.js` | Original browser-only inventory, payment and request simulations. |
 | `tests/course.test.mjs`, `tests/original-lesson-identity.json` | Content/progress checks and the retained foundation identity fixture. |
 | `tests/simulations.test.mjs` | Simulation invariants, retries and state-transition checks. |
+| `tests/retrieval.test.mjs`, `tests/ai-providers.test.mjs`, `tests/tutor-server.test.mjs` | Retrieval relevance, mocked failover, request validation and access checks. |
 
-The application uses React and the Next.js App Router. Views are selected through URL hashes within the client app. Curriculum counts and navigation come from the data instead of a fixed sixty-lesson assumption.
+The application uses React and the Next.js App Router. Views use URL hashes within the client app; the optional tutor calls a Node.js API route with direct HTTP provider adapters. Curriculum counts and navigation come from the data instead of a fixed sixty-lesson assumption.
 
 ## Checks and troubleshooting
 
@@ -186,7 +187,7 @@ npm test
 npm run build
 ```
 
-Automated checks cover content integrity, retained lesson identity, progress compatibility and simulation invariants. Browser verification remains necessary for interaction, layout, keyboard access and persistence flows. Live provider access also depends on your keys, account and current model availability. See the [verification record](docs/VERIFICATION.md) for checks actually performed and their limits.
+Automated checks cover content integrity, retained lesson identity, progress compatibility, simulation invariants, retrieval and mocked tutor behavior. Browser verification remains necessary for interaction, layout, keyboard access and persistence flows. Live provider access also depends on your keys, account and current model availability. See the [verification record](docs/VERIFICATION.md) for checks actually performed and their limits.
 
 If port 3000 is occupied, stop the other local server or run `npm run dev -- --port 3001`. Use the printed URL and export progress before changing hostname or port. For an outdated production preview, stop it, build again, restart and reload; use the development server while editing.
 
