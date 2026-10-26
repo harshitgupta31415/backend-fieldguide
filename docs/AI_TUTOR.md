@@ -26,7 +26,8 @@ The template contains empty credential fields. `.env.local` is ignored by Git. N
 | `GROQ_MODEL` | `openai/gpt-oss-20b`, a provider model identifier. |
 | `FREEAI_API_KEYS` | Empty; comma-separated Free.ai keys. |
 | `FREEAI_MODEL` | `qwen7b`. |
-| `TUTOR_ACCESS_CODE` | Empty for local use; required for public, remotely forwarded or Vercel requests. |
+| `code` | Exact lowercase name. A private 16–256 character access password; required for public, remotely forwarded or Vercel requests. Setting it protects local requests too. |
+| `TUTOR_ACCESS_CODE` | Legacy fallback used only when `code` is empty or absent. |
 | `AI_MAX_OUTPUT_TOKENS` | `1000`; clamped to an integer between 128 and 1600. |
 
 Use a single key or a comma-separated list, with up to **six distinct keys per provider**. Whitespace around keys is removed, duplicate entries are discarded and unused extra entries beyond six are ignored. The singular `OPENROUTER_API_KEY`, `GEMINI_API_KEY`, `GROQ_API_KEY` and `FREEAI_API_KEY` aliases work when the corresponding plural variable is empty. Prefer one form per provider.
@@ -132,11 +133,13 @@ More keys do **not** create more provider capacity: Gemini rate limits are [per 
 
 ## Access and request limits
 
-Requests to `localhost`, `127.0.0.1` or loopback IPv6 can run without an access code when `TUTOR_ACCESS_CODE` is empty and forwarded addresses, if present, are loopback addresses. If a code is configured, it is required locally too. Vercel, non-loopback hosts and requests containing a non-loopback `x-forwarded-for` address always require a configured code of at least **16 characters**. Use a private random code no longer than 256 characters and enter it in the tutor's access field.
+Requests to `localhost`, `127.0.0.1` or loopback IPv6 can run without an access code when both `code` and the legacy `TUTOR_ACCESS_CODE` are empty and forwarded addresses, if present, are loopback addresses. A nonempty lowercase `code` takes precedence over the legacy variable. If a code is configured, it is required locally too. Vercel, non-loopback hosts and requests containing a non-loopback `x-forwarded-for` address always require a configured code of **16–256 characters**. Enter the same value in the app's access field. The server checks it without exposing the configured password in status responses or filling the field automatically.
+
+For a local environment file, use `code=your-private-access-password` and restart the server. In Vercel, set the variable name to `code` and its value to the password alone, then use a new deployment for the changed environment. `something` illustrates the value position; the literal eight-character value does not meet the minimum length.
 
 The browser sends the code in the request body (JSON for chat/read aloud, multipart for transcription), never the URL. Provider keys are attached only by server code. The APIs accept requests whose `Origin` host matches the website host, including its port. Requests without that header are rejected.
 
-The supplied run scripts bind the server to `127.0.0.1`. Always configure `TUTOR_ACCESS_CODE` before exposing the server through a network binding, proxy or tunnel, regardless of its hostname: request headers alone cannot establish that a caller is physically local.
+The supplied run scripts bind the server to `127.0.0.1`. Always configure `code` before exposing the server through a network binding, proxy or tunnel, regardless of its hostname: request headers alone cannot establish that a caller is physically local.
 
 The API also limits each server process to **10 accepted requests per minute** and **two concurrent requests**. This is shared across learners using that process, not an independent allowance per learner. These in-memory guards are not distributed rate limiting, individual user accounts or a production billing guarantee.
 
@@ -172,7 +175,7 @@ For routine replacement, create a new provider key with the intended restriction
 
 This repository supplies compatible server-side environment-variable names. It does not provision a project, upload credentials or deploy the website.
 
-If the owner later configures their own Vercel project, use the variables above, put provider keys and `TUTOR_ACCESS_CODE` in Secret values, and scope credentials to the intended environment. Keep provider order, model identifiers and token limit as configuration. Do not add `NEXT_PUBLIC_` to any secret. Vercel environment changes apply to new deployments; an existing deployment does not automatically receive a replacement value. See [Vercel environment variables](https://vercel.com/docs/environment-variables).
+If the owner later configures their own Vercel project, use the variables above, put provider keys and `code` in Secret values, and scope credentials to the intended environment. Keep provider order, model identifiers and token limit as configuration. Do not add `NEXT_PUBLIC_` to any secret. Vercel environment changes apply to new deployments; an existing deployment does not automatically receive a replacement value. See [Vercel environment variables](https://vercel.com/docs/environment-variables).
 
 ## Troubleshooting and verification
 

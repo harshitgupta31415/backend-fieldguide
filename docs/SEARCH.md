@@ -78,7 +78,7 @@ Completed answers offer **Read aloud** using the configured natural voice, plus 
 
 ## Server setup and access
 
-Search needs no additional environment variables or provider keys. It reuses the tutor's existing server-only configuration, provider order, automatic switching on limits and `TUTOR_ACCESS_CODE`. Local content search works without any AI configuration. See [AI tutor setup](AI_TUTOR.md#local-setup) and [`.env.example`](../.env.example).
+Search needs no additional environment variables or provider keys. It reuses the tutor's existing server-only configuration, provider order, automatic switching on limits and the lowercase `code` access password. `TUTOR_ACCESS_CODE` remains a fallback when `code` is empty or absent. Local content search works without any AI configuration. See [AI tutor setup](AI_TUTOR.md#local-setup) and [`.env.example`](../.env.example).
 
 `GET /api/search` reports availability, configured provider names and whether an access code is needed. `POST /api/search` accepts an explicit question and returns the answer, source excerpts, answer kind and provider/model names. Keys never appear in these responses.
 
