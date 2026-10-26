@@ -58,15 +58,17 @@ Choose **Explain**, **Quiz me**, **Practice** or **Plan**. The server retrieves 
 
 The default provider order is **OpenRouter → Gemini → Groq → Free.ai**. OpenRouter uses `openrouter/free`, whose available models and limits vary. Other configured providers may consume paid quota or token balances; configure only providers you intend to use. Review [OpenRouter's free router](https://openrouter.ai/docs/guides/routing/routers/free-router), [Gemini pricing](https://ai.google.dev/gemini-api/docs/pricing), [Groq models and pricing](https://console.groq.com/docs/models) and [Free.ai's API plans](https://free.ai/api/).
 
-Automatic failover tries another configured key/provider after quota, credential or temporary service errors. It does not create keys or increase shared provider quotas. Keys stay on the server; never use a `NEXT_PUBLIC_` prefix. A shared access code is required outside direct localhost access, including Vercel. Set it using the exact lowercase environment variable `code`, with a private value of 16–256 characters:
+Automatic failover tries another configured key/provider after quota, credential or temporary service errors. It does not create keys or increase shared provider quotas. Keys stay on the server; never use a `NEXT_PUBLIC_` prefix. A shared access code is required outside direct localhost access, including Vercel. Set it using the exact lowercase environment variable `code`, with a private value of 12–256 characters:
 
 ```dotenv
 code=replace-with-your-private-access-code
 ```
 
-In Vercel, use **Name: `code`** and put only your chosen password in **Value**. Locally, set it in `.env.local` and restart the server. Enter the same password in the app's access-code field; the app does not expose or fill it automatically. Setting it also protects local tutor, AI search and voice requests. Existing `TUTOR_ACCESS_CODE` settings remain supported when `code` is empty or absent; a nonempty `code` takes precedence. The checked-in template contains no credentials.
+In Vercel, use **Name: `code`** and put only your chosen password in **Value**. Locally, set it in `.env.local` and restart the server. Open **Settings → AI access**, enter the same password and choose **Unlock AI**. This verifies the code without calling a model or using AI credits. The checked code is shared by tutor, AI search and voice for this page session; refreshing or closing the page clears it. Use **Remove access code** in Settings to clear it immediately. The app does not expose or fill the server password automatically. Setting it also protects local tutor, AI search and voice requests. Existing `TUTOR_ACCESS_CODE` settings remain supported when `code` is empty or absent; a nonempty `code` takes precedence. The checked-in template contains no credentials.
 
 Tutor requests include your question, recent conversation, course titles/order, a small completion summary and relevant lesson excerpts, including selected personal edits. Notes and workshop drafts are not attached. Chat and access-code entry stay in page memory and are not exported. Reloading clears the conversation.
+
+![Shared AI access in Settings](docs/access.jpg)
 
 ![Tutor alongside the lesson](docs/tutor.jpg)
 

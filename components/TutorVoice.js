@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import '../app/voice.css';
+import { useAIAccess, AIAccessNotice } from './AIAccess';
 
 const MAX_BYTES = 5 * 1024 * 1024;
 let playback = null;
@@ -16,12 +17,14 @@ async function responseError(response, fallback) {
   try {
     const body = await response.json();
     const failure = new Error(typeof body.error === 'string' ? body.error.slice(0, 300) : fallback);
-    if (body.code === 'VOICE_TERMS_REQUIRED') failure.code = 'VOICE_TERMS_REQUIRED';
+    if (['VOICE_TERMS_REQUIRED', 'ACCESS_REQUIRED', 'ACCESS_NOT_CONFIGURED'].includes(body.code)) failure.code = body.code;
     return failure;
   } catch { return new Error(fallback); }
 }
 
 export function VoiceInput({ onTranscript, accessCode = '', disabled = false, language = 'en', active = true }) {
+  const { invalidate } = useAIAccess();
+  const [needsAccess, setNeedsAccess] = useState(false);
   const [phase, setPhase] = useState('idle');
   const [supported, setSupported] = useState(null);
   const [seconds, setSeconds] = useState(0);
@@ -131,11 +134,13 @@ export function VoiceInput({ onTranscript, accessCode = '', disabled = false, la
       discard(); setNotice(result.truncated ? 'The first 2,000 characters are in your question. Review them before sending.' : 'Your transcript is in the question box. Review it before sending.');
     } catch (failure) {
       if (!mounted.current || token !== generation.current || controller.signal.aborted) return;
+      if (['ACCESS_REQUIRED', 'ACCESS_NOT_CONFIGURED'].includes(failure.code)) { invalidate(accessCode); setNeedsAccess(true); }
       setPhase('ready'); setNotice(''); setError(failure.message || 'Transcription failed. Try again or type your question.');
     } finally { if (upload.current === controller) upload.current = null; }
   }
 
   return <div className="tutor-voice tutor-voice-input">
+    <AIAccessNotice required={needsAccess}/>
     <div className="voice-controls">
       {['idle', 'ready'].includes(phase) && <button type="button" className="voice-button" onClick={startRecording} disabled={disabled || !active || supported === false} aria-label={recording ? 'Record another question' : 'Record a question'}><span aria-hidden="true">●</span> {recording ? 'Record again' : 'Record question'}</button>}
       {phase === 'requesting' && <><span>Allow microphone access…</span><button type="button" className="voice-button" onClick={() => discard()}>Cancel</button></>}
@@ -157,6 +162,8 @@ function spokenText(value) {
 }
 
 export function VoiceOutput({ text, accessCode = '', language = 'en', active = true }) {
+  const { invalidate } = useAIAccess();
+  const [needsAccess, setNeedsAccess] = useState(false);
   const [phase, setPhase] = useState('idle'), [mode, setMode] = useState('natural'), [error, setError] = useState('');
   const [needsSetup, setNeedsSetup] = useState(false);
   const [voices, setVoices] = useState([]), [voice, setVoice] = useState(''), [browserAvailable, setBrowserAvailable] = useState(false);
@@ -216,6 +223,7 @@ export function VoiceOutput({ text, accessCode = '', language = 'en', active = t
       try { await audio.play(); } catch { if (mounted.current && token === generation.current) setPhase('ready'); }
     } catch (failure) {
       if (!mounted.current || token !== generation.current || request.signal.aborted) return;
+      if (['ACCESS_REQUIRED', 'ACCESS_NOT_CONFIGURED'].includes(failure.code)) { invalidate(accessCode); setNeedsAccess(true); }
       stop(); setNeedsSetup(failure.code === 'VOICE_TERMS_REQUIRED'); setError(failure.message || 'Natural voice is unavailable. You can use the browser voice.');
     } finally { if (controller.current === request) controller.current = null; }
   }
@@ -232,6 +240,7 @@ export function VoiceOutput({ text, accessCode = '', language = 'en', active = t
   }
 
   return <div className="tutor-voice tutor-voice-output" aria-label="Read this answer aloud">
+    <AIAccessNotice required={needsAccess}/>
     <div className="voice-controls">
       <label className="voice-select-label" htmlFor={selectId}>Voice</label>
       <select id={selectId} className="voice-select" value={mode} onChange={event => { stop(); setError(''); setNeedsSetup(false); setMode(event.target.value); }}>

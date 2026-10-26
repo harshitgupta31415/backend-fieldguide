@@ -10,6 +10,7 @@ import PracticeStudio from '../components/PracticeStudio';
 import TutorDock from '../components/TutorDock';
 import CourseManager from '../components/CourseManager';
 import SearchExperience from '../components/SearchExperience';
+import { AIAccessProvider, AIAccessSettings } from '../components/AIAccess';
 import { applyCourseChange, buildCourse, cleanCourseChanges, makeTutorCourseContext, undoCourseChange } from '../lib/course-workspace.mjs';
 import { LanguageProvider, useLanguage, useCourse } from '../components/LanguageProvider';
 
@@ -126,6 +127,7 @@ function FieldguideApp({ data, setData, workspace }) {
 
   function go(kind = 'home', id, options = {}) {
     setSearchOpen(false); searchSession.current.open=false; setQuery(''); setAnswerRequest(null);
+    if (kind === 'settings') setTutorOpen(false);
     if (kind === 'tutor') { setTutorLesson(id || (route.kind === 'lesson' ? route.id : data.last)); setTutorOpen(true); setMenu(false); return; }
     const promptSuffix = ['understand','inspect','plan','implement','debug','verify','review'].includes(options.promptMode) ? '/' + options.promptMode : '';
     const suffix = kind === 'lesson' && options.stage === 'apply' ? '/apply' + promptSuffix : kind === 'resources' && options.term ? '/' + encodeURIComponent(options.term.slice(0,100)) : '';
@@ -206,7 +208,7 @@ function FieldguideApp({ data, setData, workspace }) {
   const resume = data.completed.includes(data.last) ? lessons.find(d => !data.completed.includes(Number(d.id)))?.id || Number(lessons.at(-1).id) : data.last;
   const title = searchOpen ? 'Search & discover' : route.kind === 'lesson' ? `Part ${pad(currentModule)} / Lesson ${pad(route.id)}` : ({ home: 'Your learning path', part: `Part ${pad(route.id)}`, labs: 'Interactive labs', arcade: 'The backend arcade', practice:'Practice studio', tutor:'Course tutor', prompts: 'Prompt workshop', resources: 'Reference desk', settings: 'Settings', course: 'Your course workspace' }[route.kind]);
 
-  return <div className={`app-shell ${searchOpen ? 'search-is-open' : ''} ${focus ? 'focus-mode' : ''} ${data.reduceMotion ? 'motion-quiet' : ''} ${tutorLayout.visible ? 'has-tutor' : ''} ${tutorLayout.expanded ? 'tutor-wide' : ''}`} style={{'--tutor-space': `${tutorLayout.width + 24}px`}}>
+  return <AIAccessProvider onOpenSettings={() => go('settings')}><div className={`app-shell ${searchOpen ? 'search-is-open' : ''} ${focus ? 'focus-mode' : ''} ${data.reduceMotion ? 'motion-quiet' : ''} ${tutorLayout.visible ? 'has-tutor' : ''} ${tutorLayout.expanded ? 'tutor-wide' : ''}`} style={{'--tutor-space': `${tutorLayout.width + 24}px`}}>
     <a className="skip-link" href="#main-content" onClick={e => { e.preventDefault(); document.getElementById('main-content')?.focus(); }}>{t("Skip to learning content")}</a>
     {menu && <button className="menu-shade" onClick={() => setMenu(false)} aria-label={t("Close navigation")}/>}
     <aside className={`sidebar ${menu ? 'open' : ''}`}>
@@ -247,7 +249,7 @@ function FieldguideApp({ data, setData, workspace }) {
     </div>
     <TutorDock lessonId={tutorId} externalDraft={tutorDraft} restoreFocus={!searchOpen} course={workspace.lessons} courseContext={courseContext} learnerSummary={{completedCount:data.completed.length,totalLessons:lessons.length,currentLessonCompleted:data.completed.includes(Number(tutorId))}} onNavigate={id => go('lesson',id)} onCourseAction={applyAction} open={tutorOpen} onOpenChange={value=>{if(value && searchOpen){setSearchOpen(false);searchSession.current.open=false;}setTutorOpen(value);}} onLayoutChange={setTutorLayout}/>
     {toast && <div className="toast" role="status"><Icon name="check" size={17}/>{t(toast)}</div>}
-  </div>;
+  </div></AIAccessProvider>;
 }
 
 function wrapLabel(label) {
@@ -322,5 +324,5 @@ function Resources({ go, initialTerm = '', active = true }) {
 function Settings() {
   const { t } = useLanguage();
   const { language, setLanguage } = useLanguage();
-  return <div className="page narrow-page settings-page"><span className="eyebrow">{t("Settings")}</span><h1 className="page-title">{t("Choose how you want to learn.")}</h1><section className="resource-section"><h2>{t("Course language")}</h2><label className="tutor-context-label" htmlFor="course-language">{t("Language")}</label><select id="course-language" value={language} onChange={event => setLanguage(event.target.value)}><option value="en">{t("English")}</option><option value="hinglish">{t("Hinglish (English with a little Hindi)")}</option></select><p>{t("Your language preference is saved in this browser and included in progress exports.")}</p><p>{t("Code, URLs, lesson IDs and your own notes stay unchanged.")}</p></section></div>;
+  return <div className="page narrow-page settings-page"><span className="eyebrow">{t("Settings")}</span><h1 className="page-title">{t("Choose how you want to learn.")}</h1><AIAccessSettings/><section className="resource-section"><h2>{t("Course language")}</h2><label className="tutor-context-label" htmlFor="course-language">{t("Language")}</label><select id="course-language" value={language} onChange={event => setLanguage(event.target.value)}><option value="en">{t("English")}</option><option value="hinglish">{t("Hinglish (English with a little Hindi)")}</option></select><p>{t("Your language preference is saved in this browser and included in progress exports.")}</p><p>{t("Code, URLs, lesson IDs and your own notes stay unchanged.")}</p></section></div>;
 }

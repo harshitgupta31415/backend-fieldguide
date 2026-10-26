@@ -26,7 +26,7 @@ The template contains empty credential fields. `.env.local` is ignored by Git. N
 | `GROQ_MODEL` | `openai/gpt-oss-20b`, a provider model identifier. |
 | `FREEAI_API_KEYS` | Empty; comma-separated Free.ai keys. |
 | `FREEAI_MODEL` | `qwen7b`. |
-| `code` | Exact lowercase name. A private 16–256 character access password; required for public, remotely forwarded or Vercel requests. Setting it protects local requests too. |
+| `code` | Exact lowercase name. A private 12–256 character access password; required for public, remotely forwarded or Vercel requests. Setting it protects local requests too. |
 | `TUTOR_ACCESS_CODE` | Legacy fallback used only when `code` is empty or absent. |
 | `AI_MAX_OUTPUT_TOKENS` | `1000`; clamped to an integer between 128 and 1600. |
 
@@ -36,7 +36,7 @@ To use only OpenRouter for chat, set `AI_PROVIDER_ORDER=openrouter`. To use Gemi
 
 ## Teaching modes and your course copy
 
-The desktop tutor starts as a 600-pixel side chat. Use **Full chat** for a centered workspace up to 960 pixels wide, or adjust the side width between 480 and 800 pixels. Screens up to 1,000 pixels use the full viewport. Messages scroll independently while the composer and **Send** remain visible. Open **Settings** beside the lesson title to select the lesson, follow navigation, enter a required access code or check the connection. Minimize and reopen without losing the conversation.
+The desktop tutor starts as a 600-pixel side chat. Use **Full chat** for a centered workspace up to 960 pixels wide, or adjust the side width between 480 and 800 pixels. Screens up to 1,000 pixels use the full viewport. Messages scroll independently while the composer and **Send** remain visible. Open **Settings** beside the lesson title to select the lesson, follow navigation or check the connection. Access-code entry lives in the main **Settings → AI access** page; choose **Unlock AI** there once for tutor, search and voice. Minimize and reopen without losing the conversation.
 
 - **Explain:** one concept, a store example and a question to check understanding.
 - **Quiz me:** a prediction question, then feedback after your attempt.
@@ -133,7 +133,7 @@ More keys do **not** create more provider capacity: Gemini rate limits are [per 
 
 ## Access and request limits
 
-Requests to `localhost`, `127.0.0.1` or loopback IPv6 can run without an access code when both `code` and the legacy `TUTOR_ACCESS_CODE` are empty and forwarded addresses, if present, are loopback addresses. A nonempty lowercase `code` takes precedence over the legacy variable. If a code is configured, it is required locally too. Vercel, non-loopback hosts and requests containing a non-loopback `x-forwarded-for` address always require a configured code of **16–256 characters**. Enter the same value in the app's access field. The server checks it without exposing the configured password in status responses or filling the field automatically.
+Requests to `localhost`, `127.0.0.1` or loopback IPv6 can run without an access code when both `code` and the legacy `TUTOR_ACCESS_CODE` are empty and forwarded addresses, if present, are loopback addresses. A nonempty lowercase `code` takes precedence over the legacy variable. If a code is configured, it is required locally too. Vercel, non-loopback hosts and requests containing a non-loopback `x-forwarded-for` address always require a configured code of **12–256 characters**. Enter the same value in **Settings → AI access** and choose **Unlock AI**. The server checks it without exposing the configured password in status responses or filling the field automatically.
 
 For a local environment file, use `code=your-private-access-password` and restart the server. In Vercel, set the variable name to `code` and its value to the password alone, then use a new deployment for the changed environment. `something` illustrates the value position; the literal eight-character value does not meet the minimum length.
 
@@ -152,6 +152,8 @@ The API also limits each server process to **10 accepted requests per minute** a
 | Language | `en` or `hinglish`; defaults to `en`. |
 | Teaching mode | `explain`, `quiz`, `practice` or `plan`; defaults to `explain`. |
 | Course context | Registry of the original 108 lessons and up to 50 additions; up to six bounded personal excerpts. |
+
+`GET /api/access` reports only whether access is required and configured. `POST /api/access` accepts `accessCode` and verifies it without invoking an AI provider or returning the password. It requires a same-origin request, limits JSON to 2 KiB and permits ten checks per minute per server process. Browser state stores a successfully checked code only in page memory. Every tutor, search and voice request still authenticates independently; a client-side unlocked indicator grants no server permission.
 
 `GET /api/tutor` reports whether a provider is configured, provider names and whether an access code is required. It does not expose keys or test account validity, credit balance or model availability.
 

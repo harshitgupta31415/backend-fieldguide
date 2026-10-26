@@ -68,7 +68,7 @@ An edited lesson replaces the original lesson's teaching facts. If its current e
 
 Stored learner notes, exercise drafts, arbitrary local files and provider credentials are not automatically attached to search. Anything you type into a question or personal lesson can still be part of a request, so keep secrets and customer data out of that content. Provider fallback can send the same answer request to another configured provider under the existing rotation rules.
 
-Search conversation and access-code entry stay in component memory for the open search session. They are not saved to browser storage or progress exports. Closing search clears them. The app does not create a search-history database; configured providers apply their own data handling policies. Course edits themselves continue to use the existing local course storage and export system.
+Search conversations stay in component memory for the open search session; closing search clears them. The AI access code is checked once in **Settings → AI access** and shared with tutor and voice for the whole page session. Closing search keeps this checked code; refreshing, closing the page or removing access in Settings clears it. Neither conversations nor the code are saved to browser storage or progress exports. The app does not create a search-history database; configured providers apply their own data handling policies. Course edits themselves continue to use the existing local course storage and export system.
 
 ## Voice
 
@@ -82,7 +82,7 @@ Search needs no additional environment variables or provider keys. It reuses the
 
 `GET /api/search` reports availability, configured provider names and whether an access code is needed. `POST /api/search` accepts an explicit question and returns the answer, source excerpts, answer kind and provider/model names. Keys never appear in these responses.
 
-The endpoint checks same-origin requests and uses the existing tutor access policy: public or remotely forwarded access requires a configured access code of at least 16 characters. A configured code also protects local requests. Requests are limited to a 2,000-character question, six recent messages of up to 4,000 characters each and a 64 KiB JSON body.
+The endpoint checks same-origin requests and uses the existing tutor access policy: public or remotely forwarded access requires a configured access code of 12–256 characters. A configured code also protects local requests. Requests are limited to a 2,000-character question, six recent messages of up to 4,000 characters each and a 64 KiB JSON body.
 
 AI search permits 10 requests per minute and two concurrent requests in each server process, with the existing provider router's 45-second total attempt budget. These are process-local guards, not a shared limit across multiple server instances. Cancelling or finishing a request releases its concurrency slot. Model output is rendered as escaped text with supported formatting; generated HTML is not executed.
 

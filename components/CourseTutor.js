@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { lessons, reference, lessonById } from '../lib/course.mjs';
 import { useLanguage } from './LanguageProvider';
 import { VoiceInput, VoiceOutput } from './TutorVoice';
+import { useAIAccess, AIAccessNotice } from './AIAccess';
 import interactions from '../lib/interactions.json';
 import { makeTutorCourseContext } from '../lib/course-workspace.mjs';
 
@@ -163,16 +164,14 @@ export default function CourseTutor({ externalDraft, lessonId, onNavigate, onCou
   const [question, setQuestion] = useState('');
   const [turns, setTurns] = useState([]);
   const [status, setStatus] = useState({ loading: true, configured: false, accessCodeRequired: false, providers: [], error: '' });
-  const [accessCode, setAccessCode] = useState('');
+  const { accessCode, invalidate } = useAIAccess();
   const [pendingId, setPendingId] = useState(null);
   const [notice, setNotice] = useState('');
   const inputRef = useRef(null);
-  const accessRef = useRef(null);
   const transcriptRef = useRef(null);
   const requestRef = useRef(null);
   const statusRequestRef = useRef(null);
   const counterRef = useRef(0);
-  useEffect(() => {if(status.accessCodeRequired&&!accessCode.trim())setSettingsOpen(true);}, [status.accessCodeRequired]);
   useEffect(() => {if(!active)setVoiceOpen(false);}, [active]);
   useEffect(() => { if (context && !findLesson(context)) setContext(''); }, [availableCourse, context]);
   const consumedDraft = useRef(null);
@@ -232,7 +231,7 @@ export default function CourseTutor({ externalDraft, lessonId, onNavigate, onCou
     const text = (existingTurn?.question || question).trim();
     if (!text) { inputRef.current?.focus(); return; }
     if (!status.configured || status.loading || status.error) { setNotice('Check the tutor connection before sending a question.'); return; }
-    if (status.accessCodeRequired && !accessCode.trim()) { setNotice('Enter the tutor access code shared by the person running this app.'); setSettingsOpen(true); requestAnimationFrame(()=>accessRef.current?.focus()); return; }
+    if (status.accessCodeRequired && !accessCode.trim()) { setNotice('Open Settings → AI access to unlock the tutor. Your message stays here.'); return; }
     const id = existingTurn?.id || `turn-${Date.now()}-${++counterRef.current}`;
     const history = existingTurn?.history || recentHistory(turns);
     const selectedId = existingTurn ? existingTurn.lessonId : currentLesson ? Number(currentLesson.id) : undefined;
@@ -253,7 +252,7 @@ export default function CourseTutor({ externalDraft, lessonId, onNavigate, onCou
       if (requestRef.current !== request) return;
       if (!result || typeof result !== 'object' || Array.isArray(result)) throw new Error('The server returned an unreadable response. Try again after checking the local server.');
       if (!response.ok) {
-        if (result.accessCodeRequired || response.status === 401) { setStatus(value => ({ ...value, accessCodeRequired: true })); setSettingsOpen(true); requestAnimationFrame(()=>accessRef.current?.focus()); }
+        if (result.accessCodeRequired || response.status === 401) { setStatus(value => ({ ...value, accessCodeRequired: true })); invalidate(accessCode); }
         const failure = new Error(typeof result.error === 'string' ? result.error.slice(0, 500) : 'The tutor could not answer right now. Please try again.');
         failure.code = typeof result.code === 'string' ? result.code : '';
         throw failure;
@@ -305,10 +304,10 @@ export default function CourseTutor({ externalDraft, lessonId, onNavigate, onCou
       <div className="tutor-compact-toolbar"><button type="button" className="tutor-settings-toggle" aria-expanded={settingsOpen} aria-controls="tutor-chat-settings" onClick={()=>setSettingsOpen(value=>!value)} title={currentLesson?.title||'Across the whole course'}><TutorIcon name="book" size={15}/><span>{currentLesson?`Lesson ${pad(currentLesson.id)} · ${currentLesson.title}`:'Across the whole course'}</span><b>{settingsOpen?'Close settings':'Settings'}</b><span aria-hidden="true">{settingsOpen?'−':'+'}</span></button><button type="button" className="tutor-clear" onClick={clearConversation} disabled={!turns.length&&!question} title="Start a new conversation"><TutorIcon name="reset" size={14}/><span>New chat</span></button></div>
       <div className="tutor-chat-settings" id="tutor-chat-settings" hidden={!settingsOpen}>
         <div className="tutor-dock-context"><div><label htmlFor="tutor-dock-lesson">Lesson context</label><button type="button" aria-pressed={followLesson} onClick={()=>setFollowLesson(value=>!value)}>{followLesson?'Following your lesson':'Use current lesson'}</button></div><select id="tutor-dock-lesson" value={context} disabled={busy} onChange={event=>{setContext(event.target.value);setFollowLesson(false);}}><option value="">Across the whole course</option>{availableCourse.map(item=><option key={item.id} value={String(Number(item.id))}>{pad(item.id)} · {item.title}</option>)}</select></div>
-        {status.accessCodeRequired&&<div className="tutor-access"><label htmlFor="tutor-access-code">Tutor access code</label><input ref={accessRef} id="tutor-access-code" type="password" value={accessCode} onChange={event=>{setAccessCode(event.target.value);if(notice==='Enter the tutor access code shared by the person running this app.')setNotice('');}} autoComplete="off" maxLength={256} placeholder="Code shared by the app owner" aria-describedby="tutor-access-hint"/><small id="tutor-access-hint">Use the app’s access code, not a provider API key.</small></div>}
         <p id="tutor-sharing-note" className="tutor-chat-details">Your question, recent chat and course context are sent when you press Send. Chat stays while you browse and clears on reload. Keep private data out. Course changes need your Apply click.</p>
         <div className="tutor-settings-footer"><span>Teaching language: {language==='hinglish'?'Hinglish':'English'}</span><button type="button" onClick={checkStatus} disabled={status.loading}>Check connection ↻</button></div>
       </div>
+      <AIAccessNotice required={status.accessCodeRequired}/>
       <div className="tutor-mode-row" role="group" aria-label="How would you like to learn?">{[['explain','Explain','↳'],['quiz','Quiz me','?'],['practice','Practice','⌘'],['plan','Plan','≡']].map(([value,label,symbol])=><button type="button" key={value} disabled={busy} aria-pressed={intent===value} onClick={()=>setIntent(value)}><span aria-hidden="true">{symbol}</span>{label}</button>)}<span className={`tutor-connection-state ${status.configured&&!status.error?'is-ready':''}`} role="status"><i/>{status.loading?'Connecting':status.error?'Check connection':status.configured?'Ready':'Setup needed'}</span></div>
       {!status.loading && (!status.configured || status.error) && <div className="tutor-setup" role="status"><span className="tutor-setup-icon"><TutorIcon name="spark" size={20}/></span><div><strong>{status.error ? t("Let’s reconnect the tutor.") : t("Your course tutor needs one setup step.")}</strong><p>{t(status.error) || t("Configure an AI provider on the local server using the tutor instructions in README. Your course and practical missions remain available.")}</p>{!status.error && <details><summary>{t("Show the local setup checklist")}</summary><ol><li>{t("Use")}{" "}<code>.env.example</code>{" "}{t("to find the supported server-side provider settings.")}</li><li>{t("Place your private values in")}{" "}<code>.env.local</code>{t(". Keep API keys out of this chat and browser code.")}</li><li>{t("Restart the local development server, then check the connection here.")}</li></ol></details>}<button type="button" onClick={checkStatus}>{t("Check connection again")}{" "}<span>↻</span></button></div></div>}
       <div className={`tutor-transcript ${turns.length ? 'has-turns' : ''}`} ref={transcriptRef} role="log" aria-label={t("Questions and answers")} aria-live="off" tabIndex={0}>

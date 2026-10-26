@@ -156,7 +156,7 @@ test('blank access settings preserve local operation while public requests requi
 });
 
 test('access code length boundaries work consistently across every AI endpoint', async () => {
-  for (const size of [16, 256]) {
+  for (const size of [12, 13, 256]) {
     const value = 'a'.repeat(size);
     const app = setup({ code: value });
     for (const name of endpoints) assert.equal((await app.request(name, value)).status, 200);

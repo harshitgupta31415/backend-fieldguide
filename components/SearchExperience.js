@@ -5,6 +5,7 @@ import { createSearchIndex, searchCourse, isContextualFollowup, SEARCH_TYPES, SE
 import { makeTutorCourseContext } from '../lib/course-workspace.mjs';
 import { useCourse, useLanguage } from './LanguageProvider';
 import { VoiceInput, VoiceOutput } from './TutorVoice';
+import { useAIAccess, AIAccessNotice } from './AIAccess';
 import '../app/search.css';
 
 const MAX_QUESTION = 2000;
@@ -116,8 +117,9 @@ export default function SearchExperience({query='',onQueryChange,onClose,onNavig
   const result=useMemo(()=>searchCourse(index,deferredQuery,{type,limit}),[index,deferredQuery,type,limit]);
   const matches=result.results||[];const searching=query!==deferredQuery;const term=query.trim();
   const [status,setStatus]=useState({loading:true,configured:false,accessCodeRequired:false,error:''});
-  const [accessCode,setAccessCode]=useState(''),[turns,setTurns]=useState([]),[followup,setFollowup]=useState(''),[pending,setPending]=useState(null),[notice,setNotice]=useState('');
-  const queryRef=useRef(null),answerRef=useRef(null),followupRef=useRef(null),accessRef=useRef(null),buttons=useRef([]),requestRef=useRef(null),statusRef=useRef(null),handledRequest=useRef(null),sequence=useRef(0);
+  const { accessCode, invalidate } = useAIAccess();
+  const [turns,setTurns]=useState([]),[followup,setFollowup]=useState(''),[pending,setPending]=useState(null),[notice,setNotice]=useState('');
+  const queryRef=useRef(null),answerRef=useRef(null),followupRef=useRef(null),buttons=useRef([]),requestRef=useRef(null),statusRef=useRef(null),handledRequest=useRef(null),sequence=useRef(0);
   const initialQuery=useRef(query),previousLanguage=useRef(language);
 
   const checkStatus=useCallback(async()=>{
@@ -175,7 +177,7 @@ export default function SearchExperience({query='',onQueryChange,onClose,onNavig
     if(!question||question.length>MAX_QUESTION){setNotice('Enter a question between 1 and 2,000 characters.');queryRef.current?.focus();return;}
     if(status.loading){setNotice('Checking the AI connection…');return;}
     if(!status.configured||status.error){setNotice('AI answers need a configured provider connection. You can still open every local result below.');return;}
-    if(status.accessCodeRequired&&!accessCode.trim()){setNotice('Enter the access code to ask AI.');accessRef.current?.focus();return;}
+    if(status.accessCodeRequired&&!accessCode.trim()){setNotice('Open Settings → AI access to unlock AI answers. Local search is ready.');return;}
     const history=retry?.history|| (continuation?turns.filter(turn=>turn.state==='complete').slice(-3).flatMap(turn=>[{role:'user',content:turn.question.slice(0,4000)},{role:'assistant',content:turn.answer.slice(0,4000)}]):[]);
     const relevant=searchCourse(index,question,{limit:8}).results||[];
     const previousQuestion=[...history].reverse().find(message=>message.role==='user')?.content;
@@ -197,7 +199,7 @@ export default function SearchExperience({query='',onQueryChange,onClose,onNavig
       if(requestRef.current!==request)return;
       if(!body||typeof body!=='object'||Array.isArray(body))throw new Error('The answer response was not recognized. Please try again.');
       if(!response.ok){
-        if(response.status===401||body.accessCodeRequired)setStatus(previous=>({...previous,accessCodeRequired:true}));
+        if(response.status===401||body.accessCodeRequired){setStatus(previous=>({...previous,accessCodeRequired:true}));invalidate(accessCode);}
         throw new Error(typeof body.error==='string'?body.error.slice(0,500):'AI could not finish this answer. Please try again.');
       }
       if(typeof body.answer!=='string'||!body.answer.trim())throw new Error('AI returned an empty answer. Please try again.');
@@ -228,7 +230,7 @@ export default function SearchExperience({query='',onQueryChange,onClose,onNavig
       <div className="sx-search-meta"><p id="search-keyboard-help"><span><kbd>↓</kbd> browse results</span><span><kbd>Enter</kbd> ask AI</span><span>English or Hinglish</span></p><span className={`sx-ai-status ${status.configured&&!status.error?'is-ready':''}`}><i/>{status.loading?'Checking AI':status.error?'Local search ready':status.configured?'AI ready':'Local search ready'}</span></div>
     </form>
     <div className="sx-voice-row"><VoiceInput onTranscript={text=>{updateQuery(text);setNotice('Spoken search is ready. Review it, then choose Ask AI or a result.');queryRef.current?.focus();}} accessCode={accessCode} disabled={Boolean(pending)} language={language}/></div>
-    {status.accessCodeRequired&&<div className="sx-access"><label htmlFor="search-access-code">AI access code</label><input id="search-access-code" ref={accessRef} type="password" autoComplete="off" value={accessCode} maxLength={256} onChange={event=>setAccessCode(event.target.value)} placeholder="Code shared by the app owner"/><small>Kept only for this search session.</small></div>}
+    <AIAccessNotice required={status.accessCodeRequired}/>
     {!status.loading&&(!status.configured||status.error)&&<div className="sx-connection" role="status"><SearchIcon name="spark" size={19}/><div><strong>{status.error?'AI connection needs attention':'Explore now. Connect AI when you need an explanation.'}</strong><p>{status.error||'Local course search works without an API key. Configure a provider in the local server environment to enable AI answers.'}</p></div><button type="button" onClick={checkStatus}>Check again <SearchIcon name="reset" size={13}/></button></div>}
     {notice&&<p className="sx-notice" role="status">{notice}</p>}
 
