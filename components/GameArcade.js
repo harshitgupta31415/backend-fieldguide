@@ -139,10 +139,10 @@ export function GamePreview({ go }) {
   return <div className="ga-preview"><div className="ga-preview-icon" aria-hidden="true">✦</div><div><span className="ga-kicker">{t("LEARN BY PLAYING")}</span><h2>{t("Your next skill is one good decision away.")}</h2><p>{t("Connect a request, protect a boundary, or solve an incident. Three games. Real backend reasoning.")}</p></div><GameButton onClick={() => go?.('arcade')}>{t("Enter the arcade ")}<span aria-hidden="true">↗</span></GameButton></div>;
 }
 
-export default function GameArcade({ onAward, go, completedGames = [] }) {
+export default function GameArcade({ initialGame, onAward, go, completedGames = [] }) {
   const { t } = useLanguage();
   const { detectiveCases, gameCatalog, pipelineRounds, trustCards, trustLayers } = useCourse();
-  const [active, setActive] = useState(null);
+  const [active, setActive] = useState(['pipeline','trust','detective'].includes(initialGame) ? initialGame : null);
   const [localWins, setLocalWins] = useState([]);
   const awarded = useRef(new Set());
   const completed = new Set([...completedGames, ...localWins]);

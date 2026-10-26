@@ -9,6 +9,7 @@ import LessonExperience from '../components/LessonExperience';
 import PracticeStudio from '../components/PracticeStudio';
 import TutorDock from '../components/TutorDock';
 import CourseManager from '../components/CourseManager';
+import SearchExperience from '../components/SearchExperience';
 import { applyCourseChange, buildCourse, cleanCourseChanges, makeTutorCourseContext, undoCourseChange } from '../lib/course-workspace.mjs';
 import { LanguageProvider, useLanguage, useCourse } from '../components/LanguageProvider';
 
@@ -53,12 +54,14 @@ function Icon({ name, size = 20 }) {
 
 function readRoute(courseLessons = lessons) {
   const byId = id => courseLessons.find(lesson => Number(lesson.id) === Number(id));
-  const [kind, id] = window.location.hash.replace(/^#\/?/, '').split('/');
-  if (kind === 'lesson' && byId(id)) return { kind, id: Number(id) };
+  const [kind, id, stage, mode] = window.location.hash.replace(/^#\/?/, '').split('/');
+  if (kind === 'lesson' && byId(id)) return { kind, id: Number(id), ...(stage === 'apply' ? {stage, ...(['understand','inspect','plan','implement','debug','verify','review'].includes(mode) ? {promptMode:mode} : {})} : {}) };
   if (kind === 'part' && reference.modules.some(m => m.id === Number(id))) return { kind, id: Number(id) };
   if (kind === 'labs') return { kind, id: ['inventory', 'payments', 'api'].includes(id) ? id : 'inventory' };
   if (kind === 'practice') return {kind, id: activityIdSet.has(id) ? id : undefined};
   if (kind === 'tutor') return {kind, id: byId(id) ? Number(id) : undefined};
+  if (kind === 'arcade') return {kind, id: ['pipeline','trust','detective'].includes(id) ? id : undefined};
+  if (kind === 'resources') { let term = ''; try { term = decodeURIComponent(id || '').slice(0,100); } catch {} return {kind,term}; }
   if (['prompts', 'resources', 'arcade', 'settings', 'course'].includes(kind)) return { kind };
   return { kind: 'home' };
 }
@@ -77,6 +80,12 @@ function FieldguideApp({ data, setData, workspace }) {
   const [ready, setReady] = useState(false);
   const [storageError, setStorageError] = useState(false);
   const [query, setQuery] = useState('');
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [answerRequest, setAnswerRequest] = useState(null);
+  const [tutorDraft, setTutorDraft] = useState(null);
+  const searchActions = useRef({});
+  const searchSession = useRef({open:false,scroll:0,tutor:false});
+  const searchRequestId = useRef(0);
   const [menu, setMenu] = useState(false);
   const [focus, setFocus] = useState(false);
   const [toast, setToast] = useState('');
@@ -84,7 +93,7 @@ function FieldguideApp({ data, setData, workspace }) {
   const [navTrack, setNavTrack] = useState('foundation');
   const [tutorOpen, setTutorOpen] = useState(false);
   const [tutorLesson, setTutorLesson] = useState(null);
-  const [tutorLayout, setTutorLayout] = useState({ width: 420, visible: false });
+  const [tutorLayout, setTutorLayout] = useState({ width: 600, visible: false });
   const workspaceRef = useRef(workspace);
   workspaceRef.current = workspace;
   const searchRef = useRef(null);
@@ -95,8 +104,12 @@ function FieldguideApp({ data, setData, workspace }) {
     try { const saved = localStorage.getItem(KEY); if (saved) { const restored = cleanProgress(JSON.parse(saved)); initialLessons = buildCourse(restored.course).lessons; setData(restored); } }
     catch { setStorageError(true); }
     setReady(true); setRoute(readRoute(initialLessons));
-    const onHash = () => { setRoute(readRoute(workspaceRef.current.lessons)); setQuery(''); setMenu(false); window.scrollTo({ top: 0, behavior: 'instant' }); };
-    const key = e => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); searchRef.current?.focus(); } if (e.key === 'Escape') { setMenu(false); setQuery(''); } };
+    const onHash = () => {
+      const nextRoute = readRoute(workspaceRef.current.lessons);
+      setRoute(nextRoute); setQuery(''); setSearchOpen(false); setAnswerRequest(null); searchSession.current.open=false; setMenu(false); window.scrollTo({ top: 0, behavior: 'instant' });
+      if (nextRoute.kind==='resources' && nextRoute.term) requestAnimationFrame(()=>document.getElementById('resource-glossary')?.scrollIntoView({block:'start'}));
+    };
+    const key = e => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); searchActions.current.open?.(); searchRef.current?.focus(); searchRef.current?.select(); } if (e.key === 'Escape') { setMenu(false); if (searchSession.current.open) searchActions.current.close?.(); } };
     window.addEventListener('hashchange', onHash); window.addEventListener('keydown', key);
     return () => { window.removeEventListener('hashchange', onHash); window.removeEventListener('keydown', key); };
   }, []);
@@ -111,10 +124,33 @@ function FieldguideApp({ data, setData, workspace }) {
   }, [route.kind, route.id, workspace, ready]);
   useEffect(() => { if (!toast) return; const t = setTimeout(() => setToast(''), 3400); return () => clearTimeout(t); }, [toast]);
 
-  function go(kind = 'home', id) {
+  function go(kind = 'home', id, options = {}) {
+    setSearchOpen(false); searchSession.current.open=false; setQuery(''); setAnswerRequest(null);
     if (kind === 'tutor') { setTutorLesson(id || (route.kind === 'lesson' ? route.id : data.last)); setTutorOpen(true); setMenu(false); return; }
-    const hash = kind === 'home' ? '#home' : `#${kind}${id !== undefined ? '/' + id : ''}`;
+    const promptSuffix = ['understand','inspect','plan','implement','debug','verify','review'].includes(options.promptMode) ? '/' + options.promptMode : '';
+    const suffix = kind === 'lesson' && options.stage === 'apply' ? '/apply' + promptSuffix : kind === 'resources' && options.term ? '/' + encodeURIComponent(options.term.slice(0,100)) : '';
+    const hash = kind === 'home' ? '#home' : `#${kind}${id !== undefined ? '/' + id : ''}${suffix}`;
     window.location.hash = hash; setRoute(readRoute(workspaceRef.current.lessons)); setQuery(''); setMenu(false); window.scrollTo({ top: 0, behavior: 'instant' });
+    if (kind==='resources' && options.term) requestAnimationFrame(()=>document.getElementById('resource-glossary')?.scrollIntoView({block:'start'}));
+  }
+  function openSearch() {
+    if (!searchSession.current.open) { searchSession.current={open:true,scroll:window.scrollY,tutor:tutorOpen}; setTutorOpen(false); window.scrollTo({top:0,behavior:'instant'}); }
+    setSearchOpen(true);
+  }
+  function closeSearch() {
+    const previous=searchSession.current;
+    searchSession.current={...previous,open:false}; setSearchOpen(false); setQuery(''); setAnswerRequest(null);
+    if (previous.tutor) setTutorOpen(true);
+    requestAnimationFrame(()=>{document.getElementById('main-content')?.focus({preventScroll:true});window.scrollTo({top:previous.scroll,behavior:'instant'});});
+  }
+  searchActions.current={open:openSearch,close:closeSearch};
+  function askFromSearch(question, lessonId) {
+    go('tutor',lessonId);
+    setTutorDraft({id:++searchRequestId.current,question:String(question).slice(0,2000),lessonId});
+  }
+  function searchNavigate(destination) {
+    if (!destination || !['home','lesson','part','practice','arcade','labs','prompts','resources','settings','course','tutor'].includes(destination.kind)) return;
+    go(destination.kind,destination.id,destination);
   }
   async function copy(value) {
     try { await navigator.clipboard.writeText(value); setToast('Prompt copied. Add your project context before using it.'); }
@@ -168,9 +204,9 @@ function FieldguideApp({ data, setData, workspace }) {
   useEffect(() => { if (currentModule) setNavTrack(reference.modules.find(m => m.id === currentModule)?.track || 'foundation'); }, [currentModule]);
   const progress = Math.round(data.completed.length / lessons.length * 100);
   const resume = data.completed.includes(data.last) ? lessons.find(d => !data.completed.includes(Number(d.id)))?.id || Number(lessons.at(-1).id) : data.last;
-  const title = query ? 'Search the fieldguide' : route.kind === 'lesson' ? `Part ${pad(currentModule)} / Lesson ${pad(route.id)}` : ({ home: 'Your learning path', part: `Part ${pad(route.id)}`, labs: 'Interactive labs', arcade: 'The backend arcade', practice:'Practice studio', tutor:'Course tutor', prompts: 'Prompt workshop', resources: 'Reference desk', settings: 'Settings', course: 'Your course workspace' }[route.kind]);
+  const title = searchOpen ? 'Search & discover' : route.kind === 'lesson' ? `Part ${pad(currentModule)} / Lesson ${pad(route.id)}` : ({ home: 'Your learning path', part: `Part ${pad(route.id)}`, labs: 'Interactive labs', arcade: 'The backend arcade', practice:'Practice studio', tutor:'Course tutor', prompts: 'Prompt workshop', resources: 'Reference desk', settings: 'Settings', course: 'Your course workspace' }[route.kind]);
 
-  return <div className={`app-shell ${focus ? 'focus-mode' : ''} ${data.reduceMotion ? 'motion-quiet' : ''} ${tutorLayout.visible ? 'has-tutor' : ''} ${tutorLayout.expanded ? 'tutor-wide' : ''}`} style={{'--tutor-space': `${tutorLayout.width + 24}px`}}>
+  return <div className={`app-shell ${searchOpen ? 'search-is-open' : ''} ${focus ? 'focus-mode' : ''} ${data.reduceMotion ? 'motion-quiet' : ''} ${tutorLayout.visible ? 'has-tutor' : ''} ${tutorLayout.expanded ? 'tutor-wide' : ''}`} style={{'--tutor-space': `${tutorLayout.width + 24}px`}}>
     <a className="skip-link" href="#main-content" onClick={e => { e.preventDefault(); document.getElementById('main-content')?.focus(); }}>{t("Skip to learning content")}</a>
     {menu && <button className="menu-shade" onClick={() => setMenu(false)} aria-label={t("Close navigation")}/>}
     <aside className={`sidebar ${menu ? 'open' : ''}`}>
@@ -188,27 +224,28 @@ function FieldguideApp({ data, setData, workspace }) {
       <div className="sidebar-author"><span className="avatar">{t("HG")}</span><span>{t("harshitgupta31415")}<small>{t("Learn. Explain. Verify.")}</small></span></div>
     </aside>
     <div className="workspace">
-      <header className="topbar"><button className="icon-button mobile-menu" onClick={() => setMenu(!menu)} aria-label={t("Open navigation")}><Icon name="menu"/></button><span className="breadcrumb">{t("FIELDGUIDE ")}<span>/</span> <b>{t(title)}</b></span><label className="searchbox"><Icon name="search" size={17}/><input ref={searchRef} value={query} onChange={e => setQuery(e.target.value)} placeholder={t("Find a concept...")} aria-label={t("Search lessons")}/><kbd>Ctrl K</kbd></label><button className={`icon-button ${focus ? 'pressed' : ''}`} onClick={() => setFocus(!focus)} aria-label={t(focus ? 'Exit focus mode' : 'Enter focus mode')} title={t("Focus mode")}><Icon name="focus"/></button></header>
+      <header className="topbar"><button className="icon-button mobile-menu" onClick={() => setMenu(!menu)} aria-label={t("Open navigation")}><Icon name="menu"/></button><span className="breadcrumb">{t("FIELDGUIDE ")}<span>/</span> <b>{t(title)}</b></span><div className="searchbox omnibox"><Icon name="search" size={18}/><input ref={searchRef} value={query} onFocus={openSearch} onChange={e => {setQuery(e.target.value);openSearch();}} onKeyDown={e=>{if(e.key==='Enter' && query.trim()){e.preventDefault();openSearch();setAnswerRequest({id:++searchRequestId.current,query:query.trim()});}if(e.key==='ArrowDown' && searchOpen){e.preventDefault();document.getElementById('search-result-0')?.focus();}}} maxLength={2000} placeholder="Search anything or ask a question…" aria-label="Search anything" aria-expanded={searchOpen} aria-controls={searchOpen ? 'search-experience' : undefined}/><kbd>Ctrl K</kbd>{searchOpen && <button type="button" onClick={closeSearch} aria-label="Close search">×</button>}</div><button className={`icon-button ${focus ? 'pressed' : ''}`} onClick={() => setFocus(!focus)} aria-label={t(focus ? 'Exit focus mode' : 'Enter focus mode')} title={t("Focus mode")}><Icon name="focus"/></button></header>
       {loadingLanguage && <div className="storage-notice" role="status">{t("Hinglish is loading…")}</div>}
       {translationError && <div className="storage-notice" role="status">{t("Translations could not load. English content is still available; reload to try again.")}</div>}
       {storageError && <div className="storage-notice" role="status">{t("Browser storage is unavailable or could not be read. Export your progress before closing this session.")}</div>}
       <main id="main-content" tabIndex={-1}>
-        {query ? <SearchResults query={query} go={go} completed={data.completed}/> : <div className="route-view" key={`${route.kind}/${route.id || ''}/${route.kind === 'course' ? '' : importRevision}`}>
+        {searchOpen && <SearchExperience query={query} onQueryChange={setQuery} onClose={closeSearch} onNavigate={searchNavigate} course={workspace} completed={data.completed} courseContext={courseContext} onTutorQuestion={askFromSearch} requestAnswer={answerRequest}/>}
+        <div className="route-view" hidden={searchOpen} inert={searchOpen ? true : undefined} key={`${route.kind}/${route.id || ''}/${route.stage || route.term || ''}/${route.promptMode || ''}/${route.kind === 'course' ? '' : importRevision}`}>
           {route.kind === 'home' && <JourneyHome key={resume} go={go} data={data} resume={Number(resume)}/>}
           {route.kind === 'part' && <PartJourney id={route.id} go={go} completed={data.completed}/>}
-          {route.kind === 'lesson' && byId(route.id) && <Lesson key={route.id} lesson={byId(route.id)} go={go} copy={copy} data={data} setData={setData} complete={complete}/>}
+          {route.kind === 'lesson' && byId(route.id) && <Lesson key={route.id} initialStage={route.stage === 'apply' ? 3 : 0} initialPromptMode={route.promptMode || 'implement'} lesson={byId(route.id)} go={go} copy={copy} data={data} setData={setData} complete={complete}/>}
           {route.kind === 'labs' && <Labs name={route.id} go={go}/>}
-          {route.kind === 'arcade' && <GameArcade onAward={award} go={go} completedGames={data.achievements}/>}
+          {route.kind === 'arcade' && <GameArcade initialGame={route.id} onAward={award} go={go} completedGames={data.achievements}/>}
           {route.kind === 'practice' && <PracticeStudio name={route.id} go={go} data={data} onAward={awardPractice}/>}
           {route.kind === 'course' && <CourseManager course={workspace.lessons} modules={reference.modules} changes={data.course} onAction={applyAction} onUndo={undoCourse} onNavigate={id => go('lesson', id)} onExport={() => download(JSON.stringify({format:'backend-fieldguide-course',version:1,course:data.course},null,2),'backend-fieldguide-course.json')} onImport={importCourse}/>}
           {route.kind === 'prompts' && <PromptWorkshop draft={data.draft} update={draft => setData(d => ({ ...d, draft }))} copy={copy} download={download}/>}
-          {route.kind === 'resources' && <Resources go={go}/>}
+          {route.kind === 'resources' && <Resources go={go} initialTerm={route.term || ''}/>}
           {route.kind === 'settings' && <Settings/>}
-        </div>}
+        </div>
       </main>
       <footer className="site-footer"><span>{t("Backend Fieldguide ")}<span>{t("by harshitgupta31415")}</span></span><button className="motion-setting" aria-pressed={data.reduceMotion} onClick={() => setData(d => ({ ...d, reduceMotion: !d.reduceMotion }))}>{t(data.reduceMotion ? 'Reduced motion on' : 'Reduce animations')}</button><span>{t("Learn a little. Build understanding.")}</span></footer>
     </div>
-    <TutorDock lessonId={tutorId} course={workspace.lessons} courseContext={courseContext} learnerSummary={{completedCount:data.completed.length,totalLessons:lessons.length,currentLessonCompleted:data.completed.includes(Number(tutorId))}} onNavigate={id => go('lesson',id)} onCourseAction={applyAction} open={tutorOpen} onOpenChange={setTutorOpen} onLayoutChange={setTutorLayout}/>
+    <TutorDock lessonId={tutorId} externalDraft={tutorDraft} restoreFocus={!searchOpen} course={workspace.lessons} courseContext={courseContext} learnerSummary={{completedCount:data.completed.length,totalLessons:lessons.length,currentLessonCompleted:data.completed.includes(Number(tutorId))}} onNavigate={id => go('lesson',id)} onCourseAction={applyAction} open={tutorOpen} onOpenChange={value=>{if(value && searchOpen){setSearchOpen(false);searchSession.current.open=false;}setTutorOpen(value);}} onLayoutChange={setTutorLayout}/>
     {toast && <div className="toast" role="status"><Icon name="check" size={17}/>{t(toast)}</div>}
   </div>;
 }
@@ -273,21 +310,14 @@ const prework = [
   ['Know what this course covers','The foundation and practical tracks cover a standard single-store ecommerce business with synthetic service-integration exercises. Advanced marketplaces, subscriptions, multi-warehouse inventory, international money movement, disputes, event streaming and alternate databases need additional business and technical decisions. Start with clear domain boundaries; add services or infrastructure to solve a demonstrated need.'],
 ];
 
-function Resources({ go }) {
+function Resources({ go, initialTerm = '' }) {
   const { t } = useLanguage();
   const { reference } = useCourse();
-  const [term, setTerm] = useState('');
+  const [term, setTerm] = useState(initialTerm);
+  useEffect(()=>{if(initialTerm) requestAnimationFrame(()=>document.getElementById('resource-glossary')?.scrollIntoView({block:'start'}));},[initialTerm]);
   const filtered = reference.glossary.filter(g => (g.term+' '+g.meaning).toLowerCase().includes(term.toLowerCase()));
-  return <div className="page resources-page"><span className="eyebrow">{t("REFERENCE DESK")}</span><h1 className="page-title">{t("Keep the meaning.")}<br/><em>{t("Lose the mystery.")}</em></h1><p className="page-intro">{t("Plain-language prework, a searchable glossary and primary references for going deeper.")}</p><section className="resource-section"><div className="section-heading"><h2>{t("Before lesson one")}</h2><span className="pill">{t("Start here if code is new")}</span></div>{prework.map(([title,body],i) => <details className="prework-item" key={title}><summary><span>{t(pad(i+1))}</span>{t(title)}<b>+</b></summary><p>{t(body)}</p></details>)}<button className="btn secondary" onClick={() => go('lesson',1)}>{t("Begin lesson 01")}<Icon name="arrow" size={17}/></button></section><section className="resource-section"><div className="section-heading"><h2>{t("The vocabulary, translated.")}</h2><label className="glossary-search"><Icon name="search" size={17}/><input value={term} onChange={e => setTerm(e.target.value)} placeholder={t("Find a term...")} aria-label={t("Search glossary")}/></label></div><div className="glossary-grid">{filtered.map(g => <div key={g.term}><h3>{t(g.term)}</h3><p>{t(g.meaning)}</p></div>)}</div>{!filtered.length && <p>{t("No matching terms. Try “transaction”, “session” or “retry”.")}</p>}</section>{reference.advancedTracks?.length > 0 && <section className="resource-section"><div className="section-heading"><div><span className="eyebrow">{t("OPTIONAL EXTENSIONS")}</span><h2>{t("Beyond a standard single-store foundation.")}</h2></div></div><p className="reference-intro">{t("These are follow-on tracks for specialized business requirements, not included lessons or completed competencies.")}</p>{reference.advancedTracks.map((track,index) => <details className="prework-item" key={track.title}><summary><span>{t(pad(index+1))}</span>{t(track.title)}<b>+</b></summary><p>{t(track.summary)}<br/><strong>{t("Prerequisites: ")}</strong>{t(Array.isArray(track.prerequisites) ? track.prerequisites.join('; ') : track.prerequisites)}</p></details>)}</section>}<section className="resource-section"><div className="section-heading"><div><span className="eyebrow">{t("PRIMARY DOCUMENTATION")}</span><h2>{t("Check the original source.")}</h2></div><small>{t("Reviewed ")}{t(reference.reviewed || '23 October 2026')}</small></div><p className="reference-intro">{t("The lessons use original store examples. These references provide technical depth; provider names illustrate concepts and do not prescribe your stack. Verify the versions and business rules in your own project.")}</p><div className="reference-list">{reference.sources.map(s => <a key={s.id} href={s.url} target="_blank" rel="noreferrer noopener"><span>{t(s.id)}</span><div><h3>{t(s.title)}</h3><p>{t(s.note)}</p></div><b>↗</b></a>)}</div></section></div>;
+  return <div className="page resources-page"><span className="eyebrow">{t("REFERENCE DESK")}</span><h1 className="page-title">{t("Keep the meaning.")}<br/><em>{t("Lose the mystery.")}</em></h1><p className="page-intro">{t("Plain-language prework, a searchable glossary and primary references for going deeper.")}</p><section className="resource-section"><div className="section-heading"><h2>{t("Before lesson one")}</h2><span className="pill">{t("Start here if code is new")}</span></div>{prework.map(([title,body],i) => <details className="prework-item" key={title}><summary><span>{t(pad(i+1))}</span>{t(title)}<b>+</b></summary><p>{t(body)}</p></details>)}<button className="btn secondary" onClick={() => go('lesson',1)}>{t("Begin lesson 01")}<Icon name="arrow" size={17}/></button></section><section className="resource-section" id="resource-glossary"><div className="section-heading"><h2>{t("The vocabulary, translated.")}</h2><label className="glossary-search"><Icon name="search" size={17}/><input value={term} onChange={e => setTerm(e.target.value)} placeholder={t("Find a term...")} aria-label={t("Search glossary")}/></label></div><div className="glossary-grid">{filtered.map(g => <div key={g.term}><h3>{t(g.term)}</h3><p>{t(g.meaning)}</p></div>)}</div>{!filtered.length && <p>{t("No matching terms. Try “transaction”, “session” or “retry”.")}</p>}</section>{reference.advancedTracks?.length > 0 && <section className="resource-section"><div className="section-heading"><div><span className="eyebrow">{t("OPTIONAL EXTENSIONS")}</span><h2>{t("Beyond a standard single-store foundation.")}</h2></div></div><p className="reference-intro">{t("These are follow-on tracks for specialized business requirements, not included lessons or completed competencies.")}</p>{reference.advancedTracks.map((track,index) => <details className="prework-item" key={track.title}><summary><span>{t(pad(index+1))}</span>{t(track.title)}<b>+</b></summary><p>{t(track.summary)}<br/><strong>{t("Prerequisites: ")}</strong>{t(Array.isArray(track.prerequisites) ? track.prerequisites.join('; ') : track.prerequisites)}</p></details>)}</section>}<section className="resource-section"><div className="section-heading"><div><span className="eyebrow">{t("PRIMARY DOCUMENTATION")}</span><h2>{t("Check the original source.")}</h2></div><small>{t("Reviewed ")}{t(reference.reviewed || '23 October 2026')}</small></div><p className="reference-intro">{t("The lessons use original store examples. These references provide technical depth; provider names illustrate concepts and do not prescribe your stack. Verify the versions and business rules in your own project.")}</p><div className="reference-list">{reference.sources.map(s => <a key={s.id} href={s.url} target="_blank" rel="noreferrer noopener"><span>{t(s.id)}</span><div><h3>{t(s.title)}</h3><p>{t(s.note)}</p></div><b>↗</b></a>)}</div></section></div>;
 }
-
-function SearchResults({ query, go, completed }) {
-  const { t } = useLanguage();
-  const { lessons, reference } = useCourse();
-  const results = lessons.filter(d => `${d.title} ${d.definition} ${d.module_title} ${d.question} ${d.details?.map(x => x.title + ' ' + x.body).join(' ') || ''}`.toLowerCase().includes(query.trim().toLowerCase()));
-  return <div className="page narrow-page"><span className="eyebrow">{t("SEARCH THE FIELDGUIDE")}</span><h1 className="page-title">{t("Find your next")}<br/>{t("connection.")}</h1><p className="page-intro">{t(results.length)} {t(results.length === 1 ? 'lesson' : 'lessons')}{t(" matching “")}{t(query)}”</p><div className="lesson-list">{results.map(d => <button key={d.id} onClick={() => go('lesson',Number(d.id))}><span className="lesson-list-num">{t(completed.includes(Number(d.id)) ? '✓' : pad(d.id))}</span><div><small>{t("PART ")}{t(pad(d.module_id))} / {t(reference.modules[Number(d.module_id)-1].title)}</small><h2>{t(d.title)}</h2><p>{t(d.question)}</p></div><Icon name="arrow"/></button>)}</div>{!results.length && <div className="empty-state"><Icon name="search" size={32}/><h2>{t("No matching concept yet.")}</h2><p>{t("Try “payment”, “stock”, “API”, “session” or “testing”.")}</p></div>}</div>;
-}
-
 
 function Settings() {
   const { t } = useLanguage();

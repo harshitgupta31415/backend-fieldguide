@@ -12,15 +12,15 @@ const stages = [
   ['04', 'Apply', 'Direct AI with precision'],
 ];
 
-export default function LessonExperience({ lesson: d, module: m, quiz, go, copy, data, setData, complete, Diagram, Icon, nextTitle }) {
+export default function LessonExperience({ initialStage = 0, initialPromptMode = 'implement', lesson: d, module: m, quiz, go, copy, data, setData, complete, Diagram, Icon, nextTitle }) {
   const { t } = useLanguage();
   const { lessons, activities, moduleLessons, nextLesson, previousLesson } = useCourse();
   const id = Number(d.id);
-  const [stage, setStage] = useState(0);
-  const [visited, setVisited] = useState([0]);
+  const [stage, setStage] = useState(initialStage);
+  const [visited, setVisited] = useState([initialStage]);
   const [choice, setChoice] = useState(null);
   const [revealed, setRevealed] = useState(false);
-  const [promptMode, setPromptMode] = useState('implement');
+  const [promptMode, setPromptMode] = useState(initialPromptMode);
   const [promptEdits, setPromptEdits] = useState({});
   const [celebrate, setCelebrate] = useState(false);
   const panelRef = useRef(null);

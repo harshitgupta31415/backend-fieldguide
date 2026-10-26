@@ -10,7 +10,7 @@ Designed for learners who already understand their intended UI/UX and want to un
 
 The original **60 foundation lessons and their IDs are preserved**. The expansion adds **48 practical lessons**. Seven optional advanced tracks suggest further study beyond the single-store foundation; they are not counted as completed lessons.
 
-[Full curriculum](docs/CURRICULUM.md) · [Fieldstore capstone](docs/CAPSTONE.md) · [AI tutor setup](docs/AI_TUTOR.md) · [Verification record](docs/VERIFICATION.md)
+[Full curriculum](docs/CURRICULUM.md) · [Fieldstore capstone](docs/CAPSTONE.md) · [Search guide](docs/SEARCH.md) · [AI tutor setup](docs/AI_TUTOR.md) · [Verification record](docs/VERIFICATION.md)
 
 ## Run locally
 
@@ -36,9 +36,21 @@ npm start
 
 This starts a local production server. It does not deploy or host the website.
 
+## Search and ask
+
+Use the search bar or **Ctrl/Cmd + K** to find lessons, parts, practice missions, games, labs, glossary definitions, AI prompts, official references and app pages. Search understands common synonyms, simple Hinglish queries and many spelling mistakes. Filter by content type, preview matching passages, copy a prompt, or jump directly to its lesson stage. Your personal lesson additions and edits are included.
+
+Choose **Ask AI** or press **Enter** to request an explanation. Course answers show the retrieved evidence and clickable source links. Questions outside the course receive a clearly labeled general AI answer. **Search does not browse the live web**, and cannot verify current news, prices or documentation. Typing only searches locally; it does not generate paid answers.
+
+Follow up, cancel, retry, dictate a question or listen to an answer. **Ask tutor about this** puts an editable question in the tutor dock. Closing search restores the lesson and its current stage. Queries and search conversations stay in page memory and are not included in progress exports. AI answers use the same optional server-side provider setup as the tutor below. [Read the search guide](docs/SEARCH.md) for details.
+
+![Search with results and source-backed answers](docs/search.jpg)
+
 ## Optional AI tutor
 
-Open the tutor dock from any page, `#tutor`, or a lesson's **Ask the tutor** link. Keep the conversation beside the lesson while you navigate, resize, expand or minimize it. Choose **Explain**, **Quiz me**, **Practice** or **Help me plan**. The server retrieves course excerpts, sends them with your question and relevant learning context to a configured model, and returns an explanation with lesson references. Retrieval uses a local keyword index; no vector database or embedding service is required. Read the cited lessons and verify advice: grounding does not guarantee a correct answer.
+Open the tutor from any page, `#tutor`, or a lesson's **Ask the tutor** link. The desktop chat starts at 600 pixels wide, with an adjustable 480–800 pixel side panel. **Full chat** opens a spacious conversation up to 960 pixels wide; narrow screens use the full viewport. The message box and **Send** stay at the bottom, with lesson settings and **Voice input** tucked into expandable controls. Chat stays while you navigate or minimize it.
+
+Choose **Explain**, **Quiz me**, **Practice** or **Plan**. The server retrieves course excerpts, sends them with your question and relevant learning context to a configured model, and returns an explanation with lesson references. Retrieval uses a local keyword index; no vector database or embedding service is required. Read the cited lessons and verify advice: grounding does not guarantee a correct answer.
 
 1. Copy [`.env.example`](.env.example) to `.env.local` in the project root.
 2. Add your own key to `OPENROUTER_API_KEYS`, `GEMINI_API_KEYS`, `GROQ_API_KEYS` or `FREEAI_API_KEYS`. Leave unused providers empty. Each accepts up to six comma-separated keys.
@@ -69,6 +81,7 @@ The interface uses a flat cream canvas with violet, cyan, pink, peach and light-
 - **Clickable explanations:** diagram nodes, store examples, common mistakes, debugging clues and implementation examples.
 - **Seven AI prompt modes:** Understand, Inspect, Plan, Implement, Debug, Verify and Review, customized to the topic.
 - **Tutor beside the lesson:** four teaching modes, follow-up questions, course references, voice input/output and reviewable course-change proposals.
+- **Search across the fieldguide:** typo-tolerant results, content filters, prompt previews and optional source-linked AI answers with follow-up questions.
 - **Your own course copy:** add, edit and reorder lessons; review and apply suggestions, undo recent changes, or export the copy.
 - **Learning checks:** solve the prediction question and complete three practical self-checks before marking a new lesson complete.
 - **Practice Studio:** sixteen missions using diagnosis, ordering, sorting, configuration decisions and local simulations, ending in the connected capstone.
@@ -168,7 +181,7 @@ Storage belongs to the current browser profile and origin, including hostname an
 
 ## Keyboard and motion
 
-Use **Tab**, **Enter** and **Space** to navigate controls. Ordering activities provide buttons rather than requiring dragging. **Ctrl/Cmd + K** focuses lesson search; **Escape** dismisses navigation/search. Use the footer's **Reduce animations** control or your system's reduced-motion preference. Focus mode gives the learning content more screen space.
+Use **Tab**, **Enter** and **Space** to navigate controls. Ordering activities provide buttons rather than requiring dragging. **Ctrl/Cmd + K** opens search, **Down arrow** moves to results, **Enter** in the search input asks AI, and **Escape** closes search. Use the footer's **Reduce animations** control or your system's reduced-motion preference. Focus mode gives the learning content more screen space.
 
 ## Source map
 
@@ -185,6 +198,8 @@ Use **Tab**, **Enter** and **Space** to navigate controls. Ordering activities p
 | `components/CourseManager.js`, `lib/course-workspace.mjs` | Local course copies, add/edit/reorder, undo and course export/import. |
 | `components/TutorVoice.js`, `lib/voice-server.mjs`, `app/api/voice/` | Explicit microphone transcription, natural speech and browser-voice fallback. |
 | `lib/retrieval.mjs` | Local lesson index and deterministic course retrieval. |
+| `components/SearchExperience.js`, `app/search.css`, `lib/search.mjs` | Unified content search, ranking, filters, previews and the interactive answer panel. |
+| `app/api/search/route.js`, `lib/search-server.mjs` | Course-grounded/general answer routing, evidence, validation and protected provider requests. |
 | `lib/tutor-server.mjs`, `lib/ai-providers.mjs` | Tutor input/access checks, grounded prompts, provider adapters and bounded failover. |
 | `lib/tutor-context.mjs`, `lib/tutor-actions.mjs` | Validated personal course context, teaching instructions and bounded action proposals. |
 | `lib/course.mjs` | Course metadata, ID sets, navigation helpers and reward calculations. |

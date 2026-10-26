@@ -533,7 +533,23 @@ html, body, .app-shell, .app-shell .workspace, .app-shell main { background: #ff
 @media(min-width:1200px){
 .app-shell.has-tutor.tutor-wide .sidebar{transform:translateX(-100%)}
 .app-shell.has-tutor.tutor-wide .sidebar.open{transform:translateX(0)}
-.app-shell.has-tutor.tutor-wide .workspace{margin-left:0}
+.app-shell.has-tutor.tutor-wide .workspace{margin-left:0;margin-right:0}
 .app-shell.has-tutor.tutor-wide .mobile-menu{display:grid}
 .app-shell.has-tutor.tutor-wide .menu-shade{display:block;position:fixed;inset:0;background:#30244833;z-index:29}
 }
+/* A single entry point for finding material and asking questions. */
+.app-shell .topbar .omnibox{display:flex;align-items:center;gap:11px;flex:1;max-width:580px;min-width:160px;padding:7px 12px;background:#fffefa;border:1px solid #ded0ef;border-radius:13px;transition:box-shadow .18s,border-color .18s}
+.app-shell .topbar .omnibox:focus-within{border-color:#a07bd2;box-shadow:0 0 0 4px #ebdef7}
+.app-shell .topbar .omnibox>svg{flex:none;color:#8862b8}
+.app-shell .topbar .omnibox input{width:100%;min-width:0;flex:1;padding:5px 0;font-size:12px;color:#38294d;background:transparent}
+.app-shell .topbar .omnibox input::placeholder{color:#887b97}
+.app-shell .topbar .omnibox kbd{flex:none;padding:4px 6px;background:#f3ebfb;border:0;border-radius:5px;color:#7b6296;font-size:9px}
+.app-shell .topbar .omnibox>button{display:grid;place-items:center;flex:none;border:0;border-radius:7px;width:26px;height:26px;padding:0;background:#f2e8fd;color:#644784;font-size:20px;cursor:pointer}
+.app-shell.search-is-open .breadcrumb{display:none}
+.app-shell.search-is-open .omnibox{max-width:800px;margin-left:0}
+.app-shell .route-view[hidden]{display:none!important}
+#search-experience{scroll-margin-top:80px}
+@media(max-width:760px){.search-is-open .tutor-dock-launcher>div,.search-is-open .tutor-dock-launcher>b{display:none}.search-is-open .tutor-dock-launcher{padding:8px;right:15px;bottom:15px}}
+#resource-glossary{scroll-margin-top:90px}
+.reference-list>a>div{min-width:0;overflow-wrap:anywhere}
+@media(max-width:760px){.app-shell .topbar{gap:10px}.app-shell .topbar .omnibox{min-width:0;padding:6px 9px;gap:7px}.app-shell .topbar .omnibox input{font-size:12px}.app-shell .topbar .omnibox kbd,.app-shell .topbar .breadcrumb{display:none}.app-shell.search-is-open .topbar>.icon-button:last-child{display:none}}

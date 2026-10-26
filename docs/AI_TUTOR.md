@@ -35,10 +35,12 @@ To use only OpenRouter for chat, set `AI_PROVIDER_ORDER=openrouter`. To use Gemi
 
 ## Teaching modes and your course copy
 
+The desktop tutor starts as a 600-pixel side chat. Use **Full chat** for a centered workspace up to 960 pixels wide, or adjust the side width between 480 and 800 pixels. Screens up to 1,000 pixels use the full viewport. Messages scroll independently while the composer and **Send** remain visible. Open **Settings** beside the lesson title to select the lesson, follow navigation, enter a required access code or check the connection. Minimize and reopen without losing the conversation.
+
 - **Explain:** one concept, a store example and a question to check understanding.
 - **Quiz me:** a prediction question, then feedback after your attempt.
 - **Practice:** a small task with a prediction or evidence to discuss.
-- **Help me plan:** a manageable next step; request course changes explicitly when wanted.
+- **Plan:** a manageable next step; request course changes explicitly when wanted.
 
 These are teaching instructions to the model, not a guaranteed assessment of mastery. The request includes the current lesson, a small completion summary and the current lesson-title registry so advice can fit your course copy.
 
@@ -52,7 +54,7 @@ Applying edits to a quiz, exercise, teaching answer or completion checks clears 
 
 ## Voice input and read aloud
 
-**Input:** choose **Record question** to request microphone permission. Stop within 60 seconds, preview or discard the recording, then explicitly choose **Transcribe**. The transcript fills the question box for review; submitting the tutor question is a separate action. The app caps recordings at **5 MB** and rejects unsupported formats. It sends the recording to Groq only for transcription, keeps no recording database or local-storage audio, and releases microphone tracks when stopped or hidden. Browser microphone support and permission are required.
+**Input:** open **Voice input**, then choose **Record question** to request microphone permission. Stop within 60 seconds, preview or discard the recording, then explicitly choose **Transcribe**. The transcript fills the question box for review; submitting the tutor question is a separate action. The app caps recordings at **5 MB** and rejects unsupported formats. It sends the recording to Groq only for transcription, keeps no recording database or local-storage audio, and releases microphone tracks when stopped or hidden. Browser microphone support and permission are required.
 
 Transcription uses Groq's multilingual `whisper-large-v3-turbo` at `/audio/transcriptions`. English mode supplies an English language hint; Hinglish mode leaves language detection automatic with a short terminology hint. Recognition and Roman-script spelling are not guaranteed, so edit the transcript before sending. A provider-reported recording longer than the limit is rejected. See [Groq speech-to-text](https://console.groq.com/docs/speech-to-text).
 
