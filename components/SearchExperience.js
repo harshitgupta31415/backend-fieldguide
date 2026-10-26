@@ -219,7 +219,7 @@ export default function SearchExperience({query='',onQueryChange,onClose,onNavig
   const latest=turns.at(-1);
   const counts=result.counts||{};
   const displayedTypes=['all',...SEARCH_TYPES];
-  const queryTerms=term.match(/[a-zA-Z0-9_]{2,}/g)||[];
+  const queryTerms=(term.match(/[a-zA-Z0-9_]{3,}/g)||[]).filter(word=>!['the','and','for','with','what','why','how','explain','lesson','words','please'].includes(word.toLowerCase()));
 
   return <section id="search-experience" className="page search-experience" aria-label="Search and understand the fieldguide">
     <header className="sx-heading"><div><span className="sx-eyebrow"><i/> EVERY CONNECTION, ONE PLACE</span><h1>Find anything.<br/><em>Understand it.</em></h1><p>Search the whole fieldguide. Ask a question. Follow the idea wherever it takes you.</p></div><button type="button" className="sx-close" onClick={onClose} aria-label="Close search"><SearchIcon name="close" size={17}/><span>Back to learning</span><kbd>Esc</kbd></button></header>

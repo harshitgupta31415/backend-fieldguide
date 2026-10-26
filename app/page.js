@@ -106,8 +106,8 @@ function FieldguideApp({ data, setData, workspace }) {
     setReady(true); setRoute(readRoute(initialLessons));
     const onHash = () => {
       const nextRoute = readRoute(workspaceRef.current.lessons);
-      setRoute(nextRoute); setQuery(''); setSearchOpen(false); setAnswerRequest(null); searchSession.current.open=false; setMenu(false); window.scrollTo({ top: 0, behavior: 'instant' });
-      if (nextRoute.kind==='resources' && nextRoute.term) requestAnimationFrame(()=>document.getElementById('resource-glossary')?.scrollIntoView({block:'start'}));
+      setRoute(nextRoute); setQuery(''); setSearchOpen(false); setAnswerRequest(null); searchSession.current.open=false; setMenu(false);
+      if (nextRoute.kind!=='resources' || !nextRoute.term) window.scrollTo({ top: 0, behavior: 'instant' });
     };
     const key = e => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); searchActions.current.open?.(); searchRef.current?.focus(); searchRef.current?.select(); } if (e.key === 'Escape') { setMenu(false); if (searchSession.current.open) searchActions.current.close?.(); } };
     window.addEventListener('hashchange', onHash); window.addEventListener('keydown', key);
@@ -130,8 +130,8 @@ function FieldguideApp({ data, setData, workspace }) {
     const promptSuffix = ['understand','inspect','plan','implement','debug','verify','review'].includes(options.promptMode) ? '/' + options.promptMode : '';
     const suffix = kind === 'lesson' && options.stage === 'apply' ? '/apply' + promptSuffix : kind === 'resources' && options.term ? '/' + encodeURIComponent(options.term.slice(0,100)) : '';
     const hash = kind === 'home' ? '#home' : `#${kind}${id !== undefined ? '/' + id : ''}${suffix}`;
-    window.location.hash = hash; setRoute(readRoute(workspaceRef.current.lessons)); setQuery(''); setMenu(false); window.scrollTo({ top: 0, behavior: 'instant' });
-    if (kind==='resources' && options.term) requestAnimationFrame(()=>document.getElementById('resource-glossary')?.scrollIntoView({block:'start'}));
+    window.location.hash = hash; setRoute(readRoute(workspaceRef.current.lessons)); setQuery(''); setMenu(false);
+    if (kind!=='resources' || !options.term) window.scrollTo({ top: 0, behavior: 'instant' });
   }
   function openSearch() {
     if (!searchSession.current.open) { searchSession.current={open:true,scroll:window.scrollY,tutor:tutorOpen}; setTutorOpen(false); window.scrollTo({top:0,behavior:'instant'}); }
@@ -239,7 +239,7 @@ function FieldguideApp({ data, setData, workspace }) {
           {route.kind === 'practice' && <PracticeStudio name={route.id} go={go} data={data} onAward={awardPractice}/>}
           {route.kind === 'course' && <CourseManager course={workspace.lessons} modules={reference.modules} changes={data.course} onAction={applyAction} onUndo={undoCourse} onNavigate={id => go('lesson', id)} onExport={() => download(JSON.stringify({format:'backend-fieldguide-course',version:1,course:data.course},null,2),'backend-fieldguide-course.json')} onImport={importCourse}/>}
           {route.kind === 'prompts' && <PromptWorkshop draft={data.draft} update={draft => setData(d => ({ ...d, draft }))} copy={copy} download={download}/>}
-          {route.kind === 'resources' && <Resources go={go} initialTerm={route.term || ''}/>}
+          {route.kind === 'resources' && <Resources go={go} initialTerm={route.term || ''} active={!searchOpen}/>}
           {route.kind === 'settings' && <Settings/>}
         </div>
       </main>
@@ -310,11 +310,11 @@ const prework = [
   ['Know what this course covers','The foundation and practical tracks cover a standard single-store ecommerce business with synthetic service-integration exercises. Advanced marketplaces, subscriptions, multi-warehouse inventory, international money movement, disputes, event streaming and alternate databases need additional business and technical decisions. Start with clear domain boundaries; add services or infrastructure to solve a demonstrated need.'],
 ];
 
-function Resources({ go, initialTerm = '' }) {
+function Resources({ go, initialTerm = '', active = true }) {
   const { t } = useLanguage();
   const { reference } = useCourse();
   const [term, setTerm] = useState(initialTerm);
-  useEffect(()=>{if(initialTerm) requestAnimationFrame(()=>document.getElementById('resource-glossary')?.scrollIntoView({block:'start'}));},[initialTerm]);
+  useEffect(()=>{if(initialTerm && active) document.getElementById('resource-glossary')?.scrollIntoView({block:'start',behavior:'instant'});},[initialTerm,active]);
   const filtered = reference.glossary.filter(g => (g.term+' '+g.meaning).toLowerCase().includes(term.toLowerCase()));
   return <div className="page resources-page"><span className="eyebrow">{t("REFERENCE DESK")}</span><h1 className="page-title">{t("Keep the meaning.")}<br/><em>{t("Lose the mystery.")}</em></h1><p className="page-intro">{t("Plain-language prework, a searchable glossary and primary references for going deeper.")}</p><section className="resource-section"><div className="section-heading"><h2>{t("Before lesson one")}</h2><span className="pill">{t("Start here if code is new")}</span></div>{prework.map(([title,body],i) => <details className="prework-item" key={title}><summary><span>{t(pad(i+1))}</span>{t(title)}<b>+</b></summary><p>{t(body)}</p></details>)}<button className="btn secondary" onClick={() => go('lesson',1)}>{t("Begin lesson 01")}<Icon name="arrow" size={17}/></button></section><section className="resource-section" id="resource-glossary"><div className="section-heading"><h2>{t("The vocabulary, translated.")}</h2><label className="glossary-search"><Icon name="search" size={17}/><input value={term} onChange={e => setTerm(e.target.value)} placeholder={t("Find a term...")} aria-label={t("Search glossary")}/></label></div><div className="glossary-grid">{filtered.map(g => <div key={g.term}><h3>{t(g.term)}</h3><p>{t(g.meaning)}</p></div>)}</div>{!filtered.length && <p>{t("No matching terms. Try “transaction”, “session” or “retry”.")}</p>}</section>{reference.advancedTracks?.length > 0 && <section className="resource-section"><div className="section-heading"><div><span className="eyebrow">{t("OPTIONAL EXTENSIONS")}</span><h2>{t("Beyond a standard single-store foundation.")}</h2></div></div><p className="reference-intro">{t("These are follow-on tracks for specialized business requirements, not included lessons or completed competencies.")}</p>{reference.advancedTracks.map((track,index) => <details className="prework-item" key={track.title}><summary><span>{t(pad(index+1))}</span>{t(track.title)}<b>+</b></summary><p>{t(track.summary)}<br/><strong>{t("Prerequisites: ")}</strong>{t(Array.isArray(track.prerequisites) ? track.prerequisites.join('; ') : track.prerequisites)}</p></details>)}</section>}<section className="resource-section"><div className="section-heading"><div><span className="eyebrow">{t("PRIMARY DOCUMENTATION")}</span><h2>{t("Check the original source.")}</h2></div><small>{t("Reviewed ")}{t(reference.reviewed || '23 October 2026')}</small></div><p className="reference-intro">{t("The lessons use original store examples. These references provide technical depth; provider names illustrate concepts and do not prescribe your stack. Verify the versions and business rules in your own project.")}</p><div className="reference-list">{reference.sources.map(s => <a key={s.id} href={s.url} target="_blank" rel="noreferrer noopener"><span>{t(s.id)}</span><div><h3>{t(s.title)}</h3><p>{t(s.note)}</p></div><b>↗</b></a>)}</div></section></div>;
 }
