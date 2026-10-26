@@ -126,7 +126,7 @@ function FieldguideApp({ data, setData, workspace }) {
   }
   async function importProgress(e) {
     const file = e.target.files?.[0]; if (!file) return;
-    try { if (file.size > 1500000) throw new Error('This file is too large for a course progress export.'); const next = cleanProgress(JSON.parse(await file.text())); setData(next); setImportRevision(v => v + 1); setToast('Progress, notes, rewards and prompt draft imported.'); }
+    try { if (file.size > 16 * 1024 * 1024) throw new Error('Choose a course progress export smaller than 16 MB.'); const next = cleanProgress(JSON.parse(await file.text())); setData(next); setImportRevision(v => v + 1); setToast('Progress, notes, rewards and prompt draft imported.'); }
     catch (err) { setToast(err.message || 'Unable to import this file.'); }
     e.target.value = '';
   }
@@ -155,11 +155,11 @@ function FieldguideApp({ data, setData, workspace }) {
     setImportRevision(v => v + 1); setToast('Last course change undone.');
   }
   async function importCourse(file) {
-    if (!file || file.size > 1500000) throw new Error('Choose a course export smaller than 1.5 MB.');
+    if (!file || file.size > 5 * 1024 * 1024) throw new Error('Choose a course export smaller than 5 MB.');
     const parsed = JSON.parse(await file.text());
     if (parsed.format !== 'backend-fieldguide-course' || parsed.version !== 1 || !parsed.course || typeof parsed.course !== 'object') throw new Error('Choose a course copy exported from Edit course.');
     const imported = cleanCourseChanges(parsed.course);
-    setData(previous => withCourseChanges(previous, {...imported, history: [...(previous.course?.history || []), {...previous.course, history: undefined}].slice(-5)}));
+    setData(previous => withCourseChanges(previous, {...imported, history: [...(previous.course?.history || []), {...previous.course, history: undefined}].slice(-5)}, {importing:true}));
     setImportRevision(v => v + 1); setToast('Course copy imported. Your valid progress was kept.');
   }
   const tutorId = route.kind === 'lesson' ? route.id : tutorLesson || data.last;
@@ -170,7 +170,7 @@ function FieldguideApp({ data, setData, workspace }) {
   const resume = data.completed.includes(data.last) ? lessons.find(d => !data.completed.includes(Number(d.id)))?.id || Number(lessons.at(-1).id) : data.last;
   const title = query ? 'Search the fieldguide' : route.kind === 'lesson' ? `Part ${pad(currentModule)} / Lesson ${pad(route.id)}` : ({ home: 'Your learning path', part: `Part ${pad(route.id)}`, labs: 'Interactive labs', arcade: 'The backend arcade', practice:'Practice studio', tutor:'Course tutor', prompts: 'Prompt workshop', resources: 'Reference desk', settings: 'Settings', course: 'Your course workspace' }[route.kind]);
 
-  return <div className={`app-shell ${focus ? 'focus-mode' : ''} ${data.reduceMotion ? 'motion-quiet' : ''} ${tutorLayout.visible ? 'has-tutor' : ''}`} style={{'--tutor-space': `${tutorLayout.width + 24}px`}}>
+  return <div className={`app-shell ${focus ? 'focus-mode' : ''} ${data.reduceMotion ? 'motion-quiet' : ''} ${tutorLayout.visible ? 'has-tutor' : ''} ${tutorLayout.expanded ? 'tutor-wide' : ''}`} style={{'--tutor-space': `${tutorLayout.width + 24}px`}}>
     <a className="skip-link" href="#main-content" onClick={e => { e.preventDefault(); document.getElementById('main-content')?.focus(); }}>{t("Skip to learning content")}</a>
     {menu && <button className="menu-shade" onClick={() => setMenu(false)} aria-label={t("Close navigation")}/>}
     <aside className={`sidebar ${menu ? 'open' : ''}`}>

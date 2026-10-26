@@ -193,3 +193,5 @@ If the owner later configures their own Vercel project, use the variables above,
 Run `npm test` and `npm run build` for the project's automated checks. Mocked provider tests can establish routing and validation behavior without spending credits; they cannot prove that a real key, quota or model works. Inspect [VERIFICATION.md](VERIFICATION.md) for the checks actually run and any live-integration limits.
 
 Model and provider documentation above was reviewed on **26 October 2026**. Recheck official sources when changing models, pricing assumptions or deployment settings.
+
+Course-only imports accept up to 5 MB; full progress imports accept up to 16 MB, including bounded notes and Unicode text. Replacing a different custom lesson that happens to use the same ID clears its old notes and assessment credit. Export your current progress first when you want to preserve that prior copy.

@@ -63,7 +63,7 @@ export default function LessonExperience({ lesson: d, module: m, quiz, go, copy,
 
   return <article className="page lesson-page guided-lesson">
     <div className="lesson-topline"><button className="back-link" onClick={() => go('part', m.id)}>← {t(m.title)}</button><button className="tutor-lesson-link" onClick={() => go('tutor', id)}>{t("Ask the tutor ↗")}</button><span className="lesson-reward">✦ {t(finished ? '20 XP earned' : '20 XP to discover')}</span></div>
-    <div className="lesson-heading"><span className="eyebrow">{t("PART ")}{t(String(m.id).padStart(2, '0'))}{t(" · LESSON ")}{t(lessonNumber)} / {t(lessons.length)}</span><span className="pill">{t(finished ? '✓ Lesson complete' : 'One concept. Four small steps.')}</span></div>
+    <div className="lesson-heading"><span className="eyebrow">{t("PART ")}{t(String(m.id).padStart(2, '0'))}{t(" · LESSON ")}{t(lessonNumber)}</span><span className="pill">{t(finished ? '✓ Lesson complete' : 'One concept. Four small steps.')}</span></div>
     <h1 className="page-title">{t(d.title)}</h1>
     {(d.isCustom || d.customized) && <p className="personal-lesson-note">Your course copy · {d.isCustom ? "Added lesson" : "Edited lesson"} · Check proposed content against reliable evidence.</p>}
     <p className="lesson-question">{t(d.question)}</p>

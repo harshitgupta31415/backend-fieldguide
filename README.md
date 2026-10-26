@@ -50,6 +50,8 @@ Automatic failover tries another configured key/provider after quota, credential
 
 Tutor requests include your question, recent conversation, course titles/order, a small completion summary and relevant lesson excerpts, including selected personal edits. Notes and workshop drafts are not attached. Chat and access-code entry stay in page memory and are not exported. Reloading clears the conversation.
 
+![Tutor alongside the lesson](docs/tutor.jpg)
+
 **Voice is optional.** Record → Stop → preview → Transcribe puts a draft in the question box for review; it never sends the question automatically. Recording is limited to 60 seconds and 5 MB. **Read aloud** offers natural English speech through Groq and a selectable browser-voice fallback, with pause/resume/stop. Groq speech uses the existing `GROQ_API_KEYS`; it is separate from the chat provider order. Browser voice needs no app API key. Natural speech reads up to 2,000 characters, and Hindi pronunciation varies. Audio stops when the tutor hides; this app does not save recordings. See [AI_TUTOR.md](docs/AI_TUTOR.md) for voice models, processing, limits and troubleshooting.
 
 Groq may require an organization administrator to review and accept the Orpheus model terms in [Groq model setup](https://console.groq.com/playground?model=canopylabs%2Forpheus-v1-english) before natural speech is enabled. The app displays that setup requirement and offers Browser voice; it does not accept terms on your behalf.

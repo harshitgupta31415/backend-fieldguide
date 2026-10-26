@@ -526,3 +526,14 @@ html, body, .app-shell, .app-shell .workspace, .app-shell main { background: #ff
 .app-shell.has-tutor .lesson-page .page-title{font-size:clamp(28px,3.1vw,44px)}
 }
 @media(min-width:1200px) and (max-width:1500px){.app-shell.has-tutor .sidebar{width:210px;padding-left:14px;padding-right:14px}.app-shell.has-tutor .workspace{margin-left:210px}.app-shell.has-tutor.focus-mode .workspace{margin-left:0}.app-shell.has-tutor .journey-part-grid,.app-shell.has-tutor .studio-grid{grid-template-columns:1fr}}
+
+.app-shell .nav-track{background:transparent}
+.app-shell .nav-track button{background:#fffdf5;border-color:#e0d1f0;color:#725d87}
+.app-shell .nav-track button[aria-pressed=true]{background:#e9d5ff;border-color:#bc98e2;color:#593578}
+@media(min-width:1200px){
+.app-shell.has-tutor.tutor-wide .sidebar{transform:translateX(-100%)}
+.app-shell.has-tutor.tutor-wide .sidebar.open{transform:translateX(0)}
+.app-shell.has-tutor.tutor-wide .workspace{margin-left:0}
+.app-shell.has-tutor.tutor-wide .mobile-menu{display:grid}
+.app-shell.has-tutor.tutor-wide .menu-shade{display:block;position:fixed;inset:0;background:#30244833;z-index:29}
+}
