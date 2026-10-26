@@ -58,7 +58,7 @@ export default function LessonExperience({ lesson: d, module: m, quiz, go, copy,
   }
 
   return <article className="page lesson-page guided-lesson">
-    <div className="lesson-topline"><button className="back-link" onClick={() => go('part', m.id)}>← {m.title}</button><span className="lesson-reward">✦ {finished ? '20 XP earned' : '20 XP to discover'}</span></div>
+    <div className="lesson-topline"><button className="back-link" onClick={() => go('part', m.id)}>← {m.title}</button><button className="tutor-lesson-link" onClick={() => go('tutor', id)}>Ask the tutor ↗</button><span className="lesson-reward">✦ {finished ? '20 XP earned' : '20 XP to discover'}</span></div>
     <div className="lesson-heading"><span className="eyebrow">PART {String(m.id).padStart(2, '0')} · LESSON {lessonNumber} / {lessons.length}</span><span className="pill">{finished ? '✓ Lesson complete' : 'One concept. Four small steps.'}</span></div>
     <h1 className="page-title">{d.title}</h1>
     <p className="lesson-question">{d.question}</p>

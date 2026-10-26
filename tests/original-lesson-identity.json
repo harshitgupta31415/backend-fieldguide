@@ -1,0 +1,302 @@
+[
+  {
+    "id": "01",
+    "title": "Follow one request",
+    "module_id": 1
+  },
+  {
+    "id": "02",
+    "title": "HTTP and JSON",
+    "module_id": 1
+  },
+  {
+    "id": "03",
+    "title": "APIs are agreements",
+    "module_id": 1
+  },
+  {
+    "id": "04",
+    "title": "Validation and useful errors",
+    "module_id": 1
+  },
+  {
+    "id": "05",
+    "title": "Immediate work and background jobs",
+    "module_id": 1
+  },
+  {
+    "id": "06",
+    "title": "Entities and relationships",
+    "module_id": 2
+  },
+  {
+    "id": "07",
+    "title": "Keys and database constraints",
+    "module_id": 2
+  },
+  {
+    "id": "08",
+    "title": "SQL and everyday data operations",
+    "module_id": 2
+  },
+  {
+    "id": "09",
+    "title": "Transactions and competing requests",
+    "module_id": 2
+  },
+  {
+    "id": "10",
+    "title": "Migrations and indexes",
+    "module_id": 2
+  },
+  {
+    "id": "11",
+    "title": "Authentication versus authorization",
+    "module_id": 3
+  },
+  {
+    "id": "12",
+    "title": "Sessions, cookies, and tokens",
+    "module_id": 3
+  },
+  {
+    "id": "13",
+    "title": "Ownership, roles, and least privilege",
+    "module_id": 3
+  },
+  {
+    "id": "14",
+    "title": "Secrets and abuse protection",
+    "module_id": 3
+  },
+  {
+    "id": "15",
+    "title": "Privacy and audit history",
+    "module_id": 3
+  },
+  {
+    "id": "16",
+    "title": "Products, variants, and SKUs",
+    "module_id": 4
+  },
+  {
+    "id": "17",
+    "title": "Inventory and reservation rules",
+    "module_id": 4
+  },
+  {
+    "id": "18",
+    "title": "Authoritative prices and money",
+    "module_id": 4
+  },
+  {
+    "id": "19",
+    "title": "Cart lifecycle and guest merging",
+    "module_id": 4
+  },
+  {
+    "id": "20",
+    "title": "Discounts, tax, and delivery quotes",
+    "module_id": 4
+  },
+  {
+    "id": 21,
+    "title": "Checkout: agree on the final purchase",
+    "module_id": 5
+  },
+  {
+    "id": 22,
+    "title": "Payments: track each attempt",
+    "module_id": 5
+  },
+  {
+    "id": 23,
+    "title": "Webhooks: verify, save, then process",
+    "module_id": 5
+  },
+  {
+    "id": 24,
+    "title": "Idempotency: repeat safely",
+    "module_id": 5
+  },
+  {
+    "id": 25,
+    "title": "Reconcile uncertain and late payments",
+    "module_id": 5
+  },
+  {
+    "id": 26,
+    "title": "Keep three kinds of status separate",
+    "module_id": 6
+  },
+  {
+    "id": 27,
+    "title": "Save what was actually purchased",
+    "module_id": 6
+  },
+  {
+    "id": 28,
+    "title": "Reserve stock without overselling",
+    "module_id": 6
+  },
+  {
+    "id": 29,
+    "title": "Shipments: track items and quantities",
+    "module_id": 6
+  },
+  {
+    "id": 30,
+    "title": "Cancellations, returns, and refunds",
+    "module_id": 6
+  },
+  {
+    "id": 31,
+    "title": "Queues and workers: finish work later",
+    "module_id": 7
+  },
+  {
+    "id": 32,
+    "title": "Retries: wait, limit, and investigate",
+    "module_id": 7
+  },
+  {
+    "id": 33,
+    "title": "The outbox: remember what must be sent",
+    "module_id": 7
+  },
+  {
+    "id": 34,
+    "title": "External APIs: expect limits and delays",
+    "module_id": 7
+  },
+  {
+    "id": 35,
+    "title": "Scheduled jobs: repair and maintain",
+    "module_id": 7
+  },
+  {
+    "id": 36,
+    "title": "Pagination, filtering, and search",
+    "module_id": 8
+  },
+  {
+    "id": 37,
+    "title": "Indexes and the cost of database work",
+    "module_id": 8
+  },
+  {
+    "id": 38,
+    "title": "Caching: decide what may be stale",
+    "module_id": 8
+  },
+  {
+    "id": 39,
+    "title": "Files, validated uploads, and delivery",
+    "module_id": 8
+  },
+  {
+    "id": 40,
+    "title": "Scale from measured bottlenecks",
+    "module_id": 8
+  },
+  {
+    "id": 41,
+    "title": "Tests prove specific claims",
+    "module_id": 9
+  },
+  {
+    "id": 42,
+    "title": "Test what happens when things go wrong",
+    "module_id": 9
+  },
+  {
+    "id": 43,
+    "title": "Test external services safely",
+    "module_id": 9
+  },
+  {
+    "id": 44,
+    "title": "See what the backend is doing",
+    "module_id": 9
+  },
+  {
+    "id": 45,
+    "title": "Debug with evidence",
+    "module_id": 9
+  },
+  {
+    "id": 46,
+    "title": "Use Git as a change record",
+    "module_id": 10
+  },
+  {
+    "id": 47,
+    "title": "Separate environments and secrets",
+    "module_id": 10
+  },
+  {
+    "id": 48,
+    "title": "Release code and data safely",
+    "module_id": 10
+  },
+  {
+    "id": 49,
+    "title": "Backups need a restore plan",
+    "module_id": 10
+  },
+  {
+    "id": 50,
+    "title": "Monitor what customers depend on",
+    "module_id": 10
+  },
+  {
+    "id": 51,
+    "title": "Read the system before changing it",
+    "module_id": 11
+  },
+  {
+    "id": 52,
+    "title": "Write a specification AI can check",
+    "module_id": 11
+  },
+  {
+    "id": 53,
+    "title": "Keep AI changes small and reviewable",
+    "module_id": 11
+  },
+  {
+    "id": 54,
+    "title": "Give AI evidence when debugging",
+    "module_id": 11
+  },
+  {
+    "id": 55,
+    "title": "Review security and launch evidence",
+    "module_id": 11
+  },
+  {
+    "id": "56",
+    "title": "Choose boundaries before extra services",
+    "module_id": 12
+  },
+  {
+    "id": "57",
+    "title": "Connect records to API contracts",
+    "module_id": 12
+  },
+  {
+    "id": "58",
+    "title": "Trace the complete purchase journey",
+    "module_id": 12
+  },
+  {
+    "id": "59",
+    "title": "Make staff and customer actions agree",
+    "module_id": 12
+  },
+  {
+    "id": "60",
+    "title": "Demonstrate readiness with evidence",
+    "module_id": 12
+  }
+]

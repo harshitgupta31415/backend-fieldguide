@@ -1,1 +1,1814 @@
-[]
+[
+  {
+    "id": "setup",
+    "moduleId": 13,
+    "title": "Rescue the local startup",
+    "intro": "Fieldstore will not start. Inspect each synthetic terminal clue and choose the smallest repair. No commands are executed by this mission.",
+    "kind": "diagnose",
+    "scenarios": [
+      {
+        "title": "A command in the parent folder",
+        "evidence": [
+          "Working directory: projects/",
+          "Application files: projects/fieldstore/package.json",
+          "npm run dev: ENOENT, package.json not found"
+        ],
+        "question": "What should you check or change first?",
+        "choices": [
+          {
+            "text": "Enter the verified fieldstore application directory and inspect its scripts.",
+            "why": "The command is resolving files from the wrong directory; locating the actual package is the direct repair."
+          },
+          {
+            "text": "Delete the lockfile and upgrade all packages.",
+            "why": "Dependency updates cannot make a command read the intended package from the wrong folder."
+          },
+          {
+            "text": "Create a hosted database.",
+            "why": "No backend service is involved in this local file-location error."
+          }
+        ],
+        "correct": 0
+      },
+      {
+        "title": "The executable is missing",
+        "evidence": [
+          "Working directory contains the intended package.json and package-lock.json.",
+          "The dev script invokes next.",
+          "npm ls reports missing declared dependencies; no successful install is recorded."
+        ],
+        "question": "Which next step fits this evidence?",
+        "choices": [
+          {
+            "text": "Disable all server permission checks.",
+            "why": "Permission checks do not install the declared development executable."
+          },
+          {
+            "text": "Verify runtime and manifest/lock agreement, then run the intended lockfile install.",
+            "why": "The package definition exists but the installation is missing; check compatibility before installing its locked tree."
+          },
+          {
+            "text": "Change port numbers until next appears.",
+            "why": "A port change cannot supply an absent dependency."
+          }
+        ],
+        "correct": 1
+      },
+      {
+        "title": "The local address is occupied",
+        "evidence": [
+          "Dependencies are installed.",
+          "Startup reports EADDRINUSE on127.0.0.1:3000.",
+          "Another known local development process is already listening there."
+        ],
+        "question": "What is an appropriate resolution?",
+        "choices": [
+          {
+            "text": "Assume the product schema is invalid.",
+            "why": "The failure occurs while binding an address, before a product query."
+          },
+          {
+            "text": "Terminate every process on the computer.",
+            "why": "That is unrelated and unnecessarily disruptive; identify the actual listener."
+          },
+          {
+            "text": "Inspect the existing listener, then stop it deliberately or use a different local port.",
+            "why": "One address/port cannot be owned by two listening processes; resolve the specific conflict."
+          }
+        ],
+        "correct": 2
+      }
+    ],
+    "completion": "You can identify directory, installation, and binding failures without changing unrelated code or creating cloud resources."
+  },
+  {
+    "id": "env",
+    "moduleId": 14,
+    "title": "Repair the configuration boundary",
+    "intro": "Sort each described item by intended destination, then repair the simulated configuration. All displayed values are synthetic; an example-placeholder is nonfunctional documentation, not a credential.",
+    "kind": "sort",
+    "categories": [
+      {
+        "id": "browser",
+        "label": "Browser-safe by design"
+      },
+      {
+        "id": "server",
+        "label": "Server-only actual value"
+      },
+      {
+        "id": "example",
+        "label": "Nonfunctional example placeholder"
+      }
+    ],
+    "sortItems": [
+      {
+        "label": "NEXT_PUBLIC_SUPABASE_URL: selected project's public URL",
+        "correct": "browser",
+        "why": "The public endpoint identifies the project; it is deliberately visible and is not a customer identity."
+      },
+      {
+        "label": "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: actual publishable application key",
+        "correct": "browser",
+        "why": "This key is designed for public components; grants, RLS, and user identity still determine access."
+      },
+      {
+        "label": "SUPABASE_SECRET_KEY: actual privileged credential",
+        "correct": "server",
+        "why": "It bypasses RLS and must stay in controlled backend consumers."
+      },
+      {
+        "label": "DATABASE_URL: actual connection string with database password",
+        "correct": "server",
+        "why": "A database credential is not public SDK configuration."
+      },
+      {
+        "label": "PAYMENT_WEBHOOK_SECRET: actual verification secret",
+        "correct": "server",
+        "why": "Incoming event verification material belongs on the receiving backend."
+      },
+      {
+        "label": ".env.example: DATABASE_URL=replace-with-local-test-url",
+        "correct": "example",
+        "why": "This documents a required name with a deliberately nonfunctional value."
+      },
+      {
+        "label": ".env.example: SUPABASE_SECRET_KEY=replace-only-on-server",
+        "correct": "example",
+        "why": "A placeholder is documentation; no real secret belongs in the committed template."
+      },
+      {
+        "label": "NEXT_PUBLIC_STORE_NAME: Fieldstore",
+        "correct": "browser",
+        "why": "A public display label is intentionally inspectable and carries no privileged access."
+      }
+    ],
+    "scenarios": [
+      {
+        "title": "Testing points at production",
+        "evidence": [
+          "FIELDSTORE_ENV=test",
+          "Effective DATABASE_URL target is classified production.",
+          "A shell environment override takes precedence over local files."
+        ],
+        "question": "What should happen before any test seed or write?",
+        "choices": [
+          {
+            "text": "Run once to see whether important rows change.",
+            "why": "The target is already known to be forbidden; a trial write can damage real data."
+          },
+          {
+            "text": "Refuse startup, repair the complete target/credential bundle, and validate isolation.",
+            "why": "The effective target determines impact, regardless of a test label."
+          },
+          {
+            "text": "Rename DATABASE_URL without changing its value.",
+            "why": "A new name does not change where a connection goes."
+          }
+        ],
+        "correct": 1
+      },
+      {
+        "title": "A public privileged key",
+        "evidence": [
+          "A developer added NEXT_PUBLIC_SUPABASE_SECRET_KEY.",
+          "The client build contains its actual privileged value.",
+          "The local file is ignored by Git."
+        ],
+        "question": "Which repair addresses exposure and future access?",
+        "choices": [
+          {
+            "text": "Only delete the local file.",
+            "why": "Built files and other copies may retain an active credential."
+          },
+          {
+            "text": "Keep it because .gitignore protects browser bundles.",
+            "why": ".gitignore does not control what a build sends to clients."
+          },
+          {
+            "text": "Remove the exposure, rotate/revoke the key under the incident plan, and update controlled consumers.",
+            "why": "Fix the code path and the provider-side capability; neither step alone completes recovery."
+          }
+        ],
+        "correct": 2
+      },
+      {
+        "title": "A frozen public project URL",
+        "evidence": [
+          "The client artifact was built for a staging target.",
+          "A server variable was changed later.",
+          "The browser still uses the staged public URL."
+        ],
+        "question": "What explains the result?",
+        "choices": [
+          {
+            "text": "The public value was embedded at build time; rebuild intentionally or design safe runtime configuration.",
+            "why": "A server environment edit does not rewrite already built JavaScript."
+          },
+          {
+            "text": "All browsers continuously read the server's process.env.",
+            "why": "The client does not have direct access to server process memory."
+          },
+          {
+            "text": "Prefixing a secret with NEXT_PUBLIC encrypts it.",
+            "why": "The prefix exposes supported values to the client; it is not encryption."
+          }
+        ],
+        "correct": 0
+      }
+    ],
+    "completion": "You can classify capability, refuse cross-environment writes, and distinguish build-time public values from protected runtime credentials.",
+    "simulator": "environment"
+  },
+  {
+    "id": "next-flow",
+    "moduleId": 15,
+    "title": "Assemble Add to cart",
+    "intro": "Order this specific Fieldstore mutation route, then find misplaced checks. This model saves cart intention but does not reserve stock.",
+    "kind": "sort",
+    "orderItems": [
+      {
+        "id": "intent",
+        "label": "Shopper selects a variant and clicks Add to cart.",
+        "why": "The browser collects an intention, not an authoritative price or identity."
+      },
+      {
+        "id": "request",
+        "label": "Browser sends desired variant and quantity to the existing server entry point.",
+        "why": "The request carries untrusted input for validation."
+      },
+      {
+        "id": "verify",
+        "label": "Server verifies identity, scopes the cart, and validates current rules.",
+        "why": "The actual operation enforces access even when UI controls are bypassed."
+      },
+      {
+        "id": "commit",
+        "label": "Shared cart operation commits the permitted quantity change.",
+        "why": "Persistent state and defined retry semantics make the result survive refresh without unintended increments."
+      },
+      {
+        "id": "respond",
+        "label": "Return the authoritative cart or safe error.",
+        "why": "The response reports the actual outcome instead of presuming every click succeeded."
+      },
+      {
+        "id": "render",
+        "label": "Browser renders the confirmed result or reconciles provisional UI.",
+        "why": "Presentation follows evidence; it cannot substitute for the saved record."
+      }
+    ],
+    "orderStart": [
+      "respond",
+      "intent",
+      "commit",
+      "render",
+      "request",
+      "verify"
+    ],
+    "scenarios": [
+      {
+        "title": "Security only in the component",
+        "evidence": [
+          "The admin button is hidden.",
+          "The Server Action checks only that any session exists.",
+          "A normal customer can call it directly."
+        ],
+        "question": "Where is the required repair?",
+        "choices": [
+          {
+            "text": "Add operation/resource authorization inside the trusted action path.",
+            "why": "Hidden controls and action identifiers do not enforce server permission."
+          },
+          {
+            "text": "Make the button smaller.",
+            "why": "Visual design cannot constrain a direct request."
+          },
+          {
+            "text": "Use a more obscure action name.",
+            "why": "Obscurity is not an authorization policy."
+          }
+        ],
+        "correct": 0
+      },
+      {
+        "title": "Two meanings of quantity",
+        "evidence": [
+          "The server increments by2 on each request.",
+          "A timeout triggers a retry of the same intended action.",
+          "The cart grows by4."
+        ],
+        "question": "What must be clarified and protected?",
+        "choices": [
+          {
+            "text": "The color of the success toast.",
+            "why": "The stored quantity, not its appearance, is incorrect."
+          },
+          {
+            "text": "Set-versus-increment semantics and repeat-safe operation handling.",
+            "why": "A repeated request must not unexpectedly repeat the intended effect."
+          },
+          {
+            "text": "Only the page refresh interval.",
+            "why": "Refreshing will show the wrong persisted quantity rather than repair it."
+          }
+        ],
+        "correct": 1
+      },
+      {
+        "title": "Malformed request",
+        "evidence": [
+          "POST body is broken JSON.",
+          "The handler returns a raw parser stack trace.",
+          "No cart write occurred."
+        ],
+        "question": "Which behavior should replace the raw disclosure?",
+        "choices": [
+          {
+            "text": "Return200 and create an empty order.",
+            "why": "Malformed input must not become fabricated success or an unrelated mutation."
+          },
+          {
+            "text": "Expose environment values to help the customer debug.",
+            "why": "That would disclose configuration without solving the input error."
+          },
+          {
+            "text": "Return the documented safe parse error and keep redacted diagnostics server-side.",
+            "why": "Handle invalid input deliberately, without leaking internals or claiming a write."
+          }
+        ],
+        "correct": 2
+      }
+    ],
+    "completion": "You can trace request-to-record behavior and locate permission, retry, and parsing checks in trusted code."
+  },
+  {
+    "id": "supabase-access",
+    "moduleId": 16,
+    "title": "Defend two customer accounts",
+    "intro": "Use a publishable component key and distinct synthetic user identities. Secret-key success is not evidence that customer policies work.",
+    "kind": "diagnose",
+    "scenarios": [
+      {
+        "title": "Customer A selects B's order",
+        "evidence": [
+          "Both users are signed in separately.",
+          "The intended SELECT policy checks auth.uid() = customer_id.",
+          "A targets B's order ID directly."
+        ],
+        "question": "What is the intended customer result?",
+        "choices": [
+          {
+            "text": "Return B's order because A is authenticated.",
+            "why": "Authentication alone does not authorize a different customer's resource."
+          },
+          {
+            "text": "No B row becomes visible to A under the ownership policy.",
+            "why": "The row predicate scopes the otherwise permitted SELECT; the API may represent this as an empty result."
+          },
+          {
+            "text": "Reveal the row but hide the button afterward.",
+            "why": "The data would already be exposed."
+          }
+        ],
+        "correct": 1
+      },
+      {
+        "title": "New table has no API grant",
+        "evidence": [
+          "The table exists and RLS is enabled.",
+          "Data API reports permission denied for the intended role.",
+          "No appropriate SELECT grant is present."
+        ],
+        "question": "Which change addresses the actual access layer?",
+        "choices": [
+          {
+            "text": "Disable RLS on all tables.",
+            "why": "Row filtering is separate from the missing operation privilege and should remain enforced."
+          },
+          {
+            "text": "Put the privileged secret key in the browser.",
+            "why": "That bypasses protection and exposes elevated capability."
+          },
+          {
+            "text": "Review exposure and add only the intended table privilege while retaining appropriate RLS.",
+            "why": "A grant makes the operation eligible; policies still constrain which rows it can access."
+          }
+        ],
+        "correct": 2
+      },
+      {
+        "title": "Own order does not mean editable money",
+        "evidence": [
+          "Customer A may read A's order.",
+          "A submits paid=true and total_minor=1.",
+          "Order money and payment transitions are server-owned."
+        ],
+        "question": "Which result preserves the store's model?",
+        "choices": [
+          {
+            "text": "Reject the unauthorized mutation even though the customer owns the order.",
+            "why": "Ownership permits only explicitly allowed operations and fields, not rewriting financial truth."
+          },
+          {
+            "text": "Accept it because any owner may edit any field.",
+            "why": "That confuses resource scope with operation and column authority."
+          },
+          {
+            "text": "Accept it only when the browser hides the price input.",
+            "why": "A direct caller can still submit the field; UI visibility adds no permission."
+          }
+        ],
+        "correct": 0
+      }
+    ],
+    "completion": "You can distinguish role grants, row scope, operation/column permission, and bypass credentials using direct two-customer tests.",
+    "simulator": "permissions"
+  },
+  {
+    "id": "auth-lifecycle",
+    "moduleId": 17,
+    "title": "Repair the identity journey",
+    "intro": "Follow three synthetic account incidents without logging tokens, contacting Auth, or creating users.",
+    "kind": "diagnose",
+    "scenarios": [
+      {
+        "title": "A cookie that is no longer enough",
+        "evidence": [
+          "The browser has an expired access token.",
+          "Server code trusts the getSession user object.",
+          "A protected order read is attempted without verified identity."
+        ],
+        "question": "What should the trusted path do?",
+        "choices": [
+          {
+            "text": "Follow supported refresh, verify identity, and authorize the order; require sign-in if recovery fails.",
+            "why": "A session-shaped value does not establish current valid identity or order permission."
+          },
+          {
+            "text": "Trust any cookie containing a user ID.",
+            "why": "Client-controlled storage is not sufficient verification."
+          },
+          {
+            "text": "Disable all order ownership checks while refreshing.",
+            "why": "Identity renewal does not justify removing resource protection."
+          }
+        ],
+        "correct": 0
+      },
+      {
+        "title": "The callback points elsewhere",
+        "evidence": [
+          "Fieldstore runs at127.0.0.1:3000.",
+          "The configured callback points to a different hostname.",
+          "The login return does not establish the intended local session."
+        ],
+        "question": "Which focused repair is appropriate?",
+        "choices": [
+          {
+            "text": "Allow every possible redirect destination.",
+            "why": "A broad bypass obscures the configuration error and can enable unsafe redirects."
+          },
+          {
+            "text": "Match the approved exact origin/path and verify the documented exchange and cookie flow.",
+            "why": "Callback configuration and completion must agree with the actual environment."
+          },
+          {
+            "text": "Store the user's password in the URL.",
+            "why": "That exposes credentials and does not implement the required exchange."
+          }
+        ],
+        "correct": 1
+      },
+      {
+        "title": "The self-awarded admin role",
+        "evidence": [
+          "A customer updates user_metadata.role to admin.",
+          "The refund handler reads that field as authority.",
+          "No trusted staff assignment exists."
+        ],
+        "question": "Which boundary must be restored?",
+        "choices": [
+          {
+            "text": "Only rename the profile form field.",
+            "why": "The user can still edit permitted metadata directly."
+          },
+          {
+            "text": "Keep trusting it because it appears in a signed token.",
+            "why": "A signed claim can still carry user-editable content; signature does not make that content a trusted assignment."
+          },
+          {
+            "text": "Use protected staff assignments and current permission checks where required.",
+            "why": "Authority must come from a trusted assignment path and account for stale claims."
+          }
+        ],
+        "correct": 2
+      }
+    ],
+    "completion": "You can separate session data from verification, exact callback routing, and trusted staff authority."
+  },
+  {
+    "id": "storage-tools",
+    "moduleId": 18,
+    "title": "Protect files and recover live updates",
+    "intro": "Configure the intended access behavior for synthetic Fieldstore photos, invoices, updates, and function work. No bucket, subscription, or function is created.",
+    "kind": "configure",
+    "scenarios": [
+      {
+        "title": "Photo versus invoice",
+        "evidence": [
+          "Approved product photos should be publicly visible.",
+          "Invoices contain private customer details.",
+          "Uploads and deletions still require authorized actors."
+        ],
+        "question": "Which bucket/access design fits?",
+        "choices": [
+          {
+            "text": "Put both file types in one public bucket and use long names.",
+            "why": "A public invoice remains publicly retrievable when its URL is known."
+          },
+          {
+            "text": "Public approved photos; private invoices with per-document authorization and scoped downloads.",
+            "why": "Audience determines delivery policy; public retrieval does not require public write privileges."
+          },
+          {
+            "text": "Allow every signed-in user to issue invoice URLs for any path.",
+            "why": "Being signed in does not establish ownership of a specific document."
+          }
+        ],
+        "correct": 1
+      },
+      {
+        "title": "A misleading image upload",
+        "evidence": [
+          "The browser says photo.jpg.",
+          "Actual bytes are not an approved image format.",
+          "The upload exceeds the configured dimension/size policy."
+        ],
+        "question": "What should the workflow do?",
+        "choices": [
+          {
+            "text": "Publish because the extension is .jpg.",
+            "why": "The name and claimed content type are untrusted."
+          },
+          {
+            "text": "Make the bucket public to solve validation.",
+            "why": "Visibility does not inspect bytes or enforce the intended safety limits."
+          },
+          {
+            "text": "Reject or quarantine through the defined inspection path before any public derivative is served.",
+            "why": "Authorized, bounded, actual-content validation must precede public publication."
+          }
+        ],
+        "correct": 2
+      },
+      {
+        "title": "The realtime connection gap",
+        "evidence": [
+          "The dashboard was offline for ten minutes.",
+          "Orders may have changed during that interval.",
+          "The current socket shows no new event."
+        ],
+        "question": "How should the view recover?",
+        "choices": [
+          {
+            "text": "Reauthorize and refetch current durable state, then restore the scoped subscription.",
+            "why": "No visible event cannot prove no missed change; current state repairs the knowledge gap."
+          },
+          {
+            "text": "Assume the old screen is complete forever.",
+            "why": "Disconnected delivery provides no such guarantee."
+          },
+          {
+            "text": "Repeat the customer's payment to generate a fresh event.",
+            "why": "A new charge is unrelated and unsafe."
+          }
+        ],
+        "correct": 0
+      },
+      {
+        "title": "Verified user, privileged query",
+        "evidence": [
+          "An Edge Function verifies a real user.",
+          "Its admin client bypasses RLS.",
+          "The query selects every customer's invoice record."
+        ],
+        "question": "What else is required?",
+        "choices": [
+          {
+            "text": "Only a nicer success message.",
+            "why": "The problem is unauthorized data scope."
+          },
+          {
+            "text": "Enforce the caller's resource scope or use a correctly caller-scoped client.",
+            "why": "Identity verification does not constrain privileged database access by itself."
+          },
+          {
+            "text": "Send the secret key to the browser for filtering.",
+            "why": "That exposes elevated capability and moves enforcement into an untrusted client."
+          }
+        ],
+        "correct": 1
+      }
+    ],
+    "completion": "You can configure public/private file paths, require real upload inspection, recover missed state, and retain authorization inside privileged functions."
+  },
+  {
+    "id": "vercel-release-room",
+    "moduleId": 19,
+    "title": "Repair the simulated preview",
+    "intro": "Inspect a fictional release of Fieldstore. Choose the change supported by the evidence. Nothing is deployed.",
+    "kind": "configure",
+    "scenarios": [
+      {
+        "title": "Green build, broken cart",
+        "evidence": [
+          "Build: passed for rev-PLACEHOLDER",
+          "Preview request: CONFIG_MISSING DATABASE_URL",
+          "Variable scope: production only"
+        ],
+        "question": "What is the smallest correct repair?",
+        "choices": [
+          {
+            "text": "Add an isolated preview configuration and create a new simulated deployment.",
+            "why": "The preview needs its own scoped value, and deployment configuration is not retroactively rewritten."
+          },
+          {
+            "text": "Use the production database in every environment.",
+            "why": "This breaks data isolation and can turn testing into real changes."
+          },
+          {
+            "text": "Expose DATABASE_URL to the browser.",
+            "why": "A database credential must not enter a public bundle."
+          }
+        ],
+        "correct": 0
+      },
+      {
+        "title": "Login returns to the wrong host",
+        "evidence": [
+          "Shop host: shop.example.test",
+          "Auth callback: old-preview.example.test/auth/callback",
+          "Database probe: passed"
+        ],
+        "question": "Where should you investigate?",
+        "choices": [
+          {
+            "text": "Delete all auth checks.",
+            "why": "The evidence points to the return URL contract, not a need to remove verification."
+          },
+          {
+            "text": "Compare the exact approved callback and site URL for this environment.",
+            "why": "Scheme, host and path must match the intended login flow; update only approved destinations."
+          },
+          {
+            "text": "Buy a larger compute plan.",
+            "why": "More compute cannot fix the callback mismatch."
+          }
+        ],
+        "correct": 1
+      },
+      {
+        "title": "The old browser URL remains",
+        "evidence": [
+          "NEXT_PUBLIC_API_URL changed after build",
+          "Current browser bundle still contains old.example.test",
+          "No new deployment was built"
+        ],
+        "question": "What explains the result?",
+        "choices": [
+          {
+            "text": "Public build-time values may remain embedded until a new build.",
+            "why": "A running environment variable cannot rewrite already-produced JavaScript."
+          },
+          {
+            "text": "The browser can decrypt hidden server secrets.",
+            "why": "Public variables are intentionally exposed, not encrypted credentials."
+          },
+          {
+            "text": "The database password is necessarily wrong.",
+            "why": "No database evidence supports that conclusion."
+          }
+        ],
+        "correct": 0
+      },
+      {
+        "title": "Rollback and side effects",
+        "evidence": [
+          "rev-B created SHIPMENT_PLACEHOLDER",
+          "rev-B then began returning errors",
+          "rev-A is considered for rollback"
+        ],
+        "question": "Which step belongs in recovery?",
+        "choices": [
+          {
+            "text": "Erase the provider shipment ID.",
+            "why": "Erasing evidence makes duplicate fulfillment more likely."
+          },
+          {
+            "text": "Assume rollback cancels the parcel.",
+            "why": "Changing application code does not undo external resources."
+          },
+          {
+            "text": "Check old-code compatibility and reconcile the existing shipment.",
+            "why": "Recovery must respect current data and side effects already committed."
+          }
+        ],
+        "correct": 2
+      }
+    ],
+    "completion": "You can connect a failure to build scope, callback configuration or persistent release side effects without deploying."
+  },
+  {
+    "id": "render-operations-desk",
+    "moduleId": 20,
+    "title": "Bring the service back to healthy",
+    "intro": "Diagnose four local fixtures representing a Render API and worker. Every fix is a teaching decision, not a cloud change.",
+    "kind": "diagnose",
+    "scenarios": [
+      {
+        "title": "The router cannot reach the API",
+        "evidence": [
+          "Start log: listening on 127.0.0.1:3000",
+          "Configured PORT: 10000",
+          "Process has not exited"
+        ],
+        "question": "Which configuration should the hosted-service fixture use?",
+        "choices": [
+          {
+            "text": "0.0.0.0 and the supplied PORT.",
+            "why": "The platform router needs a reachable interface and configured listener; the actual course stays on localhost."
+          },
+          {
+            "text": "No HTTP listener.",
+            "why": "A web service must receive HTTP traffic."
+          },
+          {
+            "text": "A secret added to the query string.",
+            "why": "Credentials do not fix the listener and should not be exposed in URLs."
+          }
+        ],
+        "correct": 0
+      },
+      {
+        "title": "The readiness probe gets 401",
+        "evidence": [
+          "GET /health: 401",
+          "Authenticated order request: 200",
+          "Global session middleware covers every path"
+        ],
+        "question": "What is the proportionate repair?",
+        "choices": [
+          {
+            "text": "Remove order ownership checks.",
+            "why": "This creates an unrelated security flaw."
+          },
+          {
+            "text": "Provide the minimal dedicated probe path while preserving business authorization.",
+            "why": "The probe contract and customer permissions have separate purposes."
+          },
+          {
+            "text": "Return 200 from checkout even when saves fail.",
+            "why": "This hides errors and lies about business outcomes."
+          }
+        ],
+        "correct": 1
+      },
+      {
+        "title": "Invoice disappears after restart",
+        "evidence": [
+          "PDF written to /tmp/invoice.pdf",
+          "Process restarted",
+          "Database still holds the path string"
+        ],
+        "question": "What is missing?",
+        "choices": [
+          {
+            "text": "A longer filename.",
+            "why": "Naming does not make temporary bytes durable."
+          },
+          {
+            "text": "A second browser refresh.",
+            "why": "The artifact is no longer present."
+          },
+          {
+            "text": "Durable private storage plus an authorized database reference.",
+            "why": "The final bytes need persistence, while the record needs ownership and location metadata."
+          }
+        ],
+        "correct": 2
+      },
+      {
+        "title": "Worker cannot reach its API",
+        "evidence": [
+          "Worker and private service are in different regions",
+          "Configured address is an internal Render hostname",
+          "No supported cross-region connection was configured"
+        ],
+        "question": "What should be checked?",
+        "choices": [
+          {
+            "text": "The actual private-network boundary and region placement.",
+            "why": "Internal hostnames are only useful within the supported network; design a secure reachable connection."
+          },
+          {
+            "text": "Whether the database is named after the project.",
+            "why": "A display name cannot fix routing."
+          },
+          {
+            "text": "Whether all API routes can become public and unprotected.",
+            "why": "Reachability must be solved without removing service authorization."
+          }
+        ],
+        "correct": 0
+      }
+    ],
+    "completion": "You can distinguish listener, readiness, persistence and network failures using concrete evidence."
+  },
+  {
+    "id": "architecture-board",
+    "moduleId": 21,
+    "title": "Place the store components",
+    "intro": "Place each responsibility in the simplest appropriate zone for our chosen example: browser, trusted application server, durable data service or optional worker. All three platforms are optional choices.",
+    "kind": "architecture",
+    "categories": [
+      {
+        "id": "browser",
+        "label": "Browser"
+      },
+      {
+        "id": "server",
+        "label": "Trusted application server"
+      },
+      {
+        "id": "data",
+        "label": "Durable data service"
+      },
+      {
+        "id": "worker",
+        "label": "Optional worker"
+      }
+    ],
+    "sortItems": [
+      {
+        "label": "Display a shirt and collect quantity input",
+        "correct": "browser",
+        "why": "Presentation and user intent belong in the browser; the submitted quantity is still untrusted."
+      },
+      {
+        "label": "Authorize cart ownership and calculate the payable total",
+        "correct": "server",
+        "why": "The server uses verified identity and trusted records before an operation is accepted."
+      },
+      {
+        "label": "Enforce stored relationships and unique fulfillment intent",
+        "correct": "data",
+        "why": "Database constraints protect shared facts even when multiple requests overlap."
+      },
+      {
+        "label": "Consume a durable invoice queue with bounded concurrency",
+        "correct": "worker",
+        "why": "A separate worker is justified when independent asynchronous execution is a requirement."
+      },
+      {
+        "label": "Keep the shipping provider credential",
+        "correct": "server",
+        "why": "A server-only credential belongs to the trusted service making the provider request, never the browser."
+      },
+      {
+        "label": "Persist orders, operation status and provider identifier mappings",
+        "correct": "data",
+        "why": "Durable records let the system recover after processes disappear."
+      }
+    ],
+    "scenarios": [
+      {
+        "title": "A small request-based store",
+        "evidence": [
+          "One team",
+          "Short request handlers",
+          "No independent long-running workload"
+        ],
+        "question": "What is a reasonable initial design?",
+        "choices": [
+          {
+            "text": "One application with server routes and managed durable data.",
+            "why": "This is sufficient if it meets the workload and operational requirements."
+          },
+          {
+            "text": "Always require all three platforms.",
+            "why": "Vendor count is not an acceptance criterion."
+          },
+          {
+            "text": "Browser-only checkout with a secret key.",
+            "why": "Trusted money and access operations cannot be delegated to an untrusted client."
+          }
+        ],
+        "correct": 0
+      },
+      {
+        "title": "A new invoice workload",
+        "evidence": [
+          "Large PDF generation delays responses",
+          "Jobs must survive deploys",
+          "Current system has durable order records"
+        ],
+        "question": "What extra responsibility is justified?",
+        "choices": [
+          {
+            "text": "Move every button into another microservice.",
+            "why": "That does not address the specific asynchronous requirement."
+          },
+          {
+            "text": "A durable job path and a worker or workflow suited to the workload.",
+            "why": "The separation addresses process lifetime and scaling while retaining an operation record."
+          },
+          {
+            "text": "Fire an unawaited promise and return success.",
+            "why": "No durable work record or recovery is guaranteed."
+          }
+        ],
+        "correct": 1
+      },
+      {
+        "title": "Where is the authoritative price?",
+        "evidence": [
+          "Browser sends totalMinor: 1",
+          "Stored shirt price: 25000 INR minor units",
+          "Quantity: 1"
+        ],
+        "question": "Which component decides the payable amount?",
+        "choices": [
+          {
+            "text": "The browser because the customer controls it.",
+            "why": "Customer input is not an authoritative price."
+          },
+          {
+            "text": "Any cache entry from last year.",
+            "why": "Checkout must apply the current trusted pricing contract."
+          },
+          {
+            "text": "The trusted business operation using validated server data.",
+            "why": "The architecture needs a clear pricing authority, not competing calculations."
+          }
+        ],
+        "correct": 2
+      }
+    ],
+    "completion": "You can explain every component, its credential boundary and the requirement for any optional service."
+  },
+  {
+    "id": "shipment-booking-desk",
+    "moduleId": 22,
+    "title": "Book one parcel without duplicates",
+    "intro": "Follow a synthetic Fieldstore parcel through quote, booking timeout and pickup preparation. No Shiprocket request is made.",
+    "kind": "shipment",
+    "scenarios": [
+      {
+        "title": "Measure the packed shirt",
+        "evidence": [
+          "Actual weight: 0.4 kg",
+          "Box: 20 × 15 × 10 cm",
+          "Exercise-only divisor: 5000"
+        ],
+        "question": "Which weight comparison is correct before courier-specific slabs?",
+        "choices": [
+          {
+            "text": "max(0.4, 0.6) = 0.6 kg.",
+            "why": "The assumed volumetric calculation is 3000/5000. Actual pricing still needs the selected courier rules."
+          },
+          {
+            "text": "0.4 kg, dimensions never matter.",
+            "why": "Space can affect chargeable weight."
+          },
+          {
+            "text": "25000 kg.",
+            "why": "Money minor units and package weights must remain distinct."
+          }
+        ],
+        "correct": 0
+      },
+      {
+        "title": "Create response is lost",
+        "evidence": [
+          "Fulfillment intent: FULFILLMENT_PLACEHOLDER",
+          "Provider fixture created SHIPMENT_PLACEHOLDER",
+          "Client observed a timeout"
+        ],
+        "question": "What is the next state and action?",
+        "choices": [
+          {
+            "text": "failed; create a new order immediately.",
+            "why": "A timeout did not prove rejection and can lead to duplicates."
+          },
+          {
+            "text": "uncertain; reconcile the existing intent and reference.",
+            "why": "Recover the already-created resource using supported evidence before considering a new create."
+          },
+          {
+            "text": "delivered; deduct stock again.",
+            "why": "Neither delivery nor a second stock effect follows from a timeout."
+          }
+        ],
+        "correct": 1
+      },
+      {
+        "title": "Recover the booking",
+        "evidence": [
+          "Reconciliation matched account, reference and parcel",
+          "Existing provider shipment: SHIPMENT_PLACEHOLDER",
+          "No AWB assigned yet"
+        ],
+        "question": "What should be saved?",
+        "choices": [
+          {
+            "text": "Only a green success icon.",
+            "why": "An icon cannot support retries or later API operations."
+          },
+          {
+            "text": "A fresh merchant reference for another shipment.",
+            "why": "The existing resource has been confirmed."
+          },
+          {
+            "text": "The provider identifiers on the existing fulfillment intent, then resume AWB assignment.",
+            "why": "The mapping lets later steps use the correct ID type without another booking."
+          }
+        ],
+        "correct": 2
+      },
+      {
+        "title": "Pickup has not happened",
+        "evidence": [
+          "AWB assigned",
+          "Label ready",
+          "Pickup requested; no collection evidence"
+        ],
+        "question": "What should the customer see?",
+        "choices": [
+          {
+            "text": "Awaiting pickup.",
+            "why": "Documents and requests prepare movement; actual handover evidence is still missing."
+          },
+          {
+            "text": "Delivered.",
+            "why": "No delivery evidence exists."
+          },
+          {
+            "text": "Refund paid.",
+            "why": "Refund execution is a separate business operation."
+          }
+        ],
+        "correct": 0
+      }
+    ],
+    "completion": "You recovered the same synthetic booking and distinguished its documents from physical shipment.",
+    "simulator": "shipment"
+  },
+  {
+    "id": "fulfillment-control-room",
+    "moduleId": 23,
+    "title": "Resolve delivery, return and money separately",
+    "intro": "Work through an event timeline with safe decisions. The store, provider, bank and warehouse facts remain separate.",
+    "kind": "fulfillment",
+    "scenarios": [
+      {
+        "title": "Delayed notification",
+        "evidence": [
+          "Saved shipment: delivered at 14:00",
+          "Incoming event: in_transit observed 10:00",
+          "Token validated; event not yet stored"
+        ],
+        "question": "How do you apply it?",
+        "choices": [
+          {
+            "text": "Store the observation, avoid blind regression and reconcile a contradiction.",
+            "why": "Arrival order is not event order; semantic transition rules protect state."
+          },
+          {
+            "text": "Always overwrite with the newest arrival.",
+            "why": "That can regress a delivered parcel."
+          },
+          {
+            "text": "Compare the numeric status codes as if they were timestamps.",
+            "why": "Provider codes name states, not universal progress ranks."
+          }
+        ],
+        "correct": 0
+      },
+      {
+        "title": "Failed delivery becomes RTO",
+        "evidence": [
+          "One failed attempt recorded",
+          "Supported return-to-origin action confirmed",
+          "Parcel has not reached the warehouse"
+        ],
+        "question": "Can the item become available stock?",
+        "choices": [
+          {
+            "text": "Yes, immediately at the request.",
+            "why": "The physical item and its condition are unverified."
+          },
+          {
+            "text": "No; track return, confirm receipt and inspect.",
+            "why": "Movement initiation is not sellable inventory."
+          },
+          {
+            "text": "Yes, if the tracking webhook was authenticated.",
+            "why": "Authentication does not turn an intermediate event into a warehouse inspection."
+          }
+        ],
+        "correct": 1
+      },
+      {
+        "title": "A damaged shirt arrives",
+        "evidence": [
+          "Warehouse received one returned shirt",
+          "Inspection: damaged, not sellable",
+          "Prepaid refund request: approved but not executed"
+        ],
+        "question": "What are the correct records?",
+        "choices": [
+          {
+            "text": "Available stock +1 and refund successful.",
+            "why": "Neither sellability nor money movement is supported."
+          },
+          {
+            "text": "No record because damaged items do not count.",
+            "why": "Receipt and disposition still require an audit trail."
+          },
+          {
+            "text": "Record receipt and damaged disposition; keep refund approved pending execution.",
+            "why": "Inventory condition and refund execution are independent facts."
+          }
+        ],
+        "correct": 2
+      },
+      {
+        "title": "Delivered COD, no bank match",
+        "evidence": [
+          "Order total: INR 25000 minor units",
+          "Delivery and customer collection confirmed",
+          "No remittance/bank receipt matched"
+        ],
+        "question": "What should staff do?",
+        "choices": [
+          {
+            "text": "Keep collection confirmed and reconcile remittance and applicable adjustments.",
+            "why": "A courier collection event is not evidence that funds reached the merchant bank."
+          },
+          {
+            "text": "Charge the customer again.",
+            "why": "The customer collection is already confirmed."
+          },
+          {
+            "text": "Mark merchant bank receipt from tracking alone.",
+            "why": "Movement status cannot prove a bank transfer."
+          }
+        ],
+        "correct": 0
+      }
+    ],
+    "completion": "You kept tracking, return inspection, refunds and COD remittance consistent without merging their states.",
+    "simulator": "fulfillment"
+  },
+  {
+    "id": "practical-24",
+    "moduleId": 24,
+    "title": "The unverified payment desk",
+    "intro": "The browser, backend and provider show different clues. Decide what Fieldstore should display and do without making real payment calls.",
+    "kind": "payment",
+    "scenarios": [
+      {
+        "title": "The browser celebrates first",
+        "evidence": [
+          "FS-1001 expects 25000 INR minor units.",
+          "Browser callback says success; verified backend payment state is pending.",
+          "No capture evidence is stored."
+        ],
+        "question": "What should the customer and staff see?",
+        "choices": [
+          {
+            "text": "Pending verification; staff reconcile A-1.",
+            "why": "Accurate uncertainty avoids shipping or charging again without evidence."
+          },
+          {
+            "text": "Paid and ready to ship.",
+            "why": "The browser callback alone is not verified financial evidence."
+          },
+          {
+            "text": "Failed; pay again immediately.",
+            "why": "The existing attempt may already have succeeded."
+          }
+        ],
+        "correct": 0
+      },
+      {
+        "title": "One captured event arrives twice",
+        "evidence": [
+          "Provider event E-1 has a valid verified payload.",
+          "A-1 matches expected order, amount and currency.",
+          "E-1 is delivered twice; one order confirmation is already recorded."
+        ],
+        "question": "Which transition is valid?",
+        "choices": [
+          {
+            "text": "Confirm twice so both deliveries are acknowledged.",
+            "why": "Repeated delivery should not produce another allocation or notification intent."
+          },
+          {
+            "text": "Record/reuse the existing event outcome and keep one effect.",
+            "why": "Event uniqueness plus guarded business transitions handles retries."
+          },
+          {
+            "text": "Reverse the payment because the provider repeated it.",
+            "why": "Duplicate delivery is not evidence of a refund or reversal."
+          }
+        ],
+        "correct": 1
+      },
+      {
+        "title": "Captured is not settled",
+        "evidence": [
+          "A-1 is verified captured for 25000 minor units.",
+          "Settlement report has not yet matched bank evidence.",
+          "No refund was requested."
+        ],
+        "question": "What is the accurate accounting view?",
+        "choices": [
+          {
+            "text": "Unpaid because settlement is pending.",
+            "why": "This erases a verified customer payment."
+          },
+          {
+            "text": "Refunded because settlement is pending.",
+            "why": "No refund evidence exists."
+          },
+          {
+            "text": "Paid; merchant settlement pending reconciliation.",
+            "why": "Customer collection and merchant-bank receipt are separate dimensions."
+          }
+        ],
+        "correct": 2
+      }
+    ],
+    "completion": "Explain pending verification, duplicate protection and settlement separately; the local panel cannot prove a live payment integration.",
+    "simulator": "payment"
+  },
+  {
+    "id": "practical-25",
+    "moduleId": 25,
+    "title": "One order, one useful message",
+    "intro": "Trace a repeated order event through a durable intent, a provider attempt and delivery feedback. All recipients and messages are synthetic.",
+    "kind": "notification",
+    "scenarios": [
+      {
+        "title": "Five copies of one event",
+        "evidence": [
+          "Five events reference order FS-1001 and receipt template v1.",
+          "Recipient customer-A and channel email are unchanged.",
+          "No receipt intent exists yet."
+        ],
+        "question": "How many business intents should be created?",
+        "choices": [
+          {
+            "text": "Five, because five events arrived.",
+            "why": "Delivery count is not business-intent count."
+          },
+          {
+            "text": "One unique receipt intent with repeatable delivery work.",
+            "why": "A stable unique intent key prevents repeated order events from becoming repeated receipts."
+          },
+          {
+            "text": "Zero; events can never be trusted.",
+            "why": "Verified business events should produce the intended work once."
+          }
+        ],
+        "correct": 1
+      },
+      {
+        "title": "The send response is lost",
+        "evidence": [
+          "Worker sent intent N-1.",
+          "No response was persisted; provider acceptance is uncertain.",
+          "The provider supports the same request key within its documented window."
+        ],
+        "question": "What should the worker preserve?",
+        "choices": [
+          {
+            "text": "The original intent and idempotency identity.",
+            "why": "Reuse the supported retry mechanism and reconcile ambiguity; do not invent a fresh message."
+          },
+          {
+            "text": "A new random key and a new receipt every retry.",
+            "why": "That can create multiple messages for one intention."
+          },
+          {
+            "text": "Only an in-memory sent flag.",
+            "why": "A worker restart loses in-memory evidence."
+          }
+        ],
+        "correct": 0
+      },
+      {
+        "title": "A week-late event and a bounce",
+        "evidence": [
+          "N-1 completed last week.",
+          "The original event is replayed after the provider dedupe window.",
+          "A separate message N-2 has a permanent bounce."
+        ],
+        "question": "Which policy handles both?",
+        "choices": [
+          {
+            "text": "Resend both forever until every customer complains.",
+            "why": "Retries do not fix a permanent destination failure and can duplicate N-1."
+          },
+          {
+            "text": "Delete all notification records.",
+            "why": "That removes the evidence preventing repeated sends."
+          },
+          {
+            "text": "Use the durable ledger for N-1; follow bounce/suppression policy for N-2.",
+            "why": "Application history outlives short provider keys, and delivery failures need their own resolution."
+          }
+        ],
+        "correct": 2
+      }
+    ],
+    "completion": "Show one intent for repeated events and distinguish retry, deliberate resend, acceptance and delivery.",
+    "simulator": "notification"
+  },
+  {
+    "id": "practical-26",
+    "moduleId": 26,
+    "title": "Find the failing boundary",
+    "intro": "Compare browser and server evidence before changing security configuration. Diagnose each local scenario and preserve the permission rules.",
+    "kind": "diagnose",
+    "scenarios": [
+      {
+        "title": "Works in an API client",
+        "evidence": [
+          "API client receives 200 from an owned-order request.",
+          "Browser UI uses port 3000; API uses port 4000.",
+          "OPTIONS lacks the intended Allow-Origin response."
+        ],
+        "question": "What should be investigated first?",
+        "choices": [
+          {
+            "text": "The origin/preflight response for the intended UI.",
+            "why": "A browser-only read boundary can fail even when the handler works for an API client."
+          },
+          {
+            "text": "Remove all session verification.",
+            "why": "That changes authorization, not the missing CORS response."
+          },
+          {
+            "text": "Put the API secret into the browser.",
+            "why": "Secrets do not belong in client requests and do not repair CORS."
+          }
+        ],
+        "correct": 0
+      },
+      {
+        "title": "CORS is fixed, ownership is not granted",
+        "evidence": [
+          "Preflight now succeeds.",
+          "Customer-A requests customer-B order.",
+          "Server returns 403 and no private payload."
+        ],
+        "question": "What does this show?",
+        "choices": [
+          {
+            "text": "CORS is still broken and all origins must be allowed.",
+            "why": "A 403 from the handler can be an intentional authorization result."
+          },
+          {
+            "text": "The ownership boundary is correctly denying this request.",
+            "why": "Use an owned resource for the successful case; preserve cross-account rejection."
+          },
+          {
+            "text": "The order ID should replace the login session.",
+            "why": "A resource identifier is not authentication."
+          }
+        ],
+        "correct": 1
+      },
+      {
+        "title": "No callback reaches localhost",
+        "evidence": [
+          "The local course opens at 127.0.0.1:3000.",
+          "An external provider cannot reach that machine through loopback.",
+          "The course must remain local and no live account is connected."
+        ],
+        "question": "Which exercise is appropriate now?",
+        "choices": [
+          {
+            "text": "Disable TLS checks and publish credentials.",
+            "why": "That neither creates valid reachability nor preserves security."
+          },
+          {
+            "text": "Expose the whole course automatically.",
+            "why": "The task explicitly excludes hosting and live connections."
+          },
+          {
+            "text": "Use local signed fixtures and document optional supported callback setup.",
+            "why": "Fixtures teach verification safely; live reachability remains a separate optional check."
+          }
+        ],
+        "correct": 2
+      }
+    ],
+    "completion": "Separate DNS/TLS, browser CORS and application authorization; never weaken one boundary to conceal another."
+  },
+  {
+    "id": "practical-27",
+    "moduleId": 27,
+    "title": "Recover the morning backlog",
+    "intro": "A synthetic incident crosses workers, payments and recovery records. Choose the evidence and repairs that preserve business history.",
+    "kind": "incident",
+    "scenarios": [
+      {
+        "title": "The queue grows after a credential expires",
+        "evidence": [
+          "Oldest shipment job age is rising.",
+          "Worker logs show provider-authentication failures after rotation.",
+          "Repeated retries create no successful external results."
+        ],
+        "question": "What is the targeted first repair?",
+        "choices": [
+          {
+            "text": "Restore the approved credential reference, validate it safely, and resume bounded work.",
+            "why": "Fix authentication while preserving queued intent IDs and evidence."
+          },
+          {
+            "text": "Create a new shipment intent for every retry.",
+            "why": "That can duplicate bookings once authentication is restored."
+          },
+          {
+            "text": "Drop the backlog so the graph looks healthy.",
+            "why": "Deleting pending work hides unfulfilled orders."
+          }
+        ],
+        "correct": 0
+      },
+      {
+        "title": "Connections are exhausted",
+        "evidence": [
+          "Worker concurrency increased from 4 to 40.",
+          "Database activity shows many waiting connections and long transactions.",
+          "Checkout latency rose at the same time."
+        ],
+        "question": "Which response addresses the evidence?",
+        "choices": [
+          {
+            "text": "Increase all retries immediately.",
+            "why": "That amplifies pressure on the constrained resource."
+          },
+          {
+            "text": "Bound concurrency and investigate transaction/connection lifetimes.",
+            "why": "Release resources correctly, then verify recovery with a small replay sample."
+          },
+          {
+            "text": "Assume every slow request is a cache problem.",
+            "why": "The observed connection evidence deserves investigation first."
+          }
+        ],
+        "correct": 1
+      },
+      {
+        "title": "Restore meets a captured payment",
+        "evidence": [
+          "Isolated restored database says FS-1001 unpaid.",
+          "Provider evidence shows A-1 captured before the outage.",
+          "Outbound effects remain disabled during recovery."
+        ],
+        "question": "What must happen before reopening?",
+        "choices": [
+          {
+            "text": "Charge again from restored data.",
+            "why": "Restoration does not erase external money movement."
+          },
+          {
+            "text": "Discard provider evidence.",
+            "why": "That creates a false history."
+          },
+          {
+            "text": "Reconcile A-1, rebuild/review local records and verify invariants.",
+            "why": "Stable references connect recovery data to external reality without duplicate effects."
+          }
+        ],
+        "correct": 2
+      }
+    ],
+    "completion": "Describe the root cause, controlled repair, replay gate and evidence that confirms recovery—not merely an empty queue."
+  },
+  {
+    "id": "practical-28",
+    "moduleId": 28,
+    "title": "Fieldstore: one complete purchase",
+    "intro": "Follow customer-A through ten connected stages. Start with one sellable blue shirt at 25000 INR minor units, onHand 1 and reserved 0. Shipping is free and tax is included only for this synthetic exercise. Every decision preserves an evidence trail.",
+    "kind": "capstone",
+    "scenarios": [
+      {
+        "title": "01 · Signup and verified identity",
+        "evidence": [
+          "A signup form returns a visible success message.",
+          "The session fixture has expired.",
+          "Profile metadata contains a user-edited role=admin."
+        ],
+        "question": "Which identity may the server rely on?",
+        "choices": [
+          {
+            "text": "The editable profile role.",
+            "why": "User-controlled metadata cannot grant staff permission."
+          },
+          {
+            "text": "A currently verified session and separately controlled permissions.",
+            "why": "Reauthenticate or refresh through the supported auth flow; derive authority from trusted records."
+          },
+          {
+            "text": "The success animation.",
+            "why": "A screen animation is not credential verification."
+          }
+        ],
+        "correct": 1,
+        "actor": "Customer-A and the authentication boundary.",
+        "data": "Reads session evidence; creates/loads a customer identity. Staff role data is separately controlled.",
+        "rule": "Verify current identity; never grant authority from user-editable profile fields.",
+        "service": "Synthetic auth adapter; optional real auth provider requires separate testing.",
+        "failure": "Expired session or forged admin metadata.",
+        "verify": "Use expired and valid fixtures; confirm only the valid customer identity continues and no staff role is granted."
+      },
+      {
+        "title": "02 · Product and authoritative price",
+        "evidence": [
+          "Variant shirt-blue-M is active.",
+          "Trusted unit price is 25000 INR minor units.",
+          "Browser text is edited to show a price of 1."
+        ],
+        "question": "Which price defines the purchase?",
+        "choices": [
+          {
+            "text": "The trusted active variant price, rechecked during checkout.",
+            "why": "The display can change independently; authoritative records define the quote."
+          },
+          {
+            "text": "The browser text because the customer can see it.",
+            "why": "Visible client text is untrusted input."
+          },
+          {
+            "text": "A random price copied from another cart.",
+            "why": "Quotes need the chosen variant and current business rules."
+          }
+        ],
+        "correct": 0,
+        "actor": "Catalog read handler and customer browser.",
+        "data": "Reads approved product/variant fields and trusted unit price; exposes public catalog data.",
+        "rule": "Only approved catalog fields are public; browser pricing never becomes authoritative.",
+        "service": "Synthetic catalog/database records; product-image storage is separate.",
+        "failure": "Stale display or a tampered browser price.",
+        "verify": "Change the displayed price and confirm the server quote still uses 25000 minor units."
+      },
+      {
+        "title": "03 · Cart ownership and persistence",
+        "evidence": [
+          "Customer-B is authenticated.",
+          "The submitted cart ID is cart-A.",
+          "Cart-A belongs to customer-A and has one shirt."
+        ],
+        "question": "What should Add to cart do?",
+        "choices": [
+          {
+            "text": "Accept because both customers have accounts.",
+            "why": "Authentication does not imply access to another customer’s cart."
+          },
+          {
+            "text": "Reveal cart-A details to explain the rejection.",
+            "why": "A rejection should not disclose private cart contents."
+          },
+          {
+            "text": "Reject B without changing cart-A; allow A and verify after reload.",
+            "why": "The resource owner must be checked before mutation."
+          }
+        ],
+        "correct": 2,
+        "actor": "Cart Route Handler using verified customer identity.",
+        "data": "Reads cart owner and variant; writes cart_items only for an authorized cart.",
+        "rule": "Quantity is validated; ownership is enforced on the server; cart addition does not reserve stock in this model.",
+        "service": "Synthetic cart database; no external provider is needed.",
+        "failure": "Cross-customer cart ID or a browser-only unsaved update.",
+        "verify": "Compare B’s denied request with A’s successful persisted change and a reload."
+      },
+      {
+        "title": "04 · Checkout and the last unit",
+        "evidence": [
+          "onHand=1, reserved=0, available=1.",
+          "A and B submit checkout for the last shirt.",
+          "Each request has a different logical checkout ID."
+        ],
+        "question": "Which stock outcome is correct?",
+        "choices": [
+          {
+            "text": "One atomic reservation succeeds; the other receives unavailable.",
+            "why": "A conditional transactional claim prevents both checkouts from consuming the same availability."
+          },
+          {
+            "text": "Both reserve because each first read available=1.",
+            "why": "Separate read and write operations can oversell."
+          },
+          {
+            "text": "Reserve twice and repair inventory after payment.",
+            "why": "That lets money collection outrun a broken stock promise."
+          }
+        ],
+        "correct": 0,
+        "actor": "Checkout service and transactional inventory boundary.",
+        "data": "Reads owned cart/current quote; writes one order intent, reservation and payment-attempt identity.",
+        "rule": "Availability never becomes negative; only one claimant gets the last unit; quote is 25000 INR minor units.",
+        "service": "Synthetic database transaction model; provider payment work follows the protected intent.",
+        "failure": "Concurrent last-unit requests or repeated checkout clicks.",
+        "verify": "Observe exactly one reservation, reserved 1/available 0, and a safe unavailable response for the other customer."
+      },
+      {
+        "title": "05 · Payment and duplicate verification",
+        "evidence": [
+          "A’s browser reports success.",
+          "A-1 initially remains pending verification.",
+          "A valid captured event matching 25000 INR arrives twice."
+        ],
+        "question": "Which effect is allowed?",
+        "choices": [
+          {
+            "text": "Ship from the browser callback before verification.",
+            "why": "The browser alone cannot confirm trusted payment state."
+          },
+          {
+            "text": "Apply one verified capture and keep one allocation.",
+            "why": "Authenticate and match evidence, then use guarded transitions and event identity to handle duplicates."
+          },
+          {
+            "text": "Allocate twice because two events arrived.",
+            "why": "Delivery duplication must not duplicate inventory or order effects."
+          }
+        ],
+        "correct": 1,
+        "actor": "Payment adapter, webhook handler and reconciliation worker.",
+        "data": "Reads A-1 expected references; stores event evidence and the verified payment transition.",
+        "rule": "Match amount, currency and order; one logical payment effect; physical stock is not deducted at capture.",
+        "service": "Synthetic Razorpay-shaped fixture, not a real transaction or SDK invocation.",
+        "failure": "Delayed verification, wrong signature, replayed captured event or late failure.",
+        "verify": "Show pending-verification first, then one captured result; replay leaves onHand 1/reserved 1 unchanged."
+      },
+      {
+        "title": "06 · Order confirmation and private access",
+        "evidence": [
+          "FS-1001 has a purchased-item snapshot and verified payment.",
+          "Customer-B requests FS-1001.",
+          "One order-confirmed outbox entry already exists."
+        ],
+        "question": "What does the order service do?",
+        "choices": [
+          {
+            "text": "Expose it because the payment is complete.",
+            "why": "Paid orders still contain private customer information."
+          },
+          {
+            "text": "Create another order and outbox event for B.",
+            "why": "That breaks ownership and duplicates business work."
+          },
+          {
+            "text": "Deny B; let A read the saved snapshot and keep one confirmation intent.",
+            "why": "Order privacy and duplicate-safe downstream work remain required after payment."
+          }
+        ],
+        "correct": 2,
+        "actor": "Order service, authenticated customer view and authorized staff view.",
+        "data": "Reads order ownership; preserves item/price snapshot and one downstream work record.",
+        "rule": "Only permitted actors read the order; catalog edits cannot rewrite purchased history.",
+        "service": "Synthetic database/outbox; notification and shipment adapters consume saved work.",
+        "failure": "Unauthorized order access or a repeated confirmation event.",
+        "verify": "Compare A/B access and count one order confirmation and one notification/shipment intent."
+      },
+      {
+        "title": "07 · Shipment booking and physical handoff",
+        "evidence": [
+          "First provider attempt returns 401 after credential expiry.",
+          "After credential repair, booking times out; provider fixture shows shipment S-1 for FS-1001.",
+          "No physical pickup/handoff has happened yet."
+        ],
+        "question": "Which recovery protects the order?",
+        "choices": [
+          {
+            "text": "Refresh supported credentials, reconcile/link S-1, and wait for handoff evidence.",
+            "why": "Authentication failure and uncertain booking need distinct repairs; neither proves physical shipment."
+          },
+          {
+            "text": "Create a new shipment after every timeout.",
+            "why": "S-1 already exists and a blind retry can book a duplicate."
+          },
+          {
+            "text": "Deduct stock twice because booking and label are separate actions.",
+            "why": "The allocation is consumed once at the agreed physical handoff."
+          }
+        ],
+        "correct": 0,
+        "actor": "Authorized fulfillment worker and shipping adapter.",
+        "data": "Reads order/address/package snapshot; stores provider shipment/AWB references and booking evidence.",
+        "rule": "One booking intent per fulfillment; protect credentials; booking is separate from physical stock consumption.",
+        "service": "Synthetic shipping-provider fixture; use documented Shiprocket behavior in an optional integration.",
+        "failure": "Expired credentials and a response lost after provider booking.",
+        "verify": "Count one matched shipment; at later confirmed handoff change onHand 1/reserved 1 to onHand 0/reserved 0 exactly once."
+      },
+      {
+        "title": "08 · Tracking and delivery evidence",
+        "evidence": [
+          "Verified mapped tracking says delivered.",
+          "An older in-transit event arrives later.",
+          "Payment remains captured; settlement is a separate record."
+        ],
+        "question": "How should the timeline change?",
+        "choices": [
+          {
+            "text": "Regress the shipment to in transit because it arrived last.",
+            "why": "Arrival order is not event time or valid state progression."
+          },
+          {
+            "text": "Retain delivered and record the stale event as evidence without regression.",
+            "why": "Map the provider status and event timing through allowed transitions."
+          },
+          {
+            "text": "Mark payment settled because the parcel is delivered.",
+            "why": "Delivery and bank settlement are independent facts."
+          }
+        ],
+        "correct": 1,
+        "actor": "Tracking event intake and reconciliation job.",
+        "data": "Stores original provider event and mapped internal shipment status; reads existing transition history.",
+        "rule": "Authenticate using the provider’s actual scheme; handle duplicates, delay and missing events deliberately.",
+        "service": "Synthetic courier/aggregator tracking feed; no universal signature or sandbox is assumed.",
+        "failure": "Out-of-order, duplicated or absent tracking notifications.",
+        "verify": "Apply the stale event and confirm delivery does not regress; demonstrate a reconciliation lookup for missing evidence."
+      },
+      {
+        "title": "09 · Return, quarantine and inspection",
+        "evidence": [
+          "A requests return of the delivered shirt.",
+          "The return is authorized and then physically received.",
+          "Inspection finds it sellable."
+        ],
+        "question": "When may available inventory increase?",
+        "choices": [
+          {
+            "text": "When A first clicks Return.",
+            "why": "A request does not prove the item was received or is sellable."
+          },
+          {
+            "text": "When any reverse-pickup label is printed.",
+            "why": "A label does not prove physical condition."
+          },
+          {
+            "text": "After receipt and a recorded sellable inspection under policy.",
+            "why": "Quarantine separates received goods from sellable stock; record the restock exactly once."
+          }
+        ],
+        "correct": 2,
+        "actor": "Customer return request, authorized staff and warehouse inspection.",
+        "data": "Writes return authorization, reverse-fulfillment references, received/quarantine evidence and inspection result.",
+        "rule": "Return ownership and policy apply; sellable stock increases only after suitable inspection, not automatically on refund.",
+        "service": "Synthetic reverse-shipping and warehouse records.",
+        "failure": "Unauthorized return, lost reverse parcel, damaged item or duplicate inspection event.",
+        "verify": "Before inspection available stays 0; after sellable inspection, one guarded restock transfers the unit from quarantine to onHand 1/reserved 0/available 1."
+      },
+      {
+        "title": "10 · Refund and final reconciliation",
+        "evidence": [
+          "Captured amount is 25000 INR minor units.",
+          "Authorized staff approve refund R-1 for 25000.",
+          "Provider accepts R-1, but final processed evidence has not arrived."
+        ],
+        "question": "What should the final board show now?",
+        "choices": [
+          {
+            "text": "Refund pending with its own reference; reconcile before another refund.",
+            "why": "Acceptance is not confirmed completion; keep payment, stock and refund histories separate."
+          },
+          {
+            "text": "Refund completed and bank transfer guaranteed immediately.",
+            "why": "The current evidence does not establish that result."
+          },
+          {
+            "text": "Create R-2 to speed up the pending refund.",
+            "why": "A duplicate monetary intent can exceed the approved amount."
+          }
+        ],
+        "correct": 0,
+        "actor": "Authorized refund service, provider adapter and finance reconciliation.",
+        "data": "Reads captured/refunded totals; writes a bounded refund intent, provider reference and final evidence when known.",
+        "rule": "Refund authority and cumulative amount checks are atomic; uncertainty must not trigger a fresh duplicate refund.",
+        "service": "Synthetic Razorpay-shaped refund and settlement fixtures.",
+        "failure": "Unauthorized refund request, double click, timeout or missing final refund event.",
+        "verify": "Reject unauthorized and excessive requests; apply processed evidence once and reconcile money, stock and order history separately."
+      }
+    ],
+    "completion": "Complete all ten decisions and explain the actor, records, permission, service, failure and verification at every handoff. The evidence proves the synthetic model, not a live store."
+  }
+]

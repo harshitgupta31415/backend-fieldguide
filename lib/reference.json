@@ -4,73 +4,197 @@
       "id": 1,
       "title": "How backends work",
       "outcome": "Trace a request from a customer action to a saved result.",
-      "color": "#087F83"
+      "color": "#087F83",
+      "track": "foundation"
     },
     {
       "id": 2,
       "title": "Data foundations",
       "outcome": "Explain relationships and protect stored data from invalid changes.",
-      "color": "#355C9A"
+      "color": "#355C9A",
+      "track": "foundation"
     },
     {
       "id": 3,
       "title": "Identity and security",
       "outcome": "Protect identities, ownership, secrets and sensitive data.",
-      "color": "#9B5C2D"
+      "color": "#9B5C2D",
+      "track": "foundation"
     },
     {
       "id": 4,
       "title": "Catalog and cart",
       "outcome": "Model sellable items, quantities, carts and trustworthy totals.",
-      "color": "#7E5A9B"
+      "color": "#7E5A9B",
+      "track": "foundation"
     },
     {
       "id": 5,
       "title": "Checkout and payments",
       "outcome": "Handle verified payments, duplicates and uncertain outcomes.",
-      "color": "#C25C45"
+      "color": "#C25C45",
+      "track": "foundation"
     },
     {
       "id": 6,
       "title": "Orders and fulfillment",
       "outcome": "Keep orders, stock, shipments and refunds consistent.",
-      "color": "#497A46"
+      "color": "#497A46",
+      "track": "foundation"
     },
     {
       "id": 7,
       "title": "Async work and integrations",
       "outcome": "Finish background work reliably when other systems fail.",
-      "color": "#087F83"
+      "color": "#087F83",
+      "track": "foundation"
     },
     {
       "id": 8,
       "title": "Speed and scale",
       "outcome": "Measure bottlenecks and improve speed without losing correctness.",
-      "color": "#355C9A"
+      "color": "#355C9A",
+      "track": "foundation"
     },
     {
       "id": 9,
       "title": "Testing and debugging",
       "outcome": "Prove behavior and investigate failures with useful evidence.",
-      "color": "#9B5C2D"
+      "color": "#9B5C2D",
+      "track": "foundation"
     },
     {
       "id": 10,
       "title": "Delivery and operations",
       "outcome": "Release changes, recover data and operate the store.",
-      "color": "#7E5A9B"
+      "color": "#7E5A9B",
+      "track": "foundation"
     },
     {
       "id": 11,
       "title": "Working precisely with AI",
       "outcome": "Specify, inspect, verify and improve AI-assisted changes.",
-      "color": "#C25C45"
+      "color": "#C25C45",
+      "track": "foundation"
     },
     {
       "id": 12,
       "title": "Assemble the complete backend",
       "outcome": "Connect the parts and demonstrate an end-to-end working store.",
-      "color": "#497A46"
+      "color": "#497A46",
+      "track": "foundation"
+    },
+    {
+      "id": 13,
+      "title": "Local development and project setup",
+      "outcome": "Start Fieldstore deliberately and locate failures using the actual project and runtime.",
+      "color": "#167B72",
+      "track": "practical"
+    },
+    {
+      "id": 14,
+      "title": "Environment variables and secrets",
+      "outcome": "Classify configuration, load it predictably, and prevent cross-environment secret exposure.",
+      "color": "#355C9A",
+      "track": "practical"
+    },
+    {
+      "id": 15,
+      "title": "Connect a Next.js backend",
+      "outcome": "Trace UI actions through trusted server operations and explicit HTTP contracts.",
+      "color": "#9B5C2D",
+      "track": "practical"
+    },
+    {
+      "id": 16,
+      "title": "Supabase database and access",
+      "outcome": "Choose a connection path and prove database grants, constraints, and ownership policies.",
+      "color": "#7E5A9B",
+      "track": "practical"
+    },
+    {
+      "id": 17,
+      "title": "Supabase authentication lifecycle",
+      "outcome": "Verify sessions and safely manage sign-in, callbacks, roles, and account lifecycle.",
+      "color": "#C25C45",
+      "track": "practical"
+    },
+    {
+      "id": 18,
+      "title": "Supabase storage and server tools",
+      "outcome": "Protect files and use realtime and functions only where their boundaries are understood.",
+      "color": "#497A46",
+      "track": "practical"
+    },
+    {
+      "id": 19,
+      "title": "Vercel deployment lifecycle",
+      "outcome": "Diagnose builds, environment scope, server execution and release behavior without deploying.",
+      "color": "#246856",
+      "track": "practical"
+    },
+    {
+      "id": 20,
+      "title": "Render services and workers",
+      "outcome": "Choose a service type and diagnose startup, health, storage and worker failures.",
+      "color": "#675c97",
+      "track": "practical"
+    },
+    {
+      "id": 21,
+      "title": "Connect the architecture",
+      "outcome": "Place responsibilities, credentials and data connections in a stack justified by the store.",
+      "color": "#3a7292",
+      "track": "practical"
+    },
+    {
+      "id": 22,
+      "title": "Book a shipment safely",
+      "outcome": "Prepare, quote and book a synthetic Shiprocket shipment with reliable identifiers and recovery.",
+      "color": "#aa693d",
+      "track": "practical"
+    },
+    {
+      "id": 23,
+      "title": "Tracking, returns and COD",
+      "outcome": "Handle delivery exceptions, returns, money and stock without confusing their separate states.",
+      "color": "#987047",
+      "track": "practical"
+    },
+    {
+      "id": 24,
+      "title": "Connect a payment provider",
+      "outcome": "Connect trusted checkout totals to verified payment, refund and settlement evidence.",
+      "color": "#C25C45",
+      "track": "practical"
+    },
+    {
+      "id": 25,
+      "title": "Email, SMS and notifications",
+      "outcome": "Send useful customer messages once per intent and distinguish acceptance from delivery.",
+      "color": "#087F83",
+      "track": "practical"
+    },
+    {
+      "id": 26,
+      "title": "Networking and security in practice",
+      "outcome": "Diagnose browser and service boundaries without weakening access or exposing secrets.",
+      "color": "#355C9A",
+      "track": "practical"
+    },
+    {
+      "id": 27,
+      "title": "Operate and recover the store",
+      "outcome": "Investigate incidents, recover work and prove that business records agree.",
+      "color": "#7E5A9B",
+      "track": "practical"
+    },
+    {
+      "id": 28,
+      "title": "The connected Fieldstore capstone",
+      "outcome": "Trace one purchase from signup to refund with permissions, failures and verification.",
+      "color": "#497A46",
+      "track": "practical"
     }
   ],
   "glossary": [
@@ -291,6 +415,529 @@
       "title": "OWASP: Secrets management",
       "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html",
       "note": "Parts 3 and 10: limited access, rotation and avoiding credential leaks."
+    },
+    {
+      "id": "S21",
+      "title": "MDN: HTTP caching",
+      "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Caching",
+      "note": "Cache freshness, validation, private responses, and the limits of cached results."
+    },
+    {
+      "id": "P022",
+      "title": "npm package.json",
+      "url": "https://docs.npmjs.com/cli/v11/configuring-npm/package-json",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P023",
+      "title": "npm ci",
+      "url": "https://docs.npmjs.com/cli/v11/commands/npm-ci",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P024",
+      "title": "Next.js installation",
+      "url": "https://nextjs.org/docs/app/getting-started/installation",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P025",
+      "title": "Next.js Route Handlers",
+      "url": "https://nextjs.org/docs/app/getting-started/route-handlers",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P026",
+      "title": "Next.js data security",
+      "url": "https://nextjs.org/docs/app/guides/data-security",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P027",
+      "title": "Next.js environment variables",
+      "url": "https://nextjs.org/docs/app/guides/environment-variables",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P028",
+      "title": "Supabase API keys",
+      "url": "https://supabase.com/docs/guides/getting-started/api-keys",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P029",
+      "title": "Supabase redirect URLs",
+      "url": "https://supabase.com/docs/guides/auth/redirect-urls",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P030",
+      "title": "Next.js Server and Client Components",
+      "url": "https://nextjs.org/docs/app/getting-started/server-and-client-components",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P031",
+      "title": "Supabase local development",
+      "url": "https://supabase.com/docs/guides/local-development",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P032",
+      "title": "Supabase seed data",
+      "url": "https://supabase.com/docs/guides/local-development/seeding-your-database",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P033",
+      "title": "Supabase Row Level Security",
+      "url": "https://supabase.com/docs/guides/database/postgres/row-level-security",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P034",
+      "title": "Supabase database connections",
+      "url": "https://supabase.com/docs/guides/database/connecting-to-postgres",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P035",
+      "title": "Supabase securing the Data API",
+      "url": "https://supabase.com/docs/guides/api/securing-your-api",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P036",
+      "title": "Supabase password authentication",
+      "url": "https://supabase.com/docs/guides/auth/passwords",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P037",
+      "title": "Supabase Next.js tutorial",
+      "url": "https://supabase.com/docs/guides/getting-started/tutorials/with-nextjs",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P038",
+      "title": "Supabase cookie-based SSR clients",
+      "url": "https://supabase.com/docs/guides/auth/server-side/creating-a-client?queryGroups=framework&framework=nextjs",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P039",
+      "title": "Supabase user management",
+      "url": "https://supabase.com/docs/guides/auth/managing-user-data",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P040",
+      "title": "Supabase storage buckets",
+      "url": "https://supabase.com/docs/guides/storage/buckets/fundamentals",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P041",
+      "title": "Supabase storage access control",
+      "url": "https://supabase.com/docs/guides/storage/security/access-control",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P042",
+      "title": "Supabase database change subscriptions",
+      "url": "https://supabase.com/docs/guides/realtime/subscribing-to-database-changes",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P043",
+      "title": "Supabase function authorization",
+      "url": "https://supabase.com/docs/guides/functions/auth",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P044",
+      "title": "Supabase function environment variables",
+      "url": "https://supabase.com/docs/guides/functions/secrets",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P045",
+      "title": "Vercel: configure a build",
+      "url": "https://vercel.com/docs/builds/configure-a-build",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P046",
+      "title": "Vercel: environment variables",
+      "url": "https://vercel.com/docs/environment-variables",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P047",
+      "title": "Vercel: deployments",
+      "url": "https://vercel.com/docs/deployments",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P048",
+      "title": "Vercel: Functions",
+      "url": "https://vercel.com/docs/functions",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P049",
+      "title": "Vercel: Queues",
+      "url": "https://vercel.com/docs/queues",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P050",
+      "title": "Vercel: CDN cache",
+      "url": "https://vercel.com/docs/caching/cdn-cache",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P051",
+      "title": "Vercel: working with domains",
+      "url": "https://vercel.com/docs/domains/working-with-domains",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P052",
+      "title": "Vercel: deployment protection",
+      "url": "https://vercel.com/docs/deployment-protection",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P053",
+      "title": "Vercel: Instant Rollback",
+      "url": "https://vercel.com/docs/instant-rollback",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P054",
+      "title": "Render: service types",
+      "url": "https://render.com/docs/service-types",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P055",
+      "title": "Render: web services",
+      "url": "https://render.com/docs/web-services",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P056",
+      "title": "Render: environment variables and secrets",
+      "url": "https://render.com/docs/configure-environment-variables",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P057",
+      "title": "Render: health checks",
+      "url": "https://render.com/docs/health-checks",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P058",
+      "title": "Render: deployment behavior",
+      "url": "https://render.com/docs/deploys",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P059",
+      "title": "Render: background workers",
+      "url": "https://render.com/docs/background-workers",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P060",
+      "title": "Render: persistent disks",
+      "url": "https://render.com/docs/disks",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P061",
+      "title": "Render: private network",
+      "url": "https://render.com/docs/private-network",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P062",
+      "title": "Next.js: backend for frontend",
+      "url": "https://nextjs.org/docs/app/guides/backend-for-frontend",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P063",
+      "title": "Shiprocket: official API reference",
+      "url": "https://apidocs.shiprocket.in/?version=latest",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P064",
+      "title": "Shiprocket: weight terminology",
+      "url": "https://support.shiprocket.in/support/solutions/articles/43000664201-explain-the-different-types-of-weight-terminology-used-in-the-platform-",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P065",
+      "title": "Shiprocket: API integration helpsheet",
+      "url": "https://shiprocket.freshdesk.com/support/solutions/articles/43000337456-api-document-helpsheet",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P066",
+      "title": "Shiprocket: download a manifest",
+      "url": "https://support.shiprocket.in/support/solutions/articles/43000661615-how-to-download-a-manifest-",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P067",
+      "title": "Shiprocket: NDR help",
+      "url": "https://support.shiprocket.in/support/solutions/folders/152000000132",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P068",
+      "title": "Shiprocket: return process",
+      "url": "https://support.shiprocket.in/support/solutions/articles/152000000719-how-does-the-return-process-work-",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P069",
+      "title": "Shiprocket: COD remittance plans",
+      "url": "https://support.shiprocket.in/support/solutions/articles/152000000970-instant-cod-faqs",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P070",
+      "title": "Razorpay Standard Checkout integration",
+      "url": "https://razorpay.com/docs/payments/payment-gateway/web-integration/standard/integration-steps/",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P071",
+      "title": "Razorpay capture settings",
+      "url": "https://razorpay.com/docs/payments/payments/capture-settings/",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P072",
+      "title": "Razorpay webhook verification and testing",
+      "url": "https://razorpay.com/docs/webhooks/validate-test/",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P073",
+      "title": "Razorpay refunds",
+      "url": "https://razorpay.com/docs/payments/refunds/",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P074",
+      "title": "Razorpay settlements",
+      "url": "https://razorpay.com/docs/payments/settlements/",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P075",
+      "title": "Resend verified sender domains",
+      "url": "https://resend.com/docs/dashboard/domains/introduction",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P076",
+      "title": "Resend DMARC setup",
+      "url": "https://resend.com/docs/dashboard/domains/dmarc",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P077",
+      "title": "OWASP secure application logging",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P078",
+      "title": "Resend idempotency keys",
+      "url": "https://resend.com/docs/dashboard/emails/idempotency-keys",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P079",
+      "title": "Resend delivery event types",
+      "url": "https://resend.com/docs/webhooks/event-types",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P080",
+      "title": "Amazon SQS dead-letter queues",
+      "url": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P081",
+      "title": "Resend webhook verification",
+      "url": "https://resend.com/docs/webhooks/verify-webhooks-requests",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P082",
+      "title": "Twilio Message resource",
+      "url": "https://www.twilio.com/docs/messaging/api/message-resource",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P083",
+      "title": "MDN domain names and DNS",
+      "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Howto/Web_mechanics/What_is_a_domain_name",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P084",
+      "title": "MDN Transport Layer Security",
+      "url": "https://developer.mozilla.org/en-US/docs/Web/Security/Defenses/Transport_Layer_Security",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P085",
+      "title": "MDN Cross-Origin Resource Sharing",
+      "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P086",
+      "title": "MDN HTTP cookies",
+      "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Cookies",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P087",
+      "title": "OWASP CSRF prevention",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P088",
+      "title": "OWASP file upload security",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P089",
+      "title": "GitHub secret scanning",
+      "url": "https://docs.github.com/en/code-security/concepts/secret-security/secret-scanning",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P090",
+      "title": "OpenTelemetry signals",
+      "url": "https://opentelemetry.io/docs/concepts/signals/",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P091",
+      "title": "PostgreSQL activity statistics",
+      "url": "https://www.postgresql.org/docs/current/monitoring-stats.html",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
+    },
+    {
+      "id": "P092",
+      "title": "PostgreSQL transaction isolation",
+      "url": "https://www.postgresql.org/docs/current/transaction-iso.html",
+      "note": "Official reference for the practical walkthrough. Check current capabilities and the installed version before optional implementation."
     }
-  ]
+  ],
+  "capstoneModel": {
+    "store": "Fieldstore",
+    "currency": "INR",
+    "variant": "shirt-blue-M",
+    "unitMinor": 25000,
+    "quoteAssumptions": "One shirt, zero shipping, tax included for this synthetic exercise only.",
+    "initialStock": {
+      "onHand": 1,
+      "reserved": 0,
+      "available": 1
+    },
+    "afterReservation": {
+      "onHand": 1,
+      "reserved": 1,
+      "available": 0
+    },
+    "afterCapture": {
+      "onHand": 1,
+      "reserved": 1,
+      "available": 0
+    },
+    "afterPhysicalShipment": {
+      "onHand": 0,
+      "reserved": 0,
+      "available": 0
+    },
+    "afterSellableReturnInspection": {
+      "onHand": 1,
+      "reserved": 0,
+      "available": 1
+    },
+    "stateDimensions": [
+      "identity",
+      "cart",
+      "order",
+      "payment",
+      "reservation",
+      "shipment",
+      "tracking",
+      "return",
+      "refund",
+      "settlement",
+      "notification"
+    ],
+    "rules": [
+      "A cart addition does not reserve stock in this model.",
+      "Payment capture confirms allocation; physical shipment consumes it once.",
+      "Provider booking is not physical shipment.",
+      "Returned goods enter quarantine before sellable inspection.",
+      "Refund and settlement states remain separate from order and stock.",
+      "All IDs and provider responses are synthetic; no live service is contacted."
+    ]
+  },
+  "advancedTracks": [
+    {
+      "title": "Subscriptions and recurring billing",
+      "summary": "Extension beyond the single-store foundation: renewals, payment mandates, plan changes, proration, cancellation and failed recurring collection.",
+      "prerequisites": "Verified one-time payments, idempotent events, refund ledgers and explicit entitlement rules."
+    },
+    {
+      "title": "Marketplaces, seller onboarding, commissions and payouts",
+      "summary": "Extension beyond the single-store foundation: separate seller identities, seller approval, split funds, platform fees, payout eligibility and reconciliation.",
+      "prerequisites": "Ownership policies, financial ledgers, onboarding requirements and provider-supported marketplace capabilities."
+    },
+    {
+      "title": "Multiple warehouses and split fulfillment",
+      "summary": "Extension beyond the single-store foundation: location-level availability, allocation policy, partial shipments, transfers and per-package return tracking.",
+      "prerequisites": "Atomic reservation model, inventory movements and stable order-line/fulfillment identities."
+    },
+    {
+      "title": "International currencies, tax, customs and duties",
+      "summary": "Extension beyond the single-store foundation: currency precision, exchange-rate ownership, localized tax rules, import documents and duty responsibilities.",
+      "prerequisites": "Trusted quotes, monetary ledgers and business-approved specialist guidance for each market."
+    },
+    {
+      "title": "Disputes and chargebacks",
+      "summary": "Extension beyond the single-store foundation: dispute evidence, response deadlines, reversals, representment and customer-service coordination.",
+      "prerequisites": "Payment/refund history, auditable order and delivery evidence, access control and provider dispute documentation."
+    },
+    {
+      "title": "ERP, accounting and warehouse integrations",
+      "summary": "Extension beyond the single-store foundation: system-of-record decisions, external identifiers, synchronization, reconciliation and conflicting updates.",
+      "prerequisites": "Outbox/retry patterns, versioned contracts, inventory/finance ledgers and operational replay controls."
+    },
+    {
+      "title": "Advanced search, event streaming and distributed systems",
+      "summary": "Extension beyond the single-store foundation: indexed projections, event retention, replay, partition ordering, service ownership and measurable consistency tradeoffs.",
+      "prerequisites": "Query measurement, cache invalidation, idempotent consumers and a demonstrated need for added infrastructure."
+    }
+  ],
+  "reviewed": "26 October 2026"
 }

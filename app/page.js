@@ -6,6 +6,7 @@ import interactions from '../lib/interactions.json';
 import JourneyHome, { PartJourney } from '../components/Journey';
 import GameArcade from '../components/GameArcade';
 import LessonExperience from '../components/LessonExperience';
+import PracticeStudio from '../components/PracticeStudio';
 
 import { STORAGE_KEY as KEY, emptyProgress as empty, cleanProgress } from '../lib/progress.mjs';
 const pad = n => String(n).padStart(2, '0');
@@ -51,6 +52,7 @@ function readRoute() {
   if (kind === 'lesson' && byId(id)) return { kind, id: Number(id) };
   if (kind === 'part' && reference.modules.some(m => m.id === Number(id))) return { kind, id: Number(id) };
   if (kind === 'labs') return { kind, id: ['inventory', 'payments', 'api'].includes(id) ? id : 'inventory' };
+  if (kind === 'practice') return {kind, id: activityIdSet.has(id) ? id : undefined};
   if (['prompts', 'resources', 'arcade'].includes(kind)) return { kind };
   return { kind: 'home' };
 }
@@ -107,11 +109,14 @@ export default function App() {
     if (!['pipeline', 'trust', 'detective'].includes(gameId)) return;
     setData(d => d.achievements.includes(gameId) ? d : { ...d, achievements: [...d.achievements, gameId] });
   }
+  function awardPractice(id) {
+    if (activityIdSet.has(id)) setData(d => d.practice.includes(id) ? d : {...d, practice:[...d.practice,id]});
+  }
   const currentModule = route.kind === 'lesson' ? Number(byId(route.id)?.module_id) : route.kind === 'part' ? route.id : null;
   useEffect(() => { if (currentModule) setNavTrack(reference.modules.find(m => m.id === currentModule)?.track || 'foundation'); }, [currentModule]);
   const progress = Math.round(data.completed.length / lessons.length * 100);
   const resume = data.completed.includes(data.last) ? lessons.find(d => !data.completed.includes(Number(d.id)))?.id || Number(lessons.at(-1).id) : data.last;
-  const title = query ? 'Search the fieldguide' : route.kind === 'lesson' ? `Part ${pad(currentModule)} / Lesson ${pad(route.id)}` : ({ home: 'Your learning path', part: `Part ${pad(route.id)}`, labs: 'Interactive labs', arcade: 'The backend arcade', prompts: 'Prompt workshop', resources: 'Reference desk' }[route.kind]);
+  const title = query ? 'Search the fieldguide' : route.kind === 'lesson' ? `Part ${pad(currentModule)} / Lesson ${pad(route.id)}` : ({ home: 'Your learning path', part: `Part ${pad(route.id)}`, labs: 'Interactive labs', arcade: 'The backend arcade', practice:'Practice studio', prompts: 'Prompt workshop', resources: 'Reference desk' }[route.kind]);
 
   return <div className={`app-shell ${focus ? 'focus-mode' : ''} ${data.reduceMotion ? 'motion-quiet' : ''}`}>
     <a className="skip-link" href="#main-content" onClick={e => { e.preventDefault(); document.getElementById('main-content')?.focus(); }}>Skip to learning content</a>
@@ -120,7 +125,7 @@ export default function App() {
       <button className="brand" onClick={() => go()} aria-label="Backend Fieldguide home"><span className="brand-symbol"><Icon name="prompt" size={24}/></span><span>Backend<br/><b>Fieldguide</b></span></button>
       <div className="sidebar-caption">A STORE, FROM THE INSIDE OUT</div>
       <nav className="main-nav" aria-label="Main navigation">
-        {[['home','grid','Learning path'],['arcade','game','Backend arcade'],['labs','lab','Interactive labs'],['prompts','prompt','Prompt workshop'],['resources','book','Reference desk']].map(([kind, icon, label]) => <button key={kind} className={route.kind === kind && !query ? 'active' : ''} onClick={() => go(kind)}><Icon name={icon}/><span>{label}</span>{kind === 'arcade' && <em>PLAY</em>}</button>)}
+        {[['home','grid','Learning path'],['practice','lab','Practice studio'],['arcade','game','Backend arcade'],['labs','lab','Interactive labs'],['prompts','prompt','Prompt workshop'],['resources','book','Reference desk']].map(([kind, icon, label]) => <button key={kind} className={route.kind === kind && !query ? 'active' : ''} onClick={() => go(kind)}><Icon name={icon}/><span>{label}</span>{kind === 'practice' && <em>TRY</em>}</button>)}
       </nav>
       <div className="sidebar-section-label">THE {reference.modules.length} PARTS <span>{lessons.length} lessons</span></div>
       <div className="nav-track"><button aria-pressed={navTrack === 'foundation'} onClick={() => setNavTrack('foundation')}>Foundation</button><button aria-pressed={navTrack === 'practical'} onClick={() => setNavTrack('practical')}>Practical</button></div><nav className="part-nav" aria-label="Course parts">{reference.modules.filter(m => (m.track || 'foundation') === navTrack).map(m => {
@@ -140,6 +145,7 @@ export default function App() {
           {route.kind === 'lesson' && <Lesson key={route.id} lesson={byId(route.id)} go={go} copy={copy} data={data} setData={setData} complete={complete}/>}
           {route.kind === 'labs' && <Labs name={route.id} go={go}/>}
           {route.kind === 'arcade' && <GameArcade onAward={award} go={go} completedGames={data.achievements}/>}
+          {route.kind === 'practice' && <PracticeStudio name={route.id} go={go} data={data} onAward={awardPractice}/>}
           {route.kind === 'prompts' && <PromptWorkshop draft={data.draft} update={draft => setData(d => ({ ...d, draft }))} copy={copy} download={download}/>}
           {route.kind === 'resources' && <Resources go={go}/>}
         </div>}
@@ -208,7 +214,7 @@ const prework = [
 function Resources({ go }) {
   const [term, setTerm] = useState('');
   const filtered = reference.glossary.filter(g => (g.term+' '+g.meaning).toLowerCase().includes(term.toLowerCase()));
-  return <div className="page resources-page"><span className="eyebrow">REFERENCE DESK</span><h1 className="page-title">Keep the meaning.<br/><em>Lose the mystery.</em></h1><p className="page-intro">Plain-language prework, a searchable glossary and primary references for going deeper.</p><section className="resource-section"><div className="section-heading"><h2>Before lesson one</h2><span className="pill">Start here if code is new</span></div>{prework.map(([title,body],i) => <details className="prework-item" key={title}><summary><span>{pad(i+1)}</span>{title}<b>+</b></summary><p>{body}</p></details>)}<button className="btn secondary" onClick={() => go('lesson',1)}>Begin lesson 01<Icon name="arrow" size={17}/></button></section><section className="resource-section"><div className="section-heading"><h2>The vocabulary, translated.</h2><label className="glossary-search"><Icon name="search" size={17}/><input value={term} onChange={e => setTerm(e.target.value)} placeholder="Find a term..." aria-label="Search glossary"/></label></div><div className="glossary-grid">{filtered.map(g => <div key={g.term}><h3>{g.term}</h3><p>{g.meaning}</p></div>)}</div>{!filtered.length && <p>No matching terms. Try “transaction”, “session” or “retry”.</p>}</section><section className="resource-section"><div className="section-heading"><div><span className="eyebrow">PRIMARY DOCUMENTATION</span><h2>Check the original source.</h2></div><small>Reviewed 23 October 2026</small></div><p className="reference-intro">The lessons use original store examples. These references provide technical depth; provider names illustrate concepts and do not prescribe your stack. Verify the versions and business rules in your own project.</p><div className="reference-list">{reference.sources.map(s => <a key={s.id} href={s.url} target="_blank" rel="noreferrer noopener"><span>{s.id}</span><div><h3>{s.title}</h3><p>{s.note}</p></div><b>↗</b></a>)}</div></section></div>;
+  return <div className="page resources-page"><span className="eyebrow">REFERENCE DESK</span><h1 className="page-title">Keep the meaning.<br/><em>Lose the mystery.</em></h1><p className="page-intro">Plain-language prework, a searchable glossary and primary references for going deeper.</p><section className="resource-section"><div className="section-heading"><h2>Before lesson one</h2><span className="pill">Start here if code is new</span></div>{prework.map(([title,body],i) => <details className="prework-item" key={title}><summary><span>{pad(i+1)}</span>{title}<b>+</b></summary><p>{body}</p></details>)}<button className="btn secondary" onClick={() => go('lesson',1)}>Begin lesson 01<Icon name="arrow" size={17}/></button></section><section className="resource-section"><div className="section-heading"><h2>The vocabulary, translated.</h2><label className="glossary-search"><Icon name="search" size={17}/><input value={term} onChange={e => setTerm(e.target.value)} placeholder="Find a term..." aria-label="Search glossary"/></label></div><div className="glossary-grid">{filtered.map(g => <div key={g.term}><h3>{g.term}</h3><p>{g.meaning}</p></div>)}</div>{!filtered.length && <p>No matching terms. Try “transaction”, “session” or “retry”.</p>}</section>{reference.advancedTracks?.length > 0 && <section className="resource-section"><div className="section-heading"><div><span className="eyebrow">OPTIONAL EXTENSIONS</span><h2>Beyond a standard single-store foundation.</h2></div></div><p className="reference-intro">These are follow-on tracks for specialized business requirements, not included lessons or completed competencies.</p>{reference.advancedTracks.map((track,index) => <details className="prework-item" key={track.title}><summary><span>{pad(index+1)}</span>{track.title}<b>+</b></summary><p>{track.summary}<br/><strong>Prerequisites: </strong>{Array.isArray(track.prerequisites) ? track.prerequisites.join('; ') : track.prerequisites}</p></details>)}</section>}<section className="resource-section"><div className="section-heading"><div><span className="eyebrow">PRIMARY DOCUMENTATION</span><h2>Check the original source.</h2></div><small>Reviewed {reference.reviewed || '23 October 2026'}</small></div><p className="reference-intro">The lessons use original store examples. These references provide technical depth; provider names illustrate concepts and do not prescribe your stack. Verify the versions and business rules in your own project.</p><div className="reference-list">{reference.sources.map(s => <a key={s.id} href={s.url} target="_blank" rel="noreferrer noopener"><span>{s.id}</span><div><h3>{s.title}</h3><p>{s.note}</p></div><b>↗</b></a>)}</div></section></div>;
 }
 
 function SearchResults({ query, go, completed }) {

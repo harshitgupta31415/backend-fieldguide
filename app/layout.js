@@ -1,9 +1,10 @@
 import './globals.css';
 import './experience.css';
+import { lessons } from '../lib/course.mjs';
 
 export const metadata = {
   title: 'Backend Fieldguide | Learn ecommerce, build with AI',
-  description: '60 interactive lessons that explain how an ecommerce backend works, why each part exists, and how to ask AI for precise, verifiable changes.',
+  description: `${lessons.length} interactive lessons and practical simulations for understanding ecommerce backends and guiding AI with precise, verifiable instructions.`,
   authors: [{ name: 'harshitgupta31415' }],
 };
 

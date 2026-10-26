@@ -918,5 +918,740 @@
       "Record actual results and unresolved gaps without turning assumptions into success claims.",
       "A responsible reviewer assesses the evidence and remaining work against the requirements before operation."
     ]
+  },
+  "61": {
+    "choices": [
+      "Delete the lockfile and install every latest package.",
+      "Inspect the intended change and reconcile the manifest and lockfile deliberately.",
+      "Ignore the error and assume the development server has the intended packages."
+    ],
+    "correct": 1,
+    "explanation": "A lockfile mismatch is useful evidence. Repair the intended dependency definition, then verify a reproducible install. Deleting the lockfile obscures drift rather than explaining it.",
+    "nodeDetails": [
+      "Commands operate relative to a directory; locate the actual application root.",
+      "The manifest declares dependencies and the lockfile resolves their complete tree.",
+      "Check the running Node version against every required library, not only the framework minimum.",
+      "Install the agreed locked tree and investigate failures rather than silently changing versions."
+    ]
+  },
+  "62": {
+    "choices": [
+      "Change the price calculation because development mode cannot use INR.",
+      "Create a cloud project to supply the missing build.",
+      "Check the start script and successful build in the same app directory."
+    ],
+    "correct": 2,
+    "explanation": "Development and production use different execution paths. A production server needs the expected build output; changing business logic or cloud configuration cannot supply a missing local build.",
+    "nodeDetails": [
+      "Locate the package whose script you intend to run.",
+      "Read the command behind the script name instead of guessing from its label.",
+      "Development serves edits; a production build prepares output for production start.",
+      "The host and port determine which local address accepts requests."
+    ]
+  },
+  "63": {
+    "choices": [
+      "No; inspect the browser handler and error before changing database policies.",
+      "Yes; every absent request is caused by RLS.",
+      "Yes; remove authentication and validation until a request appears."
+    ],
+    "correct": 0,
+    "explanation": "A request that never leaves the browser has not reached database policy enforcement. Trace the first failure; removing protection would add risk without addressing this evidence.",
+    "nodeDetails": [
+      "Use exact steps and expected results to make the symptom repeatable.",
+      "Determine whether failure is in command/build, browser code, request handling, or data access.",
+      "Choose a safe check that distinguishes explanations before editing.",
+      "Observe the original journey and inspect authoritative records after the correction."
+    ]
+  },
+  "64": {
+    "choices": [
+      "The project's public URL.",
+      "A synthetic placeholder documenting a required setting.",
+      "The privileged Supabase secret key."
+    ],
+    "correct": 2,
+    "explanation": "A privileged secret bypasses row protection and must stay controlled server-side. NEXT_PUBLIC_ is an exposure mechanism, not encryption. Public URLs and deliberately nonfunctional example values do not carry the same capability.",
+    "nodeDetails": [
+      "Determine what access or behavior a value enables before assigning it.",
+      "The browser is public; trusted backend modules can hold server credentials.",
+      "Keep local, test, and production targets explicitly separated.",
+      "Inspect bundles, logs, props, JSON, and tracked files as well as env filenames."
+    ]
+  },
+  "65": {
+    "choices": [
+      "No; the public value normally stays frozen in that built artifact.",
+      "Yes; every browser bundle reads the server environment continuously.",
+      "Yes, if the variable is renamed to include the word SECRET."
+    ],
+    "correct": 0,
+    "explanation": "Public values can be embedded during the build. A server environment edit does not rewrite existing client JavaScript. Runtime configuration requires a deliberate safe design, never a secret-bearing public endpoint.",
+    "nodeDetails": [
+      "An earlier source can override a later env file; inspect order before editing.",
+      "Reject missing, malformed, or wrong-target settings before dependent operations.",
+      "The build may embed public values into files delivered to clients.",
+      "Dynamic server code may read runtime values; verify the actual execution path."
+    ]
+  },
+  "66": {
+    "choices": [
+      "Yes; a command named test cannot damage live data.",
+      "No; refuse writes, repair and validate the isolated environment, then run synthetic checks.",
+      "Yes, if the test finishes quickly enough."
+    ],
+    "correct": 1,
+    "explanation": "The actual target and credential determine impact, not a command's name or duration. Validate an approved isolated environment before any seed or mutation.",
+    "nodeDetails": [
+      "Align URLs, modes, credentials, and callbacks for the intended environment.",
+      "Reject forbidden or unknown targets before opening a write path.",
+      "Use synthetic data and verify only the intended local/test destination.",
+      "Exposure requires provider-side access replacement or revocation plus investigation, not just a file edit."
+    ]
+  },
+  "67": {
+    "choices": [
+      "Authorize the operation and resource inside the trusted action path.",
+      "Hide the button with a stronger CSS rule.",
+      "Rename the action so customers are less likely to discover it."
+    ],
+    "correct": 0,
+    "explanation": "UI visibility and opaque action identifiers cannot decide permission. The action must enforce authorization when invoked, including direct requests that bypass the intended screen.",
+    "nodeDetails": [
+      "The client collects intent and handles interaction, but its fields and checks are untrusted.",
+      "The incoming mutation is an access boundary regardless of whether it is a route or action.",
+      "Shared trusted logic enforces input, identity, ownership, and current business rules.",
+      "Only fields the caller is permitted to receive return to the interface."
+    ]
+  },
+  "68": {
+    "choices": [
+      "Expose the full parser stack and environment values.",
+      "Return a documented safe parse error and retain redacted server diagnostics.",
+      "Treat any JSON-looking text as a valid order."
+    ],
+    "correct": 1,
+    "explanation": "Malformed input deserves predictable feedback without internal disclosure. A safe parse error does not replace validation of well-formed data or the later permission and business checks.",
+    "nodeDetails": [
+      "Method, path, headers, cookies, and body define the incoming operation.",
+      "Handle malformed JSON and bounded field validation before relying on values.",
+      "Apply verified identity, resource permission, and domain rules when the operation requires them.",
+      "Return the documented outcome with safe fields and correctly scoped caching."
+    ]
+  },
+  "69": {
+    "choices": [
+      "Hide more cart controls in the browser.",
+      "Trust the submitted customer_id whenever it matches the form.",
+      "Enforce verified customer ownership in the server operation and data policies."
+    ],
+    "correct": 2,
+    "explanation": "A client can submit arbitrary identifiers. Authorization belongs at the actual operation and data boundary; hiding controls does not constrain direct calls.",
+    "nodeDetails": [
+      "Collect desired inputs and represent pending state without treating the browser as authority.",
+      "Verify identity and scope the target cart to the caller before any mutation.",
+      "Apply the defined quantity/retry semantics under the store's rules.",
+      "Display the actual response and reconcile provisional state after failures."
+    ]
+  },
+  "70": {
+    "choices": [
+      "Yes; one table replaces authentication, business rules, and recovery.",
+      "No; it still needs domain rules, protected access, contracts, transactions, and verification.",
+      "Yes, once the table is named orders."
+    ],
+    "correct": 1,
+    "explanation": "Database capabilities do not invent store behavior. A table must participate in a deliberately secured and verified application, with correct relationships and transaction boundaries.",
+    "nodeDetails": [
+      "Identify the store's entities, invariants, ownership, and historical facts.",
+      "Review repeatable structural changes and their compatibility rather than editing an unknown database.",
+      "Use synthetic deterministic records for customers, products, and edge cases.",
+      "Validate constraints and behavior in an explicitly isolated local target."
+    ]
+  },
+  "71": {
+    "choices": [
+      "No; application pools still multiply and must be bounded against real limits.",
+      "Yes; poolers create unlimited physical database connections.",
+      "Yes; the browser will close all server-side database clients."
+    ],
+    "correct": 0,
+    "explanation": "A pooler shares limited resources; it does not erase application pressure. Many instances and large local pools can exhaust limits, so inspect mode, lifetime, and measured demand.",
+    "nodeDetails": [
+      "Choose access based on the operation and who executes it.",
+      "HTTP Data API and direct Postgres use different connection and identity paths.",
+      "Use the intended key/database role and compatible, bounded pooling configuration.",
+      "Check permission outcomes and resource demand rather than assuming platform defaults."
+    ]
+  },
+  "72": {
+    "choices": [
+      "Yes; authenticated means the owner of whichever row is requested.",
+      "Yes, if order IDs are long enough.",
+      "No; true supplies no ownership restriction, so verify a real owner predicate and all applicable policies."
+    ],
+    "correct": 2,
+    "explanation": "The authenticated role identifies a class of callers, not a resource owner. A true predicate permits every matching row unless other controls prevent it; an explicit ownership model and two-user tests are required.",
+    "nodeDetails": [
+      "A role must first have the required table operation privilege.",
+      "The request must carry the intended verified user context.",
+      "The policy limits rows and writes according to actual ownership and business rules.",
+      "Use distinct customer identities and direct requests, avoiding bypass credentials."
+    ]
+  },
+  "73": {
+    "choices": [
+      "No; origins and callback paths must match the intended configuration.",
+      "Yes; every browser treats these names as the same storage and cookie origin.",
+      "Yes; disable redirect validation to remove the mismatch."
+    ],
+    "correct": 0,
+    "explanation": "Hostname is part of the origin, as are scheme and port. Match approved callback settings and the documented exchange; disabling validation replaces a configuration defect with a security defect.",
+    "nodeDetails": [
+      "The selected signup, recovery, or OAuth flow has its own required state and evidence.",
+      "Validate the exact intended return origin/path and restrict post-login destinations.",
+      "Use the documented verification or code exchange; URL text alone cannot prove identity.",
+      "Verify the established session and then authorize each requested resource."
+    ]
+  },
+  "74": {
+    "choices": [
+      "Only rename the cookie; user objects are always trusted.",
+      "Verify identity and authorize the requested order, with freshness checks where required.",
+      "Use a privileged secret key in the browser to avoid refresh."
+    ],
+    "correct": 1,
+    "explanation": "Raw session data may come from client-controlled storage. Verify identity, then check resource scope. Privileged browser access would bypass protections rather than solve session correctness.",
+    "nodeDetails": [
+      "Treat request cookies as credentials requiring proper handling and verification.",
+      "Use supported helpers to renew eligible sessions and propagate required cookie changes.",
+      "Verify the token or obtain appropriate fresh Auth evidence; choose the method deliberately.",
+      "Check ownership and current capabilities for the exact action even after identity is established."
+    ]
+  },
+  "75": {
+    "choices": [
+      "Yes; any metadata attached to a user is trusted staff configuration.",
+      "Yes, if the profile form hides the role field.",
+      "No; refund authority must come from protected trusted assignments, with current checks as needed."
+    ],
+    "correct": 2,
+    "explanation": "Customers can update user metadata even when a normal form hides a field. Authorization needs a trusted assignment path, and token-based role claims may require freshness handling after changes.",
+    "nodeDetails": [
+      "Customers may edit permitted profile values; those values do not create privilege.",
+      "Only protected server-controlled assignments establish staff capabilities.",
+      "Authorize the specific action and consider whether a current role/session lookup is required.",
+      "Coordinate access, stored files, relationships, retained facts, and audit before account removal."
+    ]
+  },
+  "76": {
+    "choices": [
+      "Yes; a valid login authorizes every known file path.",
+      "No; verify document ownership or explicit staff permission before signing.",
+      "Yes; signing a URL makes any public disclosure impossible."
+    ],
+    "correct": 1,
+    "explanation": "A signed URL grants temporary bearer access, so issuing it must be authorized for the exact object. Login alone does not establish document ownership, and a copied signed link can be shared.",
+    "nodeDetails": [
+      "Decide who should read the file and which operations each actor may perform.",
+      "Check owner/role and actual file safety before accepting or publishing content.",
+      "Keep Storage bytes and business references coordinated through explicit states and cleanup.",
+      "Serve public approved photos freely; authorize private document access before issuing scoped retrieval."
+    ]
+  },
+  "77": {
+    "choices": [
+      "No; refetch authorized current state and reestablish the correct scope.",
+      "Yes; no visible event proves no database changes occurred.",
+      "Yes; replay the previous screen and trust it indefinitely."
+    ],
+    "correct": 0,
+    "explanation": "A connection gap leaves a knowledge gap. Read durable current state with authorization and guard against stale responses; realtime delivery alone cannot prove that nothing changed.",
+    "nodeDetails": [
+      "Define the actual acceptable stale period before choosing extra infrastructure.",
+      "Scope subscription access to permitted actors and resources, not merely any signed-in user.",
+      "Treat a message as a hint to refresh rather than independent proof of all business facts.",
+      "Fetch current authorized state after updates or reconnect, and safely apply it to the screen."
+    ]
+  },
+  "78": {
+    "choices": [
+      "Yes; user authentication automatically scopes every privileged query.",
+      "Yes, if the function is named secure_invoice.",
+      "No; enforce caller-specific scope or use an appropriate caller-scoped client, then test denials."
+    ],
+    "correct": 2,
+    "explanation": "Authentication and row authorization remain separate. A privileged client can bypass RLS even after a real user is identified, so the operation must deliberately enforce the resource boundary.",
+    "nodeDetails": [
+      "Identify who calls the function and which runtime executes it.",
+      "Use the documented credential mechanism and check access to the exact resource.",
+      "Apply scoped rules and stable operation identity even when privileged access is needed.",
+      "Test synthetic success and failure paths in the intended local workflow, without deploying."
+    ]
+  },
+  "79": {
+    "choices": [
+      "Configure a preview database value and create a new preview deployment.",
+      "Expose DATABASE_URL with NEXT_PUBLIC_ so the browser can fix it.",
+      "Delete the lockfile and retry until the green build changes."
+    ],
+    "correct": 0,
+    "explanation": "Give preview its own approved database configuration and create a new preview deployment. Existing deployments do not receive later variable edits. A successful build alone cannot verify a route that reads configuration only when requested.",
+    "nodeDetails": [
+      "A commit identifies the source being examined; match it to the logs.",
+      "Root directory and commands must find the correct package and build output.",
+      "Development, preview and production have separate intended resources.",
+      "Exercise the cart dependency after the build, with redacted evidence."
+    ]
+  },
+  "80": {
+    "choices": [
+      "A bigger frontend button.",
+      "Durable job state and a retry-safe consumer.",
+      "A global JavaScript variable containing the booking."
+    ],
+    "correct": 1,
+    "explanation": "Durable recording and execution of the pending work. A 202 response expresses acceptance, not successful shipment booking. Persist a job or workflow state before acknowledging it, and make repeated execution recover the same business operation.",
+    "nodeDetails": [
+      "The request has a bounded lifetime and needs a truthful response.",
+      "Authenticate and authorize before reading private state or accepting an operation.",
+      "Record work durably; a later attempt may repeat after a crash.",
+      "Update stored status and expose the confirmed outcome to the customer."
+    ]
+  },
+  "81": {
+    "choices": [
+      "Delete the shipment record because old code cannot know it.",
+      "Keep and reconcile the shipment; rollback does not cancel it.",
+      "Charge the customer again to rebuild the order."
+    ],
+    "correct": 1,
+    "explanation": "Retain and reconcile it. Rollback changes which application version handles traffic; it does not undo external side effects or necessarily reverse schema changes. Confirm the earlier code can read the current records before routing traffic to it.",
+    "nodeDetails": [
+      "DNS and TLS determine whether the intended host is reachable securely.",
+      "Allowed URLs and protection determine whether the expected caller can finish.",
+      "Use redacted logs, request IDs and dependency checks for the actual revision.",
+      "Compare code compatibility and existing side effects before rollback."
+    ]
+  },
+  "82": {
+    "choices": [
+      "Listener host and PORT usage.",
+      "The color of the checkout button.",
+      "Whether every request can bypass authentication."
+    ],
+    "correct": 0,
+    "explanation": "The listener host and port. A Render web service must accept traffic on 0.0.0.0 and should use its PORT configuration. Check the start command and framework options before rewriting routes or disabling authentication.",
+    "nodeDetails": [
+      "Choose the type from incoming traffic and lifetime requirements.",
+      "Install locked dependencies and produce the application output.",
+      "Run the production executable, not a development watcher.",
+      "Use the platform port and public-interface binding for a hosted service."
+    ]
+  },
+  "83": {
+    "choices": [
+      "Disable all authentication on the service.",
+      "Make the dedicated probe accessible while keeping business access checks.",
+      "Return success for every route, including database failures."
+    ],
+    "correct": 1,
+    "explanation": "Make the dedicated health endpoint reachable according to the platform probe contract, with a minimal response. Preserve authentication and ownership checks on business endpoints. Then demonstrate both a successful probe and a rejected unauthorized order request.",
+    "nodeDetails": [
+      "Inspect the actual path and status that the platform probes.",
+      "Check the dependencies required for the chosen readiness guarantee.",
+      "An unhealthy response affects traffic and may lead to restart.",
+      "Stop accepting work, drain within limits, and preserve retryable state."
+    ]
+  },
+  "84": {
+    "choices": [
+      "Regenerate invoices on every page load without an owner check.",
+      "Rename /tmp to /permanent without configuring storage.",
+      "Use durable authorized storage and retain its database reference."
+    ],
+    "correct": 2,
+    "explanation": "Use durable storage suitable for the document and retain an authorized database reference. Temporary files can still be used during generation. A disk requires attention to its mount path and service restrictions; object storage usually needs explicit access policies and signed access for private documents.",
+    "nodeDetails": [
+      "The queue persists work beyond a worker process and supports recovery.",
+      "The worker claims bounded work and handles retries idempotently.",
+      "The final artifact must outlive temporary processing files.",
+      "Store ownership, storage location and processing status for later checks."
+    ]
+  },
+  "85": {
+    "choices": [
+      "In the browser because it sends the fastest requests.",
+      "On the trusted server, with appropriate data permissions.",
+      "In a public product image filename."
+    ],
+    "correct": 1,
+    "explanation": "In a trusted server component of the application, with the shipping credential kept server-only and access checks still enforced. Browser-safe Supabase access, where deliberately used, requires appropriate grants and RLS; a public key is not permission to read every customer record.",
+    "nodeDetails": [
+      "The browser submits IDs and quantity, not trusted ownership or prices.",
+      "Server code verifies identity and enforces the operation rules.",
+      "Constraints and permissions protect durable data independently of screen behavior.",
+      "The response reports the result that was actually saved."
+    ]
+  },
+  "86": {
+    "choices": [
+      "Add the private hostname to browser JavaScript and hope DNS propagates.",
+      "Disable all authentication and publish every database operation.",
+      "Choose a supported authenticated network path or simplify the boundary."
+    ],
+    "correct": 2,
+    "explanation": "The proposed network path is not automatically available across providers. Either keep the components within supported private networking or use an explicitly secured reachable endpoint or integration. Authenticate the service caller and authorize the requested operation; do not expose an unrestricted admin API.",
+    "nodeDetails": [
+      "The application validates the request and creates the business operation.",
+      "The queue decouples acceptance from completion and may redeliver.",
+      "A worker has its own lifecycle, credential scope and concurrency budget.",
+      "The shared data record is the evidence of completion, not a network acknowledgement alone."
+    ]
+  },
+  "87": {
+    "choices": [
+      "Always deploy all three platforms before testing the first request.",
+      "Choose the smallest sufficient design and record expansion criteria.",
+      "Remove the database because fewer services always means less work."
+    ],
+    "correct": 1,
+    "explanation": "Choose the smallest design that meets the measured requirements and document what would justify changing it. A third platform is optional. The simpler design still needs authentication, durable records, recovery and observability; fewer boxes do not remove those responsibilities.",
+    "nodeDetails": [
+      "Describe behavior and workload before selecting vendors.",
+      "Assign each responsibility once and label its access path.",
+      "Ask which component can fail independently and what state remains.",
+      "Compare latency, operations and recovery evidence for the proposed design."
+    ]
+  },
+  "88": {
+    "choices": [
+      "Always 0.4 kg because only the scale matters.",
+      "0.6 kg before courier-specific minimums and rounding.",
+      "25000 kg because price and weight use the same field."
+    ],
+    "correct": 1,
+    "explanation": "The greater of actual 0.4 kg and calculated volumetric 0.6 kg: 0.6 kg in this specific fixture. Confirm the selected courier’s divisor, minimums, rounding and surcharges before a real quote. The simulation does not promise a real shipping charge.",
+    "nodeDetails": [
+      "Use outer package dimensions and actual packed weight, with explicit units.",
+      "Confirm the pickup and destination are supported for the requested mode.",
+      "Compare total charges, service conditions and estimates, not one price field.",
+      "Record the selected courier and the assumptions used to make the decision."
+    ]
+  },
+  "89": {
+    "choices": [
+      "Create again immediately with a new reference.",
+      "Mark the order delivered to prevent further retries.",
+      "Reconcile the existing booking and reuse its confirmed provider identifiers."
+    ],
+    "correct": 2,
+    "explanation": "Keep the booking uncertain and reconcile the existing reference using the provider’s supported lookup or operator review. Reuse a confirmed booking. Do not assume an undocumented idempotency header or duplicate-reference guarantee; create again only after evidence and policy resolve the uncertainty.",
+    "nodeDetails": [
+      "One internal operation identifies the particular parcel to fulfill.",
+      "Record request identity and state before making an external create call.",
+      "A timeout leaves ambiguity; preserve it honestly instead of marking failure.",
+      "Match the existing provider resource and persist its identifiers."
+    ]
+  },
+  "90": {
+    "choices": [
+      "Delivered, because the label already contains the customer address.",
+      "Awaiting pickup until the chosen handover evidence confirms shipment.",
+      "Payment settled, because the AWB is unique."
+    ],
+    "correct": 1,
+    "explanation": "Prepared or awaiting pickup, according to the store’s status contract. A generated label is not proof of collection. Keep booking, document generation and pickup milestones separate, and move to shipped only when the chosen physical handover evidence is recorded.",
+    "nodeDetails": [
+      "Use the provider shipment identifier for operations that require it.",
+      "The carrier reference and printable label prepare the parcel.",
+      "A pickup request can be accepted, rejected or uncertain independently.",
+      "A manifest supports handover; collection evidence establishes movement."
+    ]
+  },
+  "91": {
+    "choices": [
+      "Overwrite delivered with whichever notification arrived last.",
+      "Record the event, check semantic transitions and reconcile conflicts.",
+      "Subtract the older status code from the newer one to decide."
+    ],
+    "correct": 1,
+    "explanation": "Record the observation but do not blindly regress the shipment. Check event time, identifier mapping, allowed transitions and any correction semantics; reconcile ambiguous conflicts. Numeric order of provider status codes is not a state machine.",
+    "nodeDetails": [
+      "The notification is input, not authority until authenticated and validated.",
+      "Verify the configured provider-specific token and retain a durable event record.",
+      "Use a semantic transition policy and deduplicate effects.",
+      "Poll the supported tracking API or review mismatches when notifications are absent."
+    ]
+  },
+  "92": {
+    "choices": [
+      "Yes, every return request is proof the shirt is sellable.",
+      "No, first confirm warehouse receipt and inspection.",
+      "Only if the customer closes the browser."
+    ],
+    "correct": 1,
+    "explanation": "No. RTO initiated indicates a return process, not warehouse receipt or sellable condition. Track the parcel, receive it and inspect it before restocking under policy. Money and refund decisions remain separate from the movement status.",
+    "nodeDetails": [
+      "An NDR reason should be checked against current courier evidence.",
+      "The store records a supported next action and required information.",
+      "An accepted action can still be pending or fail.",
+      "Receipt and inspection provide evidence for stock handling."
+    ]
+  },
+  "93": {
+    "choices": [
+      "Delivered and bank-settled, because the statuses must match.",
+      "Mark unpaid and request a second customer charge.",
+      "Delivered and collected, with remittance pending reconciliation."
+    ],
+    "correct": 2,
+    "explanation": "Delivered, collection confirmed, remittance pending or under reconciliation. Check the provider remittance record, applicable deductions and bank evidence separately. Do not charge again, invent a settlement date, or mark the cash as bank-received solely from tracking.",
+    "nodeDetails": [
+      "Carrier movement and customer payment collection are different evidence streams.",
+      "Record quantities and condition before deciding sellable inventory.",
+      "An approved refund still needs a recorded successful money movement.",
+      "Match provider statements and bank evidence to the order ledger."
+    ]
+  },
+  "94": {
+    "choices": [
+      "Any amount, then fix it in the browser.",
+      "50000 minor units from the server quote.",
+      "1 minor unit because it came from hosted checkout."
+    ],
+    "correct": 1,
+    "explanation": "Use the authenticated cart and trusted prices to compute 50000 INR minor units, then link the provider order to that internal attempt. Reject or ignore the untrusted total under the API contract. Hosted checkout does not replace server pricing.",
+    "nodeDetails": [
+      "Verify identity and cart ownership before reading private items.",
+      "Use integer minor units and the agreed quote, tax and shipping policy.",
+      "Persist a stable logical operation and its requested amount before the external call.",
+      "Razorpay Orders are created server-side; retain the returned reference.",
+      "Expose the appropriate key identifier and order reference, never the server key secret."
+    ]
+  },
+  "95": {
+    "choices": [
+      "Paid immediately because the browser redirected.",
+      "Failed immediately, then ask the customer to pay again.",
+      "Pending verification, then reconcile the existing attempt."
+    ],
+    "correct": 2,
+    "explanation": "Keep a clearly named pending-verification state, show reassuring but accurate customer text, and reconcile the existing attempt. Do not ship, claim verified payment, or create another charge solely because the webhook is delayed.",
+    "nodeDetails": [
+      "The browser supplies a clue that must be tied to a stored operation.",
+      "Checkout proof and webhook signatures use different inputs and secrets.",
+      "Match the stored provider order, amount, currency and applicable payment state.",
+      "A unique provider-event record and guarded business transition prevent duplicate effects.",
+      "Use provider evidence to resolve missed, delayed or contradictory notifications."
+    ]
+  },
+  "96": {
+    "choices": [
+      "Keep paid and settlement-pending states separate.",
+      "Mark payment failed because the bank has not received it.",
+      "Create another charge to make settlement happen."
+    ],
+    "correct": 0,
+    "explanation": "No. Preserve the verified captured payment and track settlement separately. Investigate delayed settlement through provider and bank records. A refund also needs its own state and reconciliation; changing the payment history to failed would destroy useful evidence.",
+    "nodeDetails": [
+      "Authorization is not assumed to be capture. Inspect the actual method and account configuration.",
+      "Razorpay supports capture settings; fulfill only under the agreed verified-payment policy.",
+      "Track refund amount, reason, permissions, operation key and provider reference.",
+      "Settlement groups eligible monetary activity and adjustments.",
+      "Confirm actual bank receipt independently from the shopper payment outcome."
+    ]
+  },
+  "97": {
+    "choices": [
+      "Put account passwords in receipt templates to avoid reset flows.",
+      "Separate service-message purpose from marketing preference.",
+      "Send every receipt as a newsletter campaign."
+    ],
+    "correct": 1,
+    "explanation": "Keep password recovery and order notifications tied to their specific service purpose, and maintain a distinct marketing preference. Use the auth system for recovery-token lifecycle and a verified sender domain. Do not assume one opt-in flag covers every jurisdiction or channel.",
+    "nodeDetails": [
+      "The event defines why this message exists.",
+      "Resolve the intended recipient from trusted account/order records.",
+      "Render only required fields and protect recovery tokens.",
+      "Use documented domain verification and email authentication settings.",
+      "Channel and purpose determine the approved communication policy."
+    ]
+  },
+  "98": {
+    "choices": [
+      "Generate a fresh idempotency key and resend automatically.",
+      "Assume the queue permanently prevents all duplicate effects.",
+      "Use a durable completed intent plus provider evidence."
+    ],
+    "correct": 2,
+    "explanation": "The application notification ledger must remember the completed business intent beyond the provider window. A durable unique key handles repeated events. For uncertain old sends, reconcile rather than blindly retrying with a new key. A provider key is useful but is not permanent business history.",
+    "nodeDetails": [
+      "Repeated copies can describe the same business occurrence.",
+      "Uniqueness maps the occurrence, recipient, channel and template policy to one intent.",
+      "A worker may receive the job again after a crash.",
+      "Reuse the documented idempotency mechanism where supported.",
+      "Store provider ID, attempt evidence and outcome for later reconciliation."
+    ]
+  },
+  "99": {
+    "choices": [
+      "Record the bounce and follow address/suppression policy.",
+      "Mark the order unpaid because email bounced.",
+      "Keep resending forever because the send API returned success."
+    ],
+    "correct": 0,
+    "explanation": "Update notification delivery evidence and apply the appropriate suppression or address-correction workflow. Keep payment and order status unchanged. A permanent failure does not become success by retrying the same invalid destination repeatedly.",
+    "nodeDetails": [
+      "The provider reference links later callbacks to the saved intent.",
+      "Verify the actual provider request scheme before trusting callback fields.",
+      "Email and SMS states have different meanings; map them deliberately.",
+      "Respect suppression and communication policy before any retry or alternate channel.",
+      "Log safe IDs and error categories, not message bodies or full contact details."
+    ]
+  },
+  "100": {
+    "choices": [
+      "The provider should receive the application secret in its callback URL.",
+      "Loopback points to the caller’s own machine.",
+      "CORS blocks every server-to-server webhook."
+    ],
+    "correct": 1,
+    "explanation": "Loopback refers to the machine making the request. The provider is not running on your laptop. Diagnose reachability and the provider’s callback restrictions; do not disable authentication or publish the whole course to solve a synthetic exercise.",
+    "nodeDetails": [
+      "A domain and its subdomains identify names, not permissions.",
+      "DNS answers where to connect; caches and records can delay a change.",
+      "A valid certificate must cover the hostname and preserve connection trust.",
+      "The path, method and environment must resolve to the expected handler.",
+      "Reachable traffic still needs provider authentication and application validation."
+    ]
+  },
+  "101": {
+    "choices": [
+      "Allow all origins and skip ownership checks.",
+      "Move the session secret into a query string.",
+      "Preserve 403 and test with an owned order."
+    ],
+    "correct": 2,
+    "explanation": "Nothing should relax the ownership check. CORS permission is not permission to read that order. Confirm the session, actor and requested resource, then preserve the rejection. Use a valid owned order to test a successful application request.",
+    "nodeDetails": [
+      "Compare scheme, host and port; inspect OPTIONS when present.",
+      "Cookie attributes and fetch credentials affect which cookies travel.",
+      "The server verifies the credential rather than trusting a browser claim.",
+      "State changes require the appropriate anti-CSRF and resource-level access rules.",
+      "A browser-readable response may still be an intentional 403 error."
+    ]
+  },
+  "102": {
+    "choices": [
+      "Verify server identity and authorize that exact order.",
+      "Trust it because the customer logged in.",
+      "Hide the order button and leave the API unchanged."
+    ],
+    "correct": 0,
+    "explanation": "Server-side resource authorization must reject it before returning data or causing an effect. A random-looking ID, CORS header or hidden button is not an access policy. Test the direct request with two customers and record the denied result.",
+    "nodeDetails": [
+      "Treat supplied text, identifiers, filenames and URLs as untrusted.",
+      "Parameterized queries and safe rendering address different injection contexts.",
+      "Derive identity and check access to the specific order or file.",
+      "Bound bytes, rate, query cost and external-service spending.",
+      "Keep updates reviewable and revoke any exposed credential."
+    ]
+  },
+  "103": {
+    "choices": [
+      "Only the text Something went wrong with no reference.",
+      "Safe IDs, stage, duration and an uncertain outcome.",
+      "The full card payload and API secret."
+    ],
+    "correct": 1,
+    "explanation": "Record the operation/correlation ID, safe internal and provider references, stage, duration, outcome and redacted error category. Do not log secrets or full payment/customer payloads. A missing response should be labeled uncertain until provider evidence resolves it.",
+    "nodeDetails": [
+      "Start with what failed for the learner or customer.",
+      "Structured fields let events be filtered and joined.",
+      "Measurements reveal the scale and trend of the problem.",
+      "Trace spans identify the boundary consuming time or returning an error.",
+      "A useful alert names impact, responsibility and the next evidence to inspect."
+    ]
+  },
+  "104": {
+    "choices": [
+      "Double every worker and remove retry limits.",
+      "Delete all queued jobs and report the incident resolved.",
+      "Limit pressure and investigate the constrained dependency."
+    ],
+    "correct": 2,
+    "explanation": "Reduce the pressure and inspect connection ownership, long transactions and slow queries before increasing workers. Preserve jobs and diagnose the dependency. Once repaired, replay a bounded sample with duplicate protection and compare queue age, errors and business records.",
+    "nodeDetails": [
+      "Age of oldest work shows user delay better than count alone.",
+      "Classify transient dependency failure, poison payload and expired credential.",
+      "Inspect active connections, wait states and transaction duration.",
+      "Fix the actual issue instead of hiding it with more retries.",
+      "Reuse stable operation IDs and verify that replay produces no duplicate booking or charge."
+    ]
+  },
+  "105": {
+    "choices": [
+      "Reconcile the existing provider operation before any new charge.",
+      "Charge again because the restored row is unpaid.",
+      "Delete the provider evidence so it matches the restored database."
+    ],
+    "correct": 0,
+    "explanation": "Reconcile the trusted provider record to the intended order and rebuild or review the missing local attempt. Do not charge again based solely on the restored state. Preserve an audit record and verify amount, currency, ownership and stock decisions before resuming fulfillment.",
+    "nodeDetails": [
+      "Agree tolerable loss and downtime, then measure the actual drill.",
+      "Cover database, files, configuration and recovery access.",
+      "Disable outbound payment, shipment and notification effects during the drill.",
+      "Compare payments, orders, reservations, shipping and refunds by stable references.",
+      "Reopen only after critical invariants and monitoring have evidence."
+    ]
+  },
+  "106": {
+    "choices": [
+      "Accept the profile role and skip the ownership check.",
+      "Reject B and preserve A’s cart.",
+      "Allow B because both customers are logged in."
+    ],
+    "correct": 1,
+    "explanation": "No. A valid session establishes B’s identity, not access to A’s cart. Deny the operation without revealing private cart details or changing records. Then demonstrate the successful request with A and verify the saved cart after a reload.",
+    "nodeDetails": [
+      "Use trusted session verification, not user-editable role data.",
+      "The catalog exposes approved product information and authoritative variant pricing.",
+      "Check the requested cart against the authenticated customer.",
+      "Persist the item and quantity under a stable cart reference.",
+      "Render the committed result or a useful failure; refresh checks durability."
+    ]
+  },
+  "107": {
+    "choices": [
+      "onHand 0, reserved 1, available-1.",
+      "onHand 1, reserved 0, available 1.",
+      "onHand 1, reserved 1, available 0."
+    ],
+    "correct": 2,
+    "explanation": "Keep onHand 1 and reserved 1, so available 0. Payment confirms the allocation but does not consume physical stock a second time. Shipment later changes onHand and reserved together to 0. A duplicate capture must leave those counts unchanged.",
+    "nodeDetails": [
+      "Freeze the agreed amount, currency and item information for this checkout.",
+      "Only one competing request may claim the last unit.",
+      "Reconcile the existing attempt using verified provider evidence.",
+      "Keep purchased details even if the catalog later changes.",
+      "Record downstream shipping/notification work with the confirmed transition."
+    ]
+  },
+  "108": {
+    "choices": [
+      "Recover and match the existing shipment S-1.",
+      "Create a fresh booking immediately after every timeout.",
+      "Mark the order delivered because a shipment record exists."
+    ],
+    "correct": 0,
+    "explanation": "Link and recover the existing S-1 after matching order and package evidence. Do not create a duplicate booking. Booking alone does not prove physical shipment. Continue tracking, return inspection and refund state changes with their own evidence and permissions.",
+    "nodeDetails": [
+      "Keep internal order, provider shipment and tracking references distinct.",
+      "Consume allocated stock exactly once when the agreed physical event occurs.",
+      "Normalize provider statuses while retaining original evidence and event timing.",
+      "Receive returned goods into quarantine; inspect before sellable restock.",
+      "Use one authorized refund intent and verify its external result."
+    ]
   }
 }

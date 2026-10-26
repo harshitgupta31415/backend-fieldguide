@@ -2,15 +2,19 @@
 
 An interactive ecommerce backend course by [harshitgupta31415](https://github.com/harshitgupta31415).
 
-Understand what happens behind the storefront, why each backend concept exists, and how to guide AI with precise, verifiable instructions. **12 parts · 60 lessons · 3 games · 3 interactive labs.**
+Understand what happens behind the storefront, connect the services, investigate failures, and guide AI with precise instructions. **28 parts · 108 lessons · 16 practical missions · 3 games · 3 labs.**
 
 ![Backend Fieldguide learning interface](docs/preview.png)
 
-Built for learners who already have a UI/UX direction and want to understand the systems behind it. You can start without memorizing syntax; the aim is to explain data flow, business rules, failure cases, and the evidence that proves a feature works. Teachers can use the same material for guided discussion and demonstrations.
+Designed for learners who already understand their intended UI/UX and want to understand the backend well enough to direct, inspect and verify its implementation. You can start without memorizing syntax. The course teaches responsibilities, data, permissions, money, stock, failure recovery and evidence.
+
+The original **60 foundation lessons and their IDs are preserved**. The expansion adds **48 practical lessons**. Seven optional advanced tracks suggest further study beyond the single-store foundation; they are not counted as completed lessons.
+
+[Full curriculum](docs/CURRICULUM.md) · [Fieldstore capstone](docs/CAPSTONE.md) · [AI tutor setup](docs/AI_TUTOR.md) · [Verification record](docs/VERIFICATION.md)
 
 ## Run locally
 
-Install Git, **Node.js 20.9.0 or newer**, and npm.
+Install Git, npm and a **supported Node.js LTS release that meets the project's Node.js 22.12.0 minimum**. Check the [official release schedule](https://nodejs.org/en/about/previous-releases) when choosing a runtime. Provider exercises must also match the versions installed in the project being inspected.
 
 ```sh
 git clone https://github.com/harshitgupta31415/backend-fieldguide.git
@@ -21,134 +25,169 @@ npm run dev
 
 Open [http://127.0.0.1:3000](http://127.0.0.1:3000).
 
-No environment variables, database, API keys, or external accounts are needed. Dependencies require internet access to install. Reference links open external documentation. The server binds to `127.0.0.1`; the repository contains source for running the course locally, with no hosted deployment.
+The **course, games and simulations work without API keys or provider accounts**. The optional AI tutor needs a server-side provider key and internet access. Dependency installation and external reference links also need internet access. The server binds to `127.0.0.1`; this repository is for running the course locally.
 
-To run a production build on your computer, stop the development server and run:
+To run a production build on your own computer, stop the development server and run:
 
 ```sh
 npm run build
 npm start
 ```
 
-This also serves the course locally. It does not publish the website.
+This starts a local production server. It does not deploy or host the website.
 
-## A course you can work through
+## Optional AI tutor
 
-- **A visual learning path:** twelve connected parts, a next-lesson card, progress indicators, and milestones.
-- **Four small steps per lesson:** Understand → Explore → Solve → Apply.
-- **Interactive explanations:** select diagram nodes, inspect worked examples, and challenge a mistaken assumption.
-- **Practice with feedback:** repeat a quiz or game without time pressure, then read why the result makes sense.
-- **Progress rewards:** 20 XP per completed lesson and 100 XP for each completed game. Replay games without duplicating rewards.
-- **Precise prompts:** edit a topic prompt or build one in the seven-part Prompt workshop.
-- **A reference desk:** code-literacy prework, a searchable glossary, and primary documentation.
-- **Comfortable navigation:** responsive layouts, keyboard controls, focus mode, and reduced-motion support.
+Ask a backend question from the tutor page (`#tutor`) or a lesson's **Ask the tutor** link. The server retrieves relevant excerpts from the 108 lessons, sends them with your question to a configured model, and returns an explanation with lesson references. Retrieval uses a local keyword index; no vector database or embedding service is required. Read the cited lessons and verify implementation advice: grounding does not guarantee a correct answer.
 
-Lesson completion requires solving its prediction question. All parts remain available for exploration; XP and badges show learning progress, not professional certification. Previously saved completion marks remain compatible. Marking a lesson incomplete removes its 20 XP, while keeping its passed quiz check so you can review and complete it again.
+1. Copy [`.env.example`](.env.example) to `.env.local` in the project root.
+2. Add your own key to `OPENROUTER_API_KEYS`, `GEMINI_API_KEYS` or `GROQ_API_KEYS`. Leave unused providers empty. Each accepts up to six comma-separated keys.
+3. Restart the local server, open the tutor and ask a course question.
 
-## The learning path
+The default provider order is **OpenRouter → Gemini → Groq**. OpenRouter uses `openrouter/free`, whose available models and limits vary. Gemini and Groq fallback can incur charges under your account's plan; configure only providers you intend to use. Review [OpenRouter's free router](https://openrouter.ai/docs/guides/routing/routers/free-router), [Gemini pricing](https://ai.google.dev/gemini-api/docs/pricing) and [Groq models and pricing](https://console.groq.com/docs/models).
 
-Each part contains five lessons. Begin with **Reference desk → Before lesson one** if code is new to you.
+Automatic failover tries another configured key/provider after quota, credential or temporary service errors. It does not create keys or increase shared provider quotas. Keys stay on the server; never use a `NEXT_PUBLIC_` prefix. A shared `TUTOR_ACCESS_CODE` of at least 16 characters is required outside direct localhost access, including Vercel. The checked-in template contains no credentials.
 
-| Part | Lessons | Topic | What you learn to explain |
-| --- | --- | --- | --- |
-| 01 | 01–05 | How backends work | The journey from a customer action to a saved result. |
-| 02 | 06–10 | Data foundations | Relationships, constraints, transactions, and safe data changes. |
-| 03 | 11–15 | Identity and security | Identity, ownership, sessions, secrets, and sensitive data. |
-| 04 | 16–20 | Catalog and cart | Sellable variants, quantities, carts, and trustworthy totals. |
-| 05 | 21–25 | Checkout and payments | Payment attempts, verified events, duplicates, and uncertainty. |
-| 06 | 26–30 | Orders and fulfillment | Consistent orders, reservations, shipments, returns, and refunds. |
-| 07 | 31–35 | Async work and integrations | Background work and reliable communication when systems fail. |
-| 08 | 36–40 | Speed and scale | Measured bottlenecks and performance without losing correctness. |
-| 09 | 41–45 | Testing and debugging | Evidence, failure cases, integration checks, and observability. |
-| 10 | 46–50 | Delivery and operations | Releases, environments, recovery, backups, and monitoring. |
-| 11 | 51–55 | Working precisely with AI | Clear specifications, inspection, review, debugging, and verification. |
-| 12 | 56–60 | Assemble the complete backend | Connected boundaries, contracts, checkout recovery, and readiness. |
+Tutor questions, recent conversation and retrieved excerpts are sent to the selected provider. Course notes, progress and prompt drafts are not attached. Tutor conversation and access-code entry stay in page memory and are not included in progress exports. See [AI_TUTOR.md](docs/AI_TUTOR.md) for configuration, request limits, privacy, failover and troubleshooting.
 
-The course teaches the foundations of a standard single-store ecommerce business. Marketplaces, subscriptions, multi-warehouse inventory, disputes, and international money movement need further domain work. Real tax, privacy, delivery, and refund policies must come from the business and appropriate guidance.
+## The learning experience
 
-## Learn or teach one lesson
+- **A visual path:** foundation and practical tracks, a next-lesson card, progress indicators and milestones.
+- **Four steps per lesson:** Understand → Explore → Solve → Apply.
+- **Clickable explanations:** diagram nodes, store examples, common mistakes, debugging clues and implementation examples.
+- **Seven AI prompt modes:** Understand, Inspect, Plan, Implement, Debug, Verify and Review, customized to the topic.
+- **Optional course tutor:** ask follow-up questions using retrieved lesson excerpts and OpenRouter, Gemini or Groq.
+- **Learning checks:** solve the prediction question and complete three practical self-checks before marking a new lesson complete.
+- **Practice Studio:** sixteen missions using diagnosis, ordering, sorting, configuration decisions and local simulations, ending in the connected capstone.
+- **Backend Arcade:** Request relay, Boundary keeper and Incident detective, with feedback and replay.
+- **Three labs:** inventory/reservations, payments/retries and request validation.
+- **Prompt workshop:** compose seven ingredients into a prompt, copy it or save it as text.
+- **Reference desk:** prework, glossary, official documentation and optional advanced study.
 
-1. **Understand:** explain the basic idea and why it exists. Connect it to the store example.
-2. **Explore:** activate each diagram node and trace the steps, inputs, rules, and saved result.
-3. **Solve:** predict the answer before revealing the teaching explanation. Explain why a plausible alternative fails.
-4. **Apply:** customize the topic prompt with actual project context and evidence. Add a takeaway in your own words, then complete the lesson.
-5. **Practice:** try a related lab or arcade game. Change one condition and predict the consequence.
+All parts remain available for exploration. There are no timers or forced waiting. Keyboard controls, focus mode, responsive layouts and reduced-motion settings support different learning preferences.
 
-For a class, let learners predict independently, compare their reasoning, and then demonstrate the outcome together. Revisit the rule when a learner gets stuck; completing a topic is more useful when they can explain a failure and how to verify it.
+## Foundation: lessons 01–60
 
-### Prompt workshop
+Each of the original twelve parts contains five lessons.
 
-Build a prompt from seven ingredients: project context, feature and actor, inputs and outputs, invariants, constraints, failure/concurrency cases, and acceptance evidence. Start with **Expand in the prompt workshop** from a lesson, or load the completed checkout example. Review the compiled text, then copy it or save it as `.txt`.
-
-The ingredient count indicates filled sections, not prompt correctness. Use sanitized examples and keep private keys, passwords, and real customer records out of prompts and notes. The application prepares text; it does not execute prompts or contact an AI service.
-
-## Play and experiment
-
-| Activity | What you do | What it teaches |
+| Part | Lessons | Focus |
 | --- | --- | --- |
-| Request relay | Put request steps in order across three rounds. | Checks and persistence must happen in a meaningful sequence. |
-| Boundary keeper | Sort eight responsibility cards. | The browser, server, provider, and database have different roles. |
-| Incident detective game | Inspect evidence and solve three incidents. | Diagnose payment, stock, and ownership problems using the rule and evidence. |
-| Inventory lab | Reserve stock, confirm payment, expire unpaid holds, ship, or try the last-unit scenario. | Availability, reservations, and on-hand stock change at different stages. |
-| Payment lab | Simulate a timeout, apply success, replay notifications, or reconcile. | Missing information differs from failure; duplicate events must be handled. |
-| Request explorer | Change quantity, ownership, method, or a browser-submitted price. | Server checks protect access and determine authoritative amounts. |
+| 01 | 01–05 | How backends work |
+| 02 | 06–10 | Data foundations |
+| 03 | 11–15 | Identity and security |
+| 04 | 16–20 | Catalog and cart |
+| 05 | 21–25 | Checkout and payments |
+| 06 | 26–30 | Orders and fulfillment |
+| 07 | 31–35 | Async work and integrations |
+| 08 | 36–40 | Speed and scale |
+| 09 | 41–45 | Testing and debugging |
+| 10 | 46–50 | Delivery and operations |
+| 11 | 51–55 | Working precisely with AI |
+| 12 | 56–60 | Assemble the complete backend |
 
-Games include feedback, retry/replay controls, and completion rewards. Ordering controls work without dragging. There is no countdown.
+## Practical track: lessons 61–108
 
-All games and labs use synthetic data. This is a learning application, not a working ecommerce backend. It makes no real payment, shipment, or AI API calls. The inventory teaching model deducts physical stock at shipment; payment confirms allocation. The demonstrations are not production implementations of database locking, authentication, or signature verification.
+Each practical part adds three lessons and one mission. Services are taught through their responsibilities and connections; using every platform together is optional.
 
-## Saved progress and accessibility
+| Part | Lessons | Focus | Mission theme |
+| --- | --- | --- | --- |
+| 13 | 61–63 | Local development and project setup | Diagnose a project that will not start. |
+| 14 | 64–66 | Environment variables and secrets | Sort configuration and repair environment mistakes. |
+| 15 | 67–69 | Connect a Next.js backend | Assemble a request with checks in the correct layer. |
+| 16 | 70–72 | Supabase database and access | Enforce database permissions and customer ownership. |
+| 17 | 73–75 | Supabase authentication lifecycle | Diagnose sessions, callbacks and insecure roles. |
+| 18 | 76–78 | Supabase storage and server tools | Separate public images from private documents. |
+| 19 | 79–81 | Vercel deployment lifecycle | Repair simulated build/runtime configuration. |
+| 20 | 82–84 | Render services and workers | Investigate ports, health checks and storage behavior. |
+| 21 | 85–87 | Connect the architecture | Place responsibilities and explain each connection. |
+| 22 | 88–90 | Book a shipment safely | Recover a shipment booking without duplicates. |
+| 23 | 91–93 | Tracking, returns and COD | Keep delivery, remittance, return and stock states distinct. |
+| 24 | 94–96 | Connect a payment provider | Verify payments, recover uncertainty and reconcile settlement. |
+| 25 | 97–99 | Email, SMS and notifications | Prevent repeated events from sending repeated messages. |
+| 26 | 100–102 | Networking and security in practice | Distinguish CORS, credentials and authorization failures. |
+| 27 | 103–105 | Operate and recover the store | Diagnose backlog and reconcile recovery with external reality. |
+| 28 | 106–108 | The connected Fieldstore capstone | Trace ten stages from signup through return and refund. |
 
-Course state is stored in browser `localStorage` under `backend-fieldguide-v1`: completed lessons, passed quiz IDs, game achievements, notes, the last visited lesson, the Prompt workshop draft, and the reduced-animation setting.
+The capstone uses one consistent synthetic store: a blue shirt at **25000 INR minor units (₹250)**. Its explicit stock, quarantine, payment and fulfillment assumptions are documented in [CAPSTONE.md](docs/CAPSTONE.md).
 
-- **Export** in the sidebar downloads `backend-fieldguide-progress.json`.
-- **Import** replaces current saved course state with an exported file; it does not merge two learners' records.
-- Exports include notes and the workshop draft. Review them before sharing.
-- Storage belongs to the browser profile and origin, including hostname and port. There is no account or cloud sync.
-- Clearing site data removes the local copy. Keep an export as a portable backup.
-- If storage cannot be read or written, a notice prompts you to export before closing the session.
+## Learn or teach one topic
 
-Quiz selections, revealed explanations, active diagram nodes, and unfinished game/lab rounds are temporary. Edits in a lesson's prompt box last while that lesson is open; expand into the workshop to save the draft. Game and lab scenarios restart on remount or refresh, while earned game achievements remain saved.
+1. **Understand:** explain the concept and why it matters using the store example.
+2. **Explore:** activate each diagram node. Identify the actor, input, rule, saved result and failure boundary.
+3. **Solve:** predict before revealing the explanation. Discuss why a plausible alternative fails.
+4. **Apply:** inspect the implementation example and choose the appropriate AI prompt mode. Supply actual project context and expected evidence.
+5. **Check:** demonstrate or explain the three self-checks, write a takeaway, and complete the lesson.
+6. **Practice:** open the part's mission or a related lab. Change one condition and predict its effect.
 
-Use **Tab**, **Enter**, and **Space** to navigate and activate controls. **Ctrl/Cmd + K** focuses lesson search. **Escape** dismisses navigation/search. Use the footer's **Reduce animations** control, or your system's reduced-motion preference. Focus mode gives the lesson more screen space.
+For a class, let learners predict independently, compare reasoning and demonstrate the result together. A checked box records a learner's self-assessment; it is not an independently graded certification or proof of a live integration.
+
+The Prompt workshop combines project context, feature/actor, inputs/outputs, invariants, constraints, failure/concurrency cases and acceptance evidence. Its ingredient count indicates filled sections, not correctness. Workshop prompts remain editable text for your chosen tool. The separate tutor makes provider requests only when you submit a question; it cannot execute implementation instructions.
+
+## Simulations and optional integrations
+
+Course activities run locally using synthetic fixtures. Payment, notification, inventory and shipping examples demonstrate state changes and recovery decisions without contacting commerce providers. The original arcade and labs remain available alongside the practical missions. The optional AI tutor is a real text-generation integration with its own configuration.
+
+Provider walkthroughs reference current official documentation, including Supabase, Vercel, Render, Shiprocket, Razorpay, Resend and Twilio where relevant. Code blocks are teaching examples; they are **displayed, not executed as real integrations**. Optional implementation work in a separate project requires checking its actual versions, credentials, provider capabilities and business rules.
+
+Deployment lessons explain builds, environments, callbacks, observability and rollback through examples. The course creates no cloud resources, opens no public tunnel, connects no live payment/shipping account and performs no deployment.
+
+A passing simulation establishes the modeled rules only. It does not establish that a real provider integration, production concurrency control or deployed store works. Keep secrets and real customer data out of prompts, notes, fixtures and logs.
+
+## Progress, rewards and portability
+
+The original `backend-fieldguide-v1` browser storage key remains compatible. Older completion marks are respected; existing learners do not need to redo previously completed foundation lessons after upgrading.
+
+- **20 XP** per completed lesson, **100 XP** per completed arcade game, **50 XP** per completed practical mission.
+- Rewards derive from unique completion records. Replaying a game or mission does not duplicate its award.
+- Marking a lesson incomplete removes its 20 XP while retaining its passed quiz and self-check records for review.
+- Lesson progress, mission completion and arcade medals are separate. Optional advanced tracks do not change course totals.
+
+Saved state includes completed lessons, passed quiz IDs, practical self-checks, mission completions, arcade achievements, lesson notes, last visited lesson, the Prompt workshop draft and the reduced-animation setting.
+
+Use **Export** in the sidebar to download `backend-fieldguide-progress.json`. **Import replaces saved course state** and resets the current view's temporary state; it does not merge two learners' histories. Exports contain notes and prompt drafts, so inspect them before sharing.
+
+Storage belongs to the current browser profile and origin, including hostname and port. There is no account or cloud sync. Clearing site data removes the local copy; keep an export as a backup. If browser storage cannot be read or written, a notice prompts you to export before closing the session.
+
+**Unfinished game/mission rounds and lab state are temporary.** They reset on leaving the activity or refreshing; earned completions remain saved. Active diagram nodes, revealed answers and current quiz selections are also temporary. Lesson prompt edits last while the lesson is open; expand the prompt into the workshop to save the draft.
+
+## Keyboard and motion
+
+Use **Tab**, **Enter** and **Space** to navigate controls. Ordering activities provide buttons rather than requiring dragging. **Ctrl/Cmd + K** focuses lesson search; **Escape** dismisses navigation/search. Use the footer's **Reduce animations** control or your system's reduced-motion preference. Focus mode gives the learning content more screen space.
 
 ## Source map
 
 | Path | Responsibility |
 | --- | --- |
-| `app/page.js` | Hash navigation, saved state, diagram renderer, labs, prompt workshop, and prework. |
-| `app/layout.js` | Root document, metadata, and shared stylesheet imports. |
-| `app/globals.css`, `app/experience.css` | Shared layout, lesson design, responsive behavior, and motion. |
-| `components/Journey.js`, `app/journey.css` | Learning path, part views, progress, and milestones. |
-| `components/LessonExperience.js` | Four-step lesson flow, quiz feedback, notes, prompts, and completion. |
-| `components/GameArcade.js`, `app/arcade.css` | Playable backend games and their interface. |
-| `lib/game-data.js` | Game routes, responsibility cards, incident evidence, and explanations. |
-| `lib/progress.mjs` | Saved-state defaults and validation for current and older progress exports. |
-| `lib/lessons.json` | Sixty definitions, examples, exercises, answers, and topic prompts. |
-| `lib/interactions.json` | Quiz choices, explanations, and diagram-node details. |
-| `lib/reference.json` | Part metadata, glossary, and primary-documentation references. |
-| `public/labs.js` | Browser-only inventory, payment, and request simulations. |
-| `tests/course.test.mjs` | Automated checks for progress compatibility, import bounds, and lesson content integrity. |
-| `package.json`, `package-lock.json` | Start/build commands, Node requirement, and locked dependencies. |
+| `app/page.js` | Hash navigation, progress import/export, diagrams, labs, workshop and resources. |
+| `app/layout.js`, `app/*.css` | Root document, metadata, shared design, responsive layouts and motion. |
+| `components/Journey.js` | Learning tracks, part views, next steps, progress and milestones. |
+| `components/LessonExperience.js` | Four-stage lessons, seven prompt modes, quizzes, notes and completion checks. |
+| `components/PracticeStudio.js` | Practical mission navigation, scenarios, ordering and placement activities. |
+| `components/PracticeExperiments.js` | Interactive local experiment panels used by missions. |
+| `components/GameArcade.js`, `lib/game-data.js` | Three arcade games, scenarios and explanations. |
+| `components/CourseTutor.js`, `app/api/tutor/route.js` | Tutor interface and server-only API entry point. |
+| `lib/retrieval.mjs` | Local lesson index and deterministic course retrieval. |
+| `lib/tutor-server.mjs`, `lib/ai-providers.mjs` | Tutor input/access checks, grounded prompts, provider adapters and bounded failover. |
+| `lib/course.mjs` | Course metadata, ID sets, navigation helpers and reward calculations. |
+| `lib/progress.mjs` | Saved-state defaults, validation and compatibility. |
+| `lib/simulations.mjs` | Pure state transitions for local practice experiments. |
+| `lib/lessons.json`, `lib/interactions.json` | Lesson content, prompts, checks, quiz answers and diagram explanations. |
+| `lib/reference.json`, `lib/activities.json` | Part metadata, glossary, sources, advanced tracks and practical missions. |
+| `public/labs.js` | Original browser-only inventory, payment and request simulations. |
+| `tests/course.test.mjs`, `tests/original-lesson-identity.json` | Content/progress checks and the retained foundation identity fixture. |
+| `tests/simulations.test.mjs` | Simulation invariants, retries and state-transition checks. |
 
-The application uses React and the Next.js App Router. Views use URL hashes inside the client app. Original diagrams are code-native vector graphics. Prework lives in `app/page.js`, not `lib/reference.json`.
+The application uses React and the Next.js App Router. Views are selected through URL hashes within the client app. Curriculum counts and navigation come from the data instead of a fixed sixty-lesson assumption.
 
-## Troubleshooting and contributing
-
-If port 3000 is occupied, stop the other local server or run `npm run dev -- --port 3001`. Use the URL printed by the terminal. Export progress before switching hostname or port because browser storage is origin-specific.
-
-If your production preview shows old content, stop it, run `npm run build`, restart with `npm start`, and reload. Use `npm run dev` while editing. If progress appears missing, check the browser profile and exact URL, then import your saved export.
-
-For a bug report, include the lesson/view, expected behavior, observed behavior, and a small reproduction. For factual corrections, link a primary source. Use synthetic or redacted examples.
-
-Keep contributions focused. Preserve lesson IDs, five lessons per part, and alignment between diagram nodes and `nodeDetails`. Update related examples, quizzes, prompts, and simulations together when a business rule changes.
-
-Before proposing changes, run:
+## Checks and troubleshooting
 
 ```sh
-npm ci
 npm test
 npm run build
 ```
 
-Then exercise the affected browser flow. Check keyboard use and a narrow screen for UI changes; reload/export/import for persistence changes; and retries, resets, and invariants for game/lab changes. The automated tests cover progress compatibility, validation, and lesson content integrity; they do not replace browser interaction checks. There is no dedicated lint script. Report checks actually performed rather than treating a successful build as proof of every interaction.
+Automated checks cover content integrity, retained lesson identity, progress compatibility and simulation invariants. Browser verification remains necessary for interaction, layout, keyboard access and persistence flows. Live provider access also depends on your keys, account and current model availability. See the [verification record](docs/VERIFICATION.md) for checks actually performed and their limits.
+
+If port 3000 is occupied, stop the other local server or run `npm run dev -- --port 3001`. Use the printed URL and export progress before changing hostname or port. For an outdated production preview, stop it, build again, restart and reload; use the development server while editing.
+
+For a bug report, include the lesson or mission, expected behavior, observed behavior and reproduction steps. Use synthetic/redacted evidence and primary sources for factual corrections. Preserve existing IDs and update related examples, quizzes, prompts and simulations together when a rule changes. Report actual checks rather than assuming a successful build verifies every interaction.
