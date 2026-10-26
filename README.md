@@ -38,7 +38,7 @@ This starts a local production server. It does not deploy or host the website.
 
 ## Optional AI tutor
 
-Ask a backend question from the tutor page (`#tutor`) or a lesson's **Ask the tutor** link. The server retrieves relevant excerpts from the 108 lessons, sends them with your question to a configured model, and returns an explanation with lesson references. Retrieval uses a local keyword index; no vector database or embedding service is required. Read the cited lessons and verify implementation advice: grounding does not guarantee a correct answer.
+Open the tutor dock from any page, `#tutor`, or a lesson's **Ask the tutor** link. Keep the conversation beside the lesson while you navigate, resize, expand or minimize it. Choose **Explain**, **Quiz me**, **Practice** or **Help me plan**. The server retrieves course excerpts, sends them with your question and relevant learning context to a configured model, and returns an explanation with lesson references. Retrieval uses a local keyword index; no vector database or embedding service is required. Read the cited lessons and verify advice: grounding does not guarantee a correct answer.
 
 1. Copy [`.env.example`](.env.example) to `.env.local` in the project root.
 2. Add your own key to `OPENROUTER_API_KEYS`, `GEMINI_API_KEYS`, `GROQ_API_KEYS` or `FREEAI_API_KEYS`. Leave unused providers empty. Each accepts up to six comma-separated keys.
@@ -48,7 +48,15 @@ The default provider order is **OpenRouter → Gemini → Groq → Free.ai**. Op
 
 Automatic failover tries another configured key/provider after quota, credential or temporary service errors. It does not create keys or increase shared provider quotas. Keys stay on the server; never use a `NEXT_PUBLIC_` prefix. A shared `TUTOR_ACCESS_CODE` of at least 16 characters is required outside direct localhost access, including Vercel. The checked-in template contains no credentials.
 
-Tutor questions, recent conversation and retrieved excerpts are sent to the selected provider. Course notes, progress and prompt drafts are not attached. Tutor conversation and access-code entry stay in page memory and are not included in progress exports. See [AI_TUTOR.md](docs/AI_TUTOR.md) for configuration, request limits, privacy, failover and troubleshooting.
+Tutor requests include your question, recent conversation, course titles/order, a small completion summary and relevant lesson excerpts, including selected personal edits. Notes and workshop drafts are not attached. Chat and access-code entry stay in page memory and are not exported. Reloading clears the conversation.
+
+**Voice is optional.** Record → Stop → preview → Transcribe puts a draft in the question box for review; it never sends the question automatically. Recording is limited to 60 seconds and 5 MB. **Read aloud** offers natural English speech through Groq and a selectable browser-voice fallback, with pause/resume/stop. Groq speech uses the existing `GROQ_API_KEYS`; it is separate from the chat provider order. Browser voice needs no app API key. Natural speech reads up to 2,000 characters, and Hindi pronunciation varies. Audio stops when the tutor hides; this app does not save recordings. See [AI_TUTOR.md](docs/AI_TUTOR.md) for voice models, processing, limits and troubleshooting.
+
+Groq may require an organization administrator to review and accept the Orpheus model terms in [Groq model setup](https://console.groq.com/playground?model=canopylabs%2Forpheus-v1-english) before natural speech is enabled. The app displays that setup requirement and offers Browser voice; it does not accept terms on your behalf.
+
+**Your course copy:** ask the tutor to add, improve or reorder a lesson, review its proposed changes, then choose **Apply**. The **Edit course** workspace also supports manual changes, course export/import and undo for the last five changes. Copies support up to 50 added lessons and 100 edited lessons; reordering stays within the same part. Changes live in your browser, with the authored course files unchanged. A proposal is unverified teaching content until you review it; it is never applied automatically.
+
+Editing a lesson's quiz, exercise, teaching answer or completion checks clears that lesson's previous assessment/completion records so you can work through the new version. Undo restores course content; it does not restore cleared assessment records.
 
 ## The learning experience
 
@@ -58,7 +66,8 @@ The interface uses a flat cream canvas with violet, cyan, pink, peach and light-
 - **Four steps per lesson:** Understand → Explore → Solve → Apply.
 - **Clickable explanations:** diagram nodes, store examples, common mistakes, debugging clues and implementation examples.
 - **Seven AI prompt modes:** Understand, Inspect, Plan, Implement, Debug, Verify and Review, customized to the topic.
-- **Optional course tutor:** ask follow-up questions using retrieved lesson excerpts and OpenRouter, Gemini, Groq or Free.ai.
+- **Tutor beside the lesson:** four teaching modes, follow-up questions, course references, voice input/output and reviewable course-change proposals.
+- **Your own course copy:** add, edit and reorder lessons; review and apply suggestions, undo recent changes, or export the copy.
 - **Learning checks:** solve the prediction question and complete three practical self-checks before marking a new lesson complete.
 - **Practice Studio:** sixteen missions using diagnosis, ordering, sorting, configuration decisions and local simulations, ending in the connected capstone.
 - **Backend Arcade:** Request relay, Boundary keeper and Incident detective, with feedback and replay.
@@ -145,11 +154,11 @@ The original `backend-fieldguide-v1` browser storage key remains compatible. Old
 - Marking a lesson incomplete removes its 20 XP while retaining its passed quiz and self-check records for review.
 - Lesson progress, mission completion and arcade medals are separate. Optional advanced tracks do not change course totals.
 
-Saved state includes completed lessons, passed quiz IDs, practical self-checks, mission completions, arcade achievements, lesson notes, last visited lesson, the Prompt workshop draft, language preference and the reduced-animation setting.
+Saved state includes completed lessons, passed quiz IDs, practical self-checks, mission completions, arcade achievements, lesson notes, last visited lesson, the Prompt workshop draft, language preference, the reduced-animation setting and your course copy with its last five undo snapshots. Added lessons increase your local lesson total; the published curriculum remains 108 lessons.
 
 Choose your language in **Settings**. The bundled Hinglish dictionary loads when selected; explanatory content uses English as a fallback when a translation is unavailable. Switching languages does not change lesson IDs, answer keys, completion records, code, URLs or your own notes and drafts. Language selection makes no AI translation request.
 
-Use **Export** in the sidebar to download `backend-fieldguide-progress.json`. **Import replaces saved course state** and resets the current view's temporary state; it does not merge two learners' histories. Exports contain notes and prompt drafts, so inspect them before sharing.
+Use **Export** in the sidebar to download `backend-fieldguide-progress.json`. **Import replaces saved course state** and resets the current view's temporary state; it does not merge two learners' histories. Exports contain notes, prompt drafts and course changes, so inspect them before sharing. **Edit course** also exports/imports `backend-fieldguide-course.json` for sharing just the course copy; importing that file replaces local course changes.
 
 Storage belongs to the current browser profile and origin, including hostname and port. There is no account or cloud sync. Clearing site data removes the local copy; keep an export as a backup. If browser storage cannot be read or written, a notice prompts you to export before closing the session.
 
@@ -170,9 +179,12 @@ Use **Tab**, **Enter** and **Space** to navigate controls. Ordering activities p
 | `components/PracticeStudio.js` | Practical mission navigation, scenarios, ordering and placement activities. |
 | `components/PracticeExperiments.js` | Interactive local experiment panels used by missions. |
 | `components/GameArcade.js`, `lib/game-data.js` | Three arcade games, scenarios and explanations. |
-| `components/CourseTutor.js`, `app/api/tutor/route.js` | Tutor interface and server-only API entry point. |
+| `components/TutorDock.js`, `components/CourseTutor.js`, `app/api/tutor/route.js` | Persistent tutor dock, teaching modes, reviewable proposals and server-only API entry point. |
+| `components/CourseManager.js`, `lib/course-workspace.mjs` | Local course copies, add/edit/reorder, undo and course export/import. |
+| `components/TutorVoice.js`, `lib/voice-server.mjs`, `app/api/voice/` | Explicit microphone transcription, natural speech and browser-voice fallback. |
 | `lib/retrieval.mjs` | Local lesson index and deterministic course retrieval. |
 | `lib/tutor-server.mjs`, `lib/ai-providers.mjs` | Tutor input/access checks, grounded prompts, provider adapters and bounded failover. |
+| `lib/tutor-context.mjs`, `lib/tutor-actions.mjs` | Validated personal course context, teaching instructions and bounded action proposals. |
 | `lib/course.mjs` | Course metadata, ID sets, navigation helpers and reward calculations. |
 | `lib/progress.mjs` | Saved-state defaults, validation and compatibility. |
 | `components/LanguageProvider.js`, `lib/language.mjs`, `lib/interface-labels.json` | Shared language setting, English interface labels and safe content localization. |
@@ -184,6 +196,7 @@ Use **Tab**, **Enter** and **Space** to navigate controls. Ordering activities p
 | `tests/course.test.mjs`, `tests/original-lesson-identity.json` | Content/progress checks and the retained foundation identity fixture. |
 | `tests/simulations.test.mjs` | Simulation invariants, retries and state-transition checks. |
 | `tests/retrieval.test.mjs`, `tests/ai-providers.test.mjs`, `tests/tutor-server.test.mjs` | Retrieval relevance, mocked failover, request validation and access checks. |
+| `tests/voice.test.mjs` | Mocked audio validation, access protection, provider failover, speech assembly and limits. |
 
 The application uses React and the Next.js App Router. Views use URL hashes within the client app; the optional tutor calls a Node.js API route with direct HTTP provider adapters. Curriculum counts and navigation come from the data instead of a fixed sixty-lesson assumption.
 

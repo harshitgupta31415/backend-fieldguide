@@ -2,7 +2,7 @@
 
 Backend Fieldguide includes an optional tutor that answers questions using retrieved material from its 108 lessons. The course remains usable with no provider account. Generating an answer requires internet access and at least one configured OpenRouter, Gemini, Groq or Free.ai key.
 
-Open the tutor at `#tutor`, or use a lesson's **Ask the tutor** link. Ask a specific question, inspect its lesson references, and compare the answer with the lesson. The tutor explains and proposes; it cannot run code, inspect your private repository, access commerce accounts or establish that an integration works.
+Open the tutor dock from any page, `#tutor`, or a lesson's **Ask the tutor** link. The dock stays mounted while you browse, keeping your conversation beside the lesson. Resize, expand, minimize or close it; on small screens it opens as a drawer. Ask a specific question, inspect its references, and compare the answer with the lesson. The tutor explains and proposes; it cannot run code, inspect your private repository, access commerce accounts or establish that an integration works.
 
 **Settings → Language** selects English or light Hinglish. Interface labels and technical terms stay English. Hinglish explanations keep mostly English sentences with a few familiar Hindi words written in English letters; the tutor receives the same language preference. The course's bundled translations need no provider request, while submitting a tutor question still calls the configured model.
 
@@ -31,7 +31,40 @@ The template contains empty credential fields. `.env.local` is ignored by Git. N
 
 Use a single key or a comma-separated list, with up to **six distinct keys per provider**. Whitespace around keys is removed, duplicate entries are discarded and unused extra entries beyond six are ignored. The singular `OPENROUTER_API_KEY`, `GEMINI_API_KEY`, `GROQ_API_KEY` and `FREEAI_API_KEY` aliases work when the corresponding plural variable is empty. Prefer one form per provider.
 
-To use only OpenRouter, set `AI_PROVIDER_ORDER=openrouter`. To use Gemini first, set `AI_PROVIDER_ORDER=gemini,openrouter,groq,freeai`. Changing the order or model is an explicit owner decision. Restart the local server after changing configuration.
+To use only OpenRouter for chat, set `AI_PROVIDER_ORDER=openrouter`. To use Gemini first, set `AI_PROVIDER_ORDER=gemini,openrouter,groq,freeai`. Changing the order or model is an explicit owner decision. Restart the local server after changing configuration. Audio uses `GROQ_API_KEYS` independently of chat order; it needs no additional environment variables.
+
+## Teaching modes and your course copy
+
+- **Explain:** one concept, a store example and a question to check understanding.
+- **Quiz me:** a prediction question, then feedback after your attempt.
+- **Practice:** a small task with a prediction or evidence to discuss.
+- **Help me plan:** a manageable next step; request course changes explicitly when wanted.
+
+These are teaching instructions to the model, not a guaranteed assessment of mastery. The request includes the current lesson, a small completion summary and the current lesson-title registry so advice can fit your course copy.
+
+Ask, for example, “Add a short lesson about duplicate webhook handling to this part,” or “Improve this lesson's example.” The response can contain an **add**, **edit** or **move** proposal. Inspect the teaching content and placement in **Review**, then choose **Apply**. Only that click changes your local copy. The model cannot modify source files, execute code or publish anything.
+
+The **Edit course** workspace offers manual add/edit/reorder, course-only export/import, and undo for the **last five course changes**. A copy permits **50 added lessons**, **100 edited lessons**, and ordering within the same part. Added lessons receive local IDs and contribute to local totals. The original 108-lesson source remains intact. Personal additions and edits are labeled unverified content when supplied to the tutor; review their facts, quizzes and checks before teaching from them.
+
+Course changes persist in browser storage and are included in progress exports. Course-only files use `backend-fieldguide-course.json`; importing replaces local course changes rather than merging copies. Chat messages, unapplied proposals and access-code entry are not included. Keep an export before replacing a copy or clearing browser storage.
+
+Applying edits to a quiz, exercise, teaching answer or completion checks clears the lesson's previous pass/check/completion records. Revisit the updated checks. Course undo restores content, not cleared assessment records.
+
+## Voice input and read aloud
+
+**Input:** choose **Record question** to request microphone permission. Stop within 60 seconds, preview or discard the recording, then explicitly choose **Transcribe**. The transcript fills the question box for review; submitting the tutor question is a separate action. The app caps recordings at **5 MB** and rejects unsupported formats. It sends the recording to Groq only for transcription, keeps no recording database or local-storage audio, and releases microphone tracks when stopped or hidden. Browser microphone support and permission are required.
+
+Transcription uses Groq's multilingual `whisper-large-v3-turbo` at `/audio/transcriptions`. English mode supplies an English language hint; Hinglish mode leaves language detection automatic with a short terminology hint. Recognition and Roman-script spelling are not guaranteed, so edit the transcript before sending. A provider-reported recording longer than the limit is rejected. See [Groq speech-to-text](https://console.groq.com/docs/speech-to-text).
+
+**Output:** choose **Read aloud** on a completed answer. Natural speech uses Groq's English `canopylabs/orpheus-v1-english` model with the **Hannah** voice and WAV audio. It is a preview model, so availability can change. The app reads up to **2,000 characters**, omits fenced code, and splits text into requests of at most **200 characters** to match the provider limit, then joins compatible PCM WAV chunks. Long answers require multiple provider calls and may reach the time limit. See [Orpheus speech documentation](https://console.groq.com/docs/text-to-speech/orpheus) and its [model page](https://console.groq.com/docs/model/canopylabs/orpheus-v1-english).
+
+**Model setup:** Groq can return `model_terms_required` until an organization administrator reviews and accepts the Orpheus terms in [Groq model setup](https://console.groq.com/playground?model=canopylabs%2Forpheus-v1-english). When this happens, the app shows a fixed official setup link and a Browser voice option. It does not accept legal terms, retry other keys for this setup error, or expose the provider's raw error details. Natural voice remains unavailable until the account owner completes any required setup; browser speech does not need that acceptance.
+
+Pause, resume, replay or stop playback. Only one answer/recording preview plays at a time. Closing or minimizing the tutor stops playback, recording and pending audio requests. Audio never starts without a Read aloud or Play action.
+
+Choose **Browser voice** for the normal device/browser option, including when natural speech is unavailable. It uses the browser's available voices and needs no app provider key; some browser voices may use an online speech service. Voice availability, naturalness and Hindi pronunciation vary by device. Groq's natural voice is English, so Hinglish pronunciation may be imperfect. See [browser speech synthesis](https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesis).
+
+Audio routes use the same origin and access-code policy as the tutor. They share a separate in-process limit of **eight audio actions per minute** and **two concurrent actions**. Groq keys rotate independently of chat, with up to two eligible-key attempts per transcription or speech chunk, a 12-second attempt timeout and 45-second overall provider budget. Credentials/quota/temporary failures cool down keys; audio does not fall back to another vendor. Browser voice remains an explicit user choice. Groq charges and provider retention policies apply to uploaded audio and generated speech.
 
 ## Models, cost and availability
 
@@ -56,11 +89,11 @@ flowchart LR
   E --> F[Answer and lesson references]
 ```
 
-1. The browser submits the question, optional current lesson and recent conversation to `POST /api/tutor`.
+1. The browser submits the question, teaching mode, optional current lesson, recent conversation, small completion summary and course registry to `POST /api/tutor`, plus up to six bounded excerpts from personal lessons.
 2. The server checks the request host/origin, access code, input bounds and local request limits.
-3. Deterministic lexical retrieval searches the bundled lesson content and selects up to two relevant excerpts. There is no embedding API, vector database, uploaded document corpus or live web search.
+3. Deterministic lexical retrieval searches the bundled lesson content and selects up to two relevant excerpts. Relevant supplied personal excerpts can replace or supplement authored material and are labeled unverified. There is no embedding API, vector database, uploaded document corpus or live web search.
 4. The server supplies those excerpts and recent messages to a model with instructions to teach from the course and cite supported claims as `[Lesson N]`.
-5. The response includes the answer and the retrieved lesson sources so the learner can inspect the supporting material.
+5. The response includes the answer, lesson sources and any validated course-change proposals. Proposals require review and Apply in the browser.
 
 The API uses direct server-side HTTP requests: chat completion requests for OpenRouter and Groq, Free.ai's documented chat endpoint, and Gemini's `generateContent` API. It does not require a provider SDK or give the model executable tools.
 
@@ -99,7 +132,7 @@ More keys do **not** create more provider capacity: Gemini rate limits are [per 
 
 Requests to `localhost`, `127.0.0.1` or loopback IPv6 can run without an access code when `TUTOR_ACCESS_CODE` is empty and forwarded addresses, if present, are loopback addresses. If a code is configured, it is required locally too. Vercel, non-loopback hosts and requests containing a non-loopback `x-forwarded-for` address always require a configured code of at least **16 characters**. Use a private random code no longer than 256 characters and enter it in the tutor's access field.
 
-The browser sends the code in the JSON request body, never the URL. Provider keys are attached only by server code. The tutor accepts requests whose `Origin` host matches the website host, including its port. Requests without that header are rejected.
+The browser sends the code in the request body (JSON for chat/read aloud, multipart for transcription), never the URL. Provider keys are attached only by server code. The APIs accept requests whose `Origin` host matches the website host, including its port. Requests without that header are rejected.
 
 The supplied run scripts bind the server to `127.0.0.1`. Always configure `TUTOR_ACCESS_CODE` before exposing the server through a network binding, proxy or tunnel, regardless of its hostname: request headers alone cannot establish that a caller is physically local.
 
@@ -107,21 +140,25 @@ The API also limits each server process to **10 accepted requests per minute** a
 
 | Input | Limit |
 | --- | --- |
-| JSON request body | 32 KiB. |
+| Tutor JSON request body | 64 KiB. |
 | Question | 1–2,000 characters. |
 | History | At most six `user`/`assistant` entries, each up to 4,000 characters. |
 | Lesson context | An existing integer lesson ID, if supplied. |
 | Language | `en` or `hinglish`; defaults to `en`. |
+| Teaching mode | `explain`, `quiz`, `practice` or `plan`; defaults to `explain`. |
+| Course context | Registry of the original 108 lessons and up to 50 additions; up to six bounded personal excerpts. |
 
 `GET /api/tutor` reports whether a provider is configured, provider names and whether an access code is required. It does not expose keys or test account validity, credit balance or model availability.
 
-`POST /api/tutor` accepts `question`, optional `lessonId`, `history`, `language` and `accessCode`. Success returns `answer`, `sources`, `provider` and `model`; failure returns an explanatory `error` and `code`. The returned model is the configured identifier. With `openrouter/free`, it is not the identity of the underlying model selected by the router.
+`POST /api/tutor` accepts `question`, optional `lessonId`, `history`, `language`, `intent`, `learnerSummary`, `courseContext` and `accessCode`. Success returns `answer`, `sources`, `actions`, `warnings`, `provider` and `model`; failure returns an explanatory `error` and `code`. The returned model is the configured identifier. With `openrouter/free`, it is not the identity of the underlying model selected by the router.
+
+`POST /api/voice/transcribe` accepts multipart `file`, `durationMs`, `language` and `accessCode`; it returns `text`, `truncated` and `provider`. `GET` reports configuration/limits without keys. `POST /api/voice/speak` accepts JSON `text`, `language` and `accessCode` and returns `audio/wav`. Voice errors use explanatory `error` and `code` values without upstream error bodies.
 
 ## Privacy and persistence
 
-Submitting a question sends its text, recent conversation, retrieved lesson material and tutor instructions to the selected provider. Automatic fallback can send the same request to another configured provider. No lesson notes, saved progress, workshop drafts, browser storage or repository files are attached automatically. Anything you type or paste into the chat itself is part of the request.
+Submitting a question sends its text, recent conversation, retrieved lesson material, current course registry (titles/IDs/order), a small completion summary and tutor instructions to the selected provider. Supplied excerpts from your edited/added lessons may be selected as context. Automatic fallback can send the same request to another configured provider. Lesson notes, workshop drafts, the full progress record and repository files are not attached automatically. Anything typed or pasted into chat is part of the request. Transcribe sends your audio to Groq; natural Read aloud sends the prepared answer text to Groq. Browser voice processing depends on the browser's chosen service.
 
-The application keeps tutor conversation and access-code entry in page memory rather than browser storage or progress exports. Reloading starts a new tutor session. The server does not maintain a chat database. It keeps only temporary request counters, key fingerprints/cooldowns and rotation positions for its local guards.
+The application keeps conversation, unapplied proposals, access-code entry and audio in page memory rather than progress exports. Chat survives course navigation and hiding the dock; reloading clears it. Applied course changes are different: they persist in the local course copy. The server keeps no chat/audio database; its request processing and rate-limit/rotation state are temporary.
 
 Provider processing and retention policies still apply. Review [OpenRouter data collection](https://openrouter.ai/docs/guides/privacy/data-collection), [Gemini's current terms](https://ai.google.dev/gemini-api/terms), [Groq data controls](https://console.groq.com/docs/your-data) and [Free.ai privacy](https://free.ai/privacy/). Keep secrets and real customer information out of questions. Model output is displayed for review and is not executed.
 
@@ -147,6 +184,11 @@ If the owner later configures their own Vercel project, use the variables above,
 | Tutor busy | The local shared minute/concurrency guard was reached; wait before submitting again. |
 | No supporting lesson | Name a backend concept, choose a related lesson or restate the question using the course's terminology. |
 | Temporary provider failure | Retry later or configure another intended provider. A free router may have limited availability. |
+| Microphone unavailable | Use localhost/HTTPS, check browser permission and microphone hardware, or type the question. |
+| Natural voice unavailable | Check the server-side Groq key/model access; choose Browser voice as an explicit alternative. |
+| Orpheus model terms required | A Groq organization administrator must review the terms in Groq model setup. The app cannot accept them; Browser voice remains available. |
+| Long read-aloud times out | Read a shorter answer or use Browser voice; natural speech needs multiple 200-character provider calls. |
+| Course proposal cannot apply | Review required lesson fields, same-part placement and local copy size/count limits; refresh stale proposals. |
 
 Run `npm test` and `npm run build` for the project's automated checks. Mocked provider tests can establish routing and validation behavior without spending credits; they cannot prove that a real key, quota or model works. Inspect [VERIFICATION.md](VERIFICATION.md) for the checks actually run and any live-integration limits.
 

@@ -13,8 +13,8 @@ function loadDictionary() {
   return dictionaryPromise;
 }
 
-function localizedCourse(localize) {
-  const localized = localize({ lessons: course.lessons, reference: course.reference, activities: course.activities, interactions, ...gameData });
+function localizedCourse(localize, workspace) {
+  const localized = localize({ lessons: workspace?.lessons || course.lessons, reference: course.reference, activities: course.activities, interactions: workspace?.interactions || interactions, ...gameData });
   const lessonById = id => localized.lessons.find(lesson => Number(lesson.id) === Number(id));
   const moduleLessons = id => localized.lessons.filter(lesson => Number(lesson.module_id) === Number(id));
   return { ...course, ...localized, lessonById, moduleLessons, lessonsForModule: moduleLessons,
@@ -24,7 +24,7 @@ function localizedCourse(localize) {
   };
 }
 
-export function LanguageProvider({ language: selectedLanguage = 'en', onLanguageChange, children }) {
+export function LanguageProvider({ language: selectedLanguage = 'en', onLanguageChange, workspace, children }) {
   const language = normalizeLanguage(selectedLanguage);
   const [dictionary, setDictionary] = useState(null);
   const [translationError, setTranslationError] = useState(false);
@@ -40,7 +40,7 @@ export function LanguageProvider({ language: selectedLanguage = 'en', onLanguage
   const t = useCallback(value => translateText(value, language, dictionary || {}), [language, dictionary]);
   const localize = useCallback(value => localizeValue(value, language, dictionary || {}), [language, dictionary]);
   const setLanguage = useCallback(value => onLanguageChange?.(normalizeLanguage(value)), [onLanguageChange]);
-  const courseData = useMemo(() => localizedCourse(localize), [localize]);
+  const courseData = useMemo(() => localizedCourse(localize, workspace), [localize, workspace]);
   const value = useMemo(() => ({ language, t, localize, setLanguage, course: courseData, loadingLanguage: language === 'hinglish' && !dictionary && !translationError, translationError }), [language, t, localize, setLanguage, courseData, dictionary, translationError]);
   return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;
 }

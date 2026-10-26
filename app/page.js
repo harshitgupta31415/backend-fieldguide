@@ -1,16 +1,18 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { lessons, reference, activities, activityIdSet, moduleLessons, lessonById as byId } from '../lib/course.mjs';
 import interactions from '../lib/interactions.json';
 import JourneyHome, { PartJourney } from '../components/Journey';
 import GameArcade from '../components/GameArcade';
 import LessonExperience from '../components/LessonExperience';
 import PracticeStudio from '../components/PracticeStudio';
-import CourseTutor from '../components/CourseTutor';
+import TutorDock from '../components/TutorDock';
+import CourseManager from '../components/CourseManager';
+import { applyCourseChange, buildCourse, cleanCourseChanges, makeTutorCourseContext, undoCourseChange } from '../lib/course-workspace.mjs';
 import { LanguageProvider, useLanguage, useCourse } from '../components/LanguageProvider';
 
-import { STORAGE_KEY as KEY, emptyProgress as empty, cleanProgress } from '../lib/progress.mjs';
+import { STORAGE_KEY as KEY, emptyProgress as empty, cleanProgress, withCourseChanges } from '../lib/progress.mjs';
 const pad = n => String(n).padStart(2, '0');
 const draftFields = [
   ['context', 'Project context', 'Stack, versions, relevant files, current behavior'],
@@ -49,23 +51,25 @@ function Icon({ name, size = 20 }) {
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.65" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[name] || paths.book}</svg>;
 }
 
-function readRoute() {
+function readRoute(courseLessons = lessons) {
+  const byId = id => courseLessons.find(lesson => Number(lesson.id) === Number(id));
   const [kind, id] = window.location.hash.replace(/^#\/?/, '').split('/');
   if (kind === 'lesson' && byId(id)) return { kind, id: Number(id) };
   if (kind === 'part' && reference.modules.some(m => m.id === Number(id))) return { kind, id: Number(id) };
   if (kind === 'labs') return { kind, id: ['inventory', 'payments', 'api'].includes(id) ? id : 'inventory' };
   if (kind === 'practice') return {kind, id: activityIdSet.has(id) ? id : undefined};
   if (kind === 'tutor') return {kind, id: byId(id) ? Number(id) : undefined};
-  if (['prompts', 'resources', 'arcade', 'settings'].includes(kind)) return { kind };
+  if (['prompts', 'resources', 'arcade', 'settings', 'course'].includes(kind)) return { kind };
   return { kind: 'home' };
 }
 
 export default function App() {
   const [data, setData] = useState(empty);
-  return <LanguageProvider language={data.language} onLanguageChange={language => setData(previous => ({ ...previous, language }))}><FieldguideApp data={data} setData={setData}/></LanguageProvider>;
+  const workspace = useMemo(() => buildCourse(data.course), [data.course]);
+  return <LanguageProvider workspace={workspace} language={data.language} onLanguageChange={language => setData(previous => ({ ...previous, language }))}><FieldguideApp data={data} setData={setData} workspace={workspace}/></LanguageProvider>;
 }
 
-function FieldguideApp({ data, setData }) {
+function FieldguideApp({ data, setData, workspace }) {
   const { t } = useLanguage();
   const { lessons, reference, moduleLessons, lessonById: byId } = useCourse();
   const { loadingLanguage, translationError } = useLanguage();
@@ -78,25 +82,39 @@ function FieldguideApp({ data, setData }) {
   const [toast, setToast] = useState('');
   const [importRevision, setImportRevision] = useState(0);
   const [navTrack, setNavTrack] = useState('foundation');
+  const [tutorOpen, setTutorOpen] = useState(false);
+  const [tutorLesson, setTutorLesson] = useState(null);
+  const [tutorLayout, setTutorLayout] = useState({ width: 420, visible: false });
+  const workspaceRef = useRef(workspace);
+  workspaceRef.current = workspace;
   const searchRef = useRef(null);
   const uploadRef = useRef(null);
 
   useEffect(() => {
-    try { const saved = localStorage.getItem(KEY); if (saved) setData(cleanProgress(JSON.parse(saved))); }
+    let initialLessons = workspaceRef.current.lessons;
+    try { const saved = localStorage.getItem(KEY); if (saved) { const restored = cleanProgress(JSON.parse(saved)); initialLessons = buildCourse(restored.course).lessons; setData(restored); } }
     catch { setStorageError(true); }
-    setReady(true); setRoute(readRoute());
-    const onHash = () => { setRoute(readRoute()); setQuery(''); setMenu(false); window.scrollTo({ top: 0, behavior: 'instant' }); };
+    setReady(true); setRoute(readRoute(initialLessons));
+    const onHash = () => { setRoute(readRoute(workspaceRef.current.lessons)); setQuery(''); setMenu(false); window.scrollTo({ top: 0, behavior: 'instant' }); };
     const key = e => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); searchRef.current?.focus(); } if (e.key === 'Escape') { setMenu(false); setQuery(''); } };
     window.addEventListener('hashchange', onHash); window.addEventListener('keydown', key);
     return () => { window.removeEventListener('hashchange', onHash); window.removeEventListener('keydown', key); };
   }, []);
   useEffect(() => { if (ready) try { localStorage.setItem(KEY, JSON.stringify(data)); } catch { setStorageError(true); } }, [data, ready]);
   useEffect(() => { if (route.kind === 'lesson') setData(d => ({ ...d, last: route.id })); }, [route.kind, route.id]);
+  useEffect(() => {
+    if (route.kind === 'tutor') {
+      setTutorOpen(true); setTutorLesson(route.id || data.last);
+      const next = route.id && byId(route.id) ? {kind: 'lesson', id: route.id} : {kind: 'home'};
+      setRoute(next); window.history.replaceState(null, '', next.id ? `#lesson/${next.id}` : '#home');
+    } else if (ready && route.kind === 'lesson' && !byId(route.id)) go('home');
+  }, [route.kind, route.id, workspace, ready]);
   useEffect(() => { if (!toast) return; const t = setTimeout(() => setToast(''), 3400); return () => clearTimeout(t); }, [toast]);
 
   function go(kind = 'home', id) {
+    if (kind === 'tutor') { setTutorLesson(id || (route.kind === 'lesson' ? route.id : data.last)); setTutorOpen(true); setMenu(false); return; }
     const hash = kind === 'home' ? '#home' : `#${kind}${id !== undefined ? '/' + id : ''}`;
-    window.location.hash = hash; setRoute(readRoute()); setQuery(''); setMenu(false); window.scrollTo({ top: 0, behavior: 'instant' });
+    window.location.hash = hash; setRoute(readRoute(workspaceRef.current.lessons)); setQuery(''); setMenu(false); window.scrollTo({ top: 0, behavior: 'instant' });
   }
   async function copy(value) {
     try { await navigator.clipboard.writeText(value); setToast('Prompt copied. Add your project context before using it.'); }
@@ -122,20 +140,44 @@ function FieldguideApp({ data, setData }) {
   function awardPractice(id) {
     if (activityIdSet.has(id)) setData(d => d.practice.includes(id) ? d : {...d, practice:[...d.practice,id]});
   }
+  function applyAction(action) {
+    if (action.type === 'navigate') { go('lesson', action.lessonId); return {ok: true, message: 'Lesson opened.', lessonId: action.lessonId}; }
+    try {
+      const result = applyCourseChange(data.course, action);
+      const next = withCourseChanges(data, result.changes);
+      setData(next); setImportRevision(v => v + 1);
+      setToast('Course change saved in this browser. Undo is in Edit course.');
+      return {ok: true, lessonId: result.lessonId, message: 'Saved to your course copy. Undo is available in Edit course.'};
+    } catch (error) { return {ok: false, message: error.message || 'This change could not be saved.'}; }
+  }
+  function undoCourse() {
+    setData(previous => withCourseChanges(previous, undoCourseChange(previous.course)));
+    setImportRevision(v => v + 1); setToast('Last course change undone.');
+  }
+  async function importCourse(file) {
+    if (!file || file.size > 1500000) throw new Error('Choose a course export smaller than 1.5 MB.');
+    const parsed = JSON.parse(await file.text());
+    if (parsed.format !== 'backend-fieldguide-course' || parsed.version !== 1 || !parsed.course || typeof parsed.course !== 'object') throw new Error('Choose a course copy exported from Edit course.');
+    const imported = cleanCourseChanges(parsed.course);
+    setData(previous => withCourseChanges(previous, {...imported, history: [...(previous.course?.history || []), {...previous.course, history: undefined}].slice(-5)}));
+    setImportRevision(v => v + 1); setToast('Course copy imported. Your valid progress was kept.');
+  }
+  const tutorId = route.kind === 'lesson' ? route.id : tutorLesson || data.last;
+  const courseContext = useMemo(() => makeTutorCourseContext(workspace.lessons, tutorId), [workspace, tutorId]);
   const currentModule = route.kind === 'lesson' ? Number(byId(route.id)?.module_id) : route.kind === 'part' ? route.id : null;
   useEffect(() => { if (currentModule) setNavTrack(reference.modules.find(m => m.id === currentModule)?.track || 'foundation'); }, [currentModule]);
   const progress = Math.round(data.completed.length / lessons.length * 100);
   const resume = data.completed.includes(data.last) ? lessons.find(d => !data.completed.includes(Number(d.id)))?.id || Number(lessons.at(-1).id) : data.last;
-  const title = query ? 'Search the fieldguide' : route.kind === 'lesson' ? `Part ${pad(currentModule)} / Lesson ${pad(route.id)}` : ({ home: 'Your learning path', part: `Part ${pad(route.id)}`, labs: 'Interactive labs', arcade: 'The backend arcade', practice:'Practice studio', tutor:'Course tutor', prompts: 'Prompt workshop', resources: 'Reference desk', settings: 'Settings' }[route.kind]);
+  const title = query ? 'Search the fieldguide' : route.kind === 'lesson' ? `Part ${pad(currentModule)} / Lesson ${pad(route.id)}` : ({ home: 'Your learning path', part: `Part ${pad(route.id)}`, labs: 'Interactive labs', arcade: 'The backend arcade', practice:'Practice studio', tutor:'Course tutor', prompts: 'Prompt workshop', resources: 'Reference desk', settings: 'Settings', course: 'Your course workspace' }[route.kind]);
 
-  return <div className={`app-shell ${focus ? 'focus-mode' : ''} ${data.reduceMotion ? 'motion-quiet' : ''}`}>
+  return <div className={`app-shell ${focus ? 'focus-mode' : ''} ${data.reduceMotion ? 'motion-quiet' : ''} ${tutorLayout.visible ? 'has-tutor' : ''}`} style={{'--tutor-space': `${tutorLayout.width + 24}px`}}>
     <a className="skip-link" href="#main-content" onClick={e => { e.preventDefault(); document.getElementById('main-content')?.focus(); }}>{t("Skip to learning content")}</a>
     {menu && <button className="menu-shade" onClick={() => setMenu(false)} aria-label={t("Close navigation")}/>}
     <aside className={`sidebar ${menu ? 'open' : ''}`}>
       <button className="brand" onClick={() => go()} aria-label={t("Backend Fieldguide home")}><span className="brand-symbol"><Icon name="prompt" size={24}/></span><span>{t("Backend")}<br/><b>{t("Fieldguide")}</b></span></button>
       <div className="sidebar-caption">{t("A STORE, FROM THE INSIDE OUT")}</div>
       <nav className="main-nav" aria-label={t("Main navigation")}>
-        {[['home','grid','Learning path'],['tutor','prompt','Course tutor'],['practice','lab','Practice studio'],['arcade','game','Backend arcade'],['labs','lab','Interactive labs'],['prompts','prompt','Prompt workshop'],['resources','book','Reference desk'],['settings','grid','Settings']].map(([kind, icon, label]) => <button key={kind} className={route.kind === kind && !query ? 'active' : ''} onClick={() => go(kind)}><Icon name={icon}/><span>{t(label)}</span>{kind === 'practice' && <em>{t("TRY")}</em>}</button>)}
+        {[['home','grid','Learning path'],['tutor','prompt','Course tutor'],['practice','lab','Practice studio'],['arcade','game','Backend arcade'],['labs','lab','Interactive labs'],['prompts','prompt','Prompt workshop'],['resources','book','Reference desk'],['course','book','Edit course'],['settings','grid','Settings']].map(([kind, icon, label]) => <button key={kind} className={route.kind === kind && !query ? 'active' : ''} onClick={() => go(kind)}><Icon name={icon}/><span>{t(label)}</span>{kind === 'practice' && <em>{t("TRY")}</em>}</button>)}
       </nav>
       <div className="sidebar-section-label">{t("THE ")}{t(reference.modules.length)}{t(" PARTS ")}<span>{t(lessons.length)}{t(" lessons")}</span></div>
       <div className="nav-track"><button aria-pressed={navTrack === 'foundation'} onClick={() => setNavTrack('foundation')}>{t("Foundation")}</button><button aria-pressed={navTrack === 'practical'} onClick={() => setNavTrack('practical')}>{t("Practical")}</button></div><nav className="part-nav" aria-label={t("Course parts")}>{reference.modules.filter(m => (m.track || 'foundation') === navTrack).map(m => {
@@ -151,14 +193,14 @@ function FieldguideApp({ data, setData }) {
       {translationError && <div className="storage-notice" role="status">{t("Translations could not load. English content is still available; reload to try again.")}</div>}
       {storageError && <div className="storage-notice" role="status">{t("Browser storage is unavailable or could not be read. Export your progress before closing this session.")}</div>}
       <main id="main-content" tabIndex={-1}>
-        {query ? <SearchResults query={query} go={go} completed={data.completed}/> : <div className="route-view" key={`${route.kind}/${route.id || ''}/${importRevision}`}>
+        {query ? <SearchResults query={query} go={go} completed={data.completed}/> : <div className="route-view" key={`${route.kind}/${route.id || ''}/${route.kind === 'course' ? '' : importRevision}`}>
           {route.kind === 'home' && <JourneyHome key={resume} go={go} data={data} resume={Number(resume)}/>}
           {route.kind === 'part' && <PartJourney id={route.id} go={go} completed={data.completed}/>}
-          {route.kind === 'lesson' && <Lesson key={route.id} lesson={byId(route.id)} go={go} copy={copy} data={data} setData={setData} complete={complete}/>}
+          {route.kind === 'lesson' && byId(route.id) && <Lesson key={route.id} lesson={byId(route.id)} go={go} copy={copy} data={data} setData={setData} complete={complete}/>}
           {route.kind === 'labs' && <Labs name={route.id} go={go}/>}
           {route.kind === 'arcade' && <GameArcade onAward={award} go={go} completedGames={data.achievements}/>}
           {route.kind === 'practice' && <PracticeStudio name={route.id} go={go} data={data} onAward={awardPractice}/>}
-          {route.kind === 'tutor' && <CourseTutor lessonId={route.id}/>}
+          {route.kind === 'course' && <CourseManager course={workspace.lessons} modules={reference.modules} changes={data.course} onAction={applyAction} onUndo={undoCourse} onNavigate={id => go('lesson', id)} onExport={() => download(JSON.stringify({format:'backend-fieldguide-course',version:1,course:data.course},null,2),'backend-fieldguide-course.json')} onImport={importCourse}/>}
           {route.kind === 'prompts' && <PromptWorkshop draft={data.draft} update={draft => setData(d => ({ ...d, draft }))} copy={copy} download={download}/>}
           {route.kind === 'resources' && <Resources go={go}/>}
           {route.kind === 'settings' && <Settings/>}
@@ -166,6 +208,7 @@ function FieldguideApp({ data, setData }) {
       </main>
       <footer className="site-footer"><span>{t("Backend Fieldguide ")}<span>{t("by harshitgupta31415")}</span></span><button className="motion-setting" aria-pressed={data.reduceMotion} onClick={() => setData(d => ({ ...d, reduceMotion: !d.reduceMotion }))}>{t(data.reduceMotion ? 'Reduced motion on' : 'Reduce animations')}</button><span>{t("Learn a little. Build understanding.")}</span></footer>
     </div>
+    <TutorDock lessonId={tutorId} course={workspace.lessons} courseContext={courseContext} learnerSummary={{completedCount:data.completed.length,totalLessons:lessons.length,currentLessonCompleted:data.completed.includes(Number(tutorId))}} onNavigate={id => go('lesson',id)} onCourseAction={applyAction} open={tutorOpen} onOpenChange={setTutorOpen} onLayoutChange={setTutorLayout}/>
     {toast && <div className="toast" role="status"><Icon name="check" size={17}/>{t(toast)}</div>}
   </div>;
 }

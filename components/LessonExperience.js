@@ -65,6 +65,7 @@ export default function LessonExperience({ lesson: d, module: m, quiz, go, copy,
     <div className="lesson-topline"><button className="back-link" onClick={() => go('part', m.id)}>← {t(m.title)}</button><button className="tutor-lesson-link" onClick={() => go('tutor', id)}>{t("Ask the tutor ↗")}</button><span className="lesson-reward">✦ {t(finished ? '20 XP earned' : '20 XP to discover')}</span></div>
     <div className="lesson-heading"><span className="eyebrow">{t("PART ")}{t(String(m.id).padStart(2, '0'))}{t(" · LESSON ")}{t(lessonNumber)} / {t(lessons.length)}</span><span className="pill">{t(finished ? '✓ Lesson complete' : 'One concept. Four small steps.')}</span></div>
     <h1 className="page-title">{t(d.title)}</h1>
+    {(d.isCustom || d.customized) && <p className="personal-lesson-note">Your course copy · {d.isCustom ? "Added lesson" : "Edited lesson"} · Check proposed content against reliable evidence.</p>}
     <p className="lesson-question">{t(d.question)}</p>
     <nav className="lesson-steps" aria-label={t("Lesson steps")}>{stages.map(([num, label, detail], i) => <button key={label} aria-current={stage === i ? 'step' : undefined} onClick={() => changeStage(i)} className={`${stage === i ? 'is-current' : ''} ${visited.includes(i) ? 'is-visited' : ''}`}><span className="step-index">{t(i === 2 && passed ? '✓' : num)}</span><span><b>{t(label)}</b><small>{t(detail)}</small></span></button>)}</nav>
     <div className="lesson-stage-progress" aria-hidden="true"><span style={{ width: `${(stage + 1) * 25}%` }}/></div>
@@ -74,7 +75,7 @@ export default function LessonExperience({ lesson: d, module: m, quiz, go, copy,
         <div className="stage-caption"><span>{t("THE STARTING POINT")}</span><small>01 / 04</small></div>
         <div className="idea-grid"><section><span className="eyebrow">{t("THE BASIC IDEA")}</span><p>{t(d.definition)}</p></section><section className="why-card"><span className="eyebrow">{t("WHY IT EXISTS")}</span><p>{t(d.why)}</p></section></div>
         <section className="worked-example"><span className="example-mark">↳</span><div><span className="eyebrow">{t("IMAGINE YOUR STORE")}</span><p>{t(d.example)}</p></div></section>
-        <details className="assumption-flip"><summary><span>?</span><div><b>{t("Spot the mistaken assumption")}</b><small>{t("Think first, then open the card.")}</small></div><span>+</span></summary><div><p>“{t(d.misconception)}”</p><span>{t("Challenge this claim using the idea and example above. In the next step, trace what the system must actually do.")}</span></div></details>
+        {d.misconception && <details className="assumption-flip"><summary><span>?</span><div><b>{t("Spot the mistaken assumption")}</b><small>{t("Think first, then open the card.")}</small></div><span>+</span></summary><div><p>“{t(d.misconception)}”</p><span>{t("Challenge this claim using the idea and example above. In the next step, trace what the system must actually do.")}</span></div></details>}
       </>}
       {stage === 1 && <>
         <div className="stage-caption"><span>{t("MAKE THE INVISIBLE VISIBLE")}</span><small>02 / 04</small></div>

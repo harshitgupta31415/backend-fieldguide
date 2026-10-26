@@ -511,3 +511,18 @@ html, body, .app-shell, .app-shell .workspace, .app-shell main { background: #ff
 
 .app-shell .concept-svg marker path{fill:#a492d9}.settings-page select{width:100%;max-width:480px;padding:15px 18px;border:1px solid #d8ccf5;border-radius:14px;background:#fff;color:#34264f;font:inherit;margin:12px 0 20px}.settings-page .resource-section{background:#eefaff;border:1px solid #e2d7fa;border-radius:22px;padding:30px}.settings-page label{display:block}
 
+
+/* Keep lesson content beside the tutor when the viewport has room. */
+.personal-lesson-note{padding:12px 16px;border:1px solid #decaf6;border-radius:12px;background:#f3eaff;color:#644580;font-size:12px;line-height:1.6}
+@media(min-width:1200px){
+.app-shell.has-tutor .workspace{margin-right:var(--tutor-space);min-width:0}
+.app-shell.has-tutor .page{padding-left:26px;padding-right:26px}
+.app-shell.has-tutor .topbar{padding-left:22px;padding-right:22px}
+.app-shell.has-tutor .breadcrumb{display:none}
+.app-shell.has-tutor .journey-hero,.app-shell.has-tutor .idea-grid,.app-shell.has-tutor .journey-chapter-layout{grid-template-columns:1fr}
+.app-shell.has-tutor .journey-hero-art{display:none}
+.app-shell.has-tutor .lesson-steps>button{padding:12px 8px}
+.app-shell.has-tutor .lesson-steps small{display:none}
+.app-shell.has-tutor .lesson-page .page-title{font-size:clamp(28px,3.1vw,44px)}
+}
+@media(min-width:1200px) and (max-width:1500px){.app-shell.has-tutor .sidebar{width:210px;padding-left:14px;padding-right:14px}.app-shell.has-tutor .workspace{margin-left:210px}.app-shell.has-tutor.focus-mode .workspace{margin-left:0}.app-shell.has-tutor .journey-part-grid,.app-shell.has-tutor .studio-grid{grid-template-columns:1fr}}

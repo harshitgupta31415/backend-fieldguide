@@ -1,10 +1,19 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createProviderRouter, readAIConfig } from '../lib/ai-providers.mjs';
+import { parseTutorReply, TUTOR_REPLY_FALLBACK } from '../lib/tutor-actions.mjs';
 
 const messages = [{ role: 'system', content: 'Use course facts.' }, { role: 'user', content: 'Explain payment verification.' }];
 const config = readAIConfig({ OPENROUTER_API_KEYS: 'first,second', GEMINI_API_KEY: 'third', GROQ_API_KEY: 'fourth' });
 const ok = () => Response.json({ choices: [{ message: { content: 'The payment is verified by the trusted server before fulfillment. [Lesson 37]' } }] });
+
+test('a malformed teaching envelope falls through to another key within the same request budget', async () => {
+  let calls=0;
+  const generate=createProviderRouter({fetchImpl:async()=>++calls===1 ? Response.json({choices:[{message:{content:JSON.stringify({unrecognized:'This provider did not follow the required teaching response format.'})}}]}) : ok()});
+  const result=await generate(messages,config,undefined,raw=>parseTutorReply(raw).answer!==TUTOR_REPLY_FALLBACK);
+  assert.equal(calls,2);
+  assert.match(result.answer,/verified/);
+});
 
 test('configuration deduplicates bounded key pools and never accepts inherited provider names', () => {
   const result = readAIConfig({ AI_PROVIDER_ORDER: 'toString,groq,groq,gemini', GROQ_API_KEYS: 'abc,abc,def', GEMINI_API_KEY: 'replace_me', AI_MAX_OUTPUT_TOKENS: '99999' });
