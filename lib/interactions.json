@@ -1,0 +1,922 @@
+{
+  "01": {
+    "choices": [
+      "No request was sent, or the server failed to persist the cart change.",
+      "The browser font changed, or the product image loaded too slowly.",
+      "The item must have sold out; cart persistence cannot fail."
+    ],
+    "correct": 0,
+    "explanation": "A local screen update can disappear on refresh if no successful persistent write occurred. Stock changes alone do not prove why a saved cart item vanished; inspect requests and stored records.",
+    "nodeDetails": [
+      "The click starts the intended action; it is not evidence that any server work happened.",
+      "The server validates the variant, quantity, cart access, and applicable business rules.",
+      "A committed write makes the cart survive requests and refreshes.",
+      "The response communicates the actual outcome, including safe errors.",
+      "The interface should reflect the confirmed outcome and explain failures rather than pretending every click succeeded."
+    ]
+  },
+  "02": {
+    "choices": [
+      "Variant ID, quantity, and the server's secret API key.",
+      "Variant ID and quantity; the server derives the trusted final price.",
+      "Only the final price, because the browser already knows the total."
+    ],
+    "correct": 1,
+    "explanation": "The client identifies the desired item and quantity. The server verifies them and calculates money from trusted records. JSON does not make a submitted price trustworthy or justify exposing a secret.",
+    "nodeDetails": [
+      "The method describes the operation; the URL identifies the resource or action endpoint.",
+      "The body supplies structured input, such as variant ID and quantity, that the server must validate.",
+      "The status identifies the response category; the client still needs the documented error or success details.",
+      "The response body returns the contract's fields for the interface to display or act on."
+    ]
+  },
+  "03": {
+    "choices": [
+      "Any renamed response field automatically renames the frontend variable.",
+      "The database must be corrupted whenever an image stops displaying.",
+      "The frontend may still read image_url, so changing the contract can produce a missing value."
+    ],
+    "correct": 2,
+    "explanation": "Clients rely on documented response names. Internal database stability cannot preserve a changed API field. Coordinate changes or retain compatibility so both sides continue speaking the same contract.",
+    "nodeDetails": [
+      "The agreement specifies fields, access rules, errors, and behavior both sides must support.",
+      "The interface consumes the agreed fields and handles documented states.",
+      "The server produces the promised behavior while enforcing access and business rules.",
+      "Checks compare actual requests and responses with the agreement, including failure cases."
+    ]
+  },
+  "04": {
+    "choices": [
+      "Stock can change between page load and purchase; the final allocation must be concurrency-safe.",
+      "The browser's original stock value remains guaranteed until its tab closes.",
+      "A second check is needed only to improve the page's appearance."
+    ],
+    "correct": 0,
+    "explanation": "Other customers and adjustments can change stock after a page loads. A fresh read alone can still race; the final availability check and allocation need protected coordination.",
+    "nodeDetails": [
+      "Check expected data types, lengths, ranges, and allowed fields before using input.",
+      "Verify the caller may act on this particular cart or resource.",
+      "Check current conditions, such as variant availability and quantity limits.",
+      "Commit a valid change or return a stable, safe error without exposing internal secrets."
+    ]
+  },
+  "05": {
+    "choices": [
+      "Discard the order and retry payment whenever the email service recovers.",
+      "Keep the order, verified payment state, and durable notification job; retry only the email task.",
+      "Mark payment failed until the email arrives successfully."
+    ],
+    "correct": 1,
+    "explanation": "Notification delivery is separate from the purchase and payment facts. Durable pending work survives the outage. Retrying a charge or rewriting payment status would create incorrect business effects.",
+    "nodeDetails": [
+      "Save the order and durable intention to notify together, avoiding a gap where the order exists but work is forgotten.",
+      "Return the actual saved order status without waiting unnecessarily for email delivery.",
+      "A recoverable worker claim lets unfinished work resume after failure.",
+      "Call the email service with safe retry rules and a stable logical notification identity.",
+      "Record completion or visible failure; do not equate a delivery timeout with a failed purchase."
+    ]
+  },
+  "06": {
+    "choices": [
+      "950 from the current product record, because order history should always use the latest price.",
+      "An average of 800 and 950, recalculated whenever the order is viewed.",
+      "800 from the order's purchase-time snapshot, with its saved currency and adjustments."
+    ],
+    "correct": 2,
+    "explanation": "An order records the agreed purchase, not today's catalog. A saved snapshot preserves that history; price changes and later refunds must not silently rewrite the original amount.",
+    "nodeDetails": [
+      "A customer can own multiple orders; ownership guides access to those records.",
+      "The order records the agreed purchase and its purchase-time totals.",
+      "Each item stores purchased quantity, description, variant details, and money components.",
+      "A variant identifies the exact option combination purchased, such as Blue / Medium.",
+      "The product groups related variants and shared catalog information that may change later."
+    ]
+  },
+  "07": {
+    "choices": [
+      "A database uniqueness constraint permits only one committed row for that SKU.",
+      "A prior lookup guarantees no other request can insert the SKU afterward.",
+      "A longer random request ID automatically makes every SKU unique."
+    ],
+    "correct": 0,
+    "explanation": "Two requests can both observe an absent SKU. A database uniqueness rule resolves competing writes; the application handles the rejected insert as a conflict instead of trusting the earlier lookup.",
+    "nodeDetails": [
+      "A primary key gives each record a stable database identity.",
+      "A foreign key ensures a reference points to an allowed existing record.",
+      "A unique constraint prevents duplicate values or combinations, including under competing requests.",
+      "A check constraint enforces a stored-value rule, such as a positive quantity."
+    ]
+  },
+  "08": {
+    "choices": [
+      "Only whether the SQL parses; a valid UPDATE automatically changes one order.",
+      "The exact target records, authorization, and allowed transitions; preview scope before a controlled update.",
+      "Only the database password, then run it to discover which rows change."
+    ],
+    "correct": 1,
+    "explanation": "An UPDATE without a filter may affect every row. Syntax correctness does not establish business intent, permission, or scope. Determine and verify the intended targets before mutating records.",
+    "nodeDetails": [
+      "Derive customer identity from verified server-side authentication rather than a caller's claimed customer ID.",
+      "Apply ownership, business filters, and the exact intended record boundary.",
+      "Bind values as data rather than assembling executable SQL from untrusted strings.",
+      "Return only permitted fields and records, or inspect the intended write scope before mutation."
+    ]
+  },
+  "09": {
+    "choices": [
+      "The first browser to show its success animation automatically owns the unit.",
+      "Both reads were correct, so selling two units is permitted.",
+      "Both requests can read the same old value; protect the availability decision and allocation together."
+    ],
+    "correct": 2,
+    "explanation": "A read describes one moment and does not reserve the unit. A conditional update or suitable lock makes the competing claim atomic, allowing only the available quantity to be allocated.",
+    "nodeDetails": [
+      "Customer A requests the same scarce unit that another customer may request.",
+      "Customer B can overlap A's execution even if each browser shows a normal flow.",
+      "The database protects the check and allocation as one controlled decision.",
+      "Only one allocation succeeds; the other request receives a defined availability outcome."
+    ]
+  },
+  "10": {
+    "choices": [
+      "Existing rows lack the required value; stage the field, writers, backfill, verification, and constraint.",
+      "Required columns are supported only on brand-new databases.",
+      "The server will invent trustworthy values for all existing rows automatically."
+    ],
+    "correct": 0,
+    "explanation": "A populated table already contains rows that may violate the new requirement. A staged migration supplies verified values and preserves application compatibility before enforcement; invented defaults can corrupt meaning.",
+    "nodeDetails": [
+      "Introduce the field so existing code and rows can continue working during rollout.",
+      "Deploy code that writes the new field correctly while handling mixed-version compatibility.",
+      "Populate existing records from trustworthy rules and verify completeness and correctness.",
+      "Enforce the requirement only after data and active application versions support it."
+    ]
+  },
+  "11": {
+    "choices": [
+      "Only a more difficult-to-guess order ID is missing.",
+      "Server-side authorization for that order's owner or an explicitly permitted staff role is missing.",
+      "The customer needs to sign in again; ownership checks are unnecessary after login."
+    ],
+    "correct": 1,
+    "explanation": "Login establishes identity, not permission for every order. The server must authorize the particular resource on every access path. Hidden links and unpredictable identifiers cannot enforce ownership.",
+    "nodeDetails": [
+      "Authentication establishes the caller's verified identity.",
+      "Identify the specific order or other resource requested.",
+      "Evaluate ownership and explicit permissions for the requested action.",
+      "Enforce the decision server-side and return a safe response without disclosing unauthorized data."
+    ]
+  },
+  "12": {
+    "choices": [
+      "No investigation is needed because removing the logout button revokes copied credentials.",
+      "Cookies cannot be copied, so the report must be impossible.",
+      "Check whether logout invalidated server access or only removed the browser copy, according to the revocation policy."
+    ],
+    "correct": 2,
+    "explanation": "Deleting one browser copy does not necessarily invalidate every copy. Investigate the actual session or token lifecycle, expiry, renewal, and documented logout policy before concluding access has been revoked.",
+    "nodeDetails": [
+      "Use maintained authentication components to establish identity securely.",
+      "Issue a credential with appropriate storage, transport protection, lifetime, and session-binding rules.",
+      "The client presents the credential on a request to a protected operation.",
+      "The server checks validity and relevant revocation or session state before authorizing the action.",
+      "Expiry limits lifetime; revocation applies the chosen policy for logout, compromise, or other access termination."
+    ]
+  },
+  "13": {
+    "choices": [
+      "No; shipment work needs shipment permissions, while refunds and price changes require separately granted capabilities.",
+      "Yes; every employee should automatically have every administrative permission.",
+      "Yes, if the refund and pricing buttons are hidden in that worker's browser."
+    ],
+    "correct": 0,
+    "explanation": "Least privilege grants the capabilities a task actually requires. UI visibility does not restrict API access, and giving unrelated powers increases the effect of mistakes or compromised accounts.",
+    "nodeDetails": [
+      "The final decision combines trusted identity, permissions, resource scope, and the requested operation.",
+      "Identity must come from verified authentication, not an editable request field.",
+      "Roles map trusted assignments to explicit capabilities; the browser cannot award them to itself.",
+      "Ownership limits customer or organization access to the proper resource boundary.",
+      "The required permission depends on the specific action, such as shipment creation or refund approval."
+    ]
+  },
+  "14": {
+    "choices": [
+      "Yes; deleting the newest file instantly removes all history, logs, and copies.",
+      "No; rotate or revoke the potentially exposed key, update deployments, and review exposure and usage.",
+      "Yes, provided the repository was private when the key was committed."
+    ],
+    "correct": 1,
+    "explanation": "A deleted secret may remain in history or existing copies. Private access reduces exposure but does not undo it. Rotation or revocation removes the old credential's ability to authorize future requests.",
+    "nodeDetails": [
+      "An endpoint is callable outside the intended website flow, including by hostile clients.",
+      "Validate data and enforce the caller's permission before performing protected work.",
+      "Bound sizes, request frequency, concurrency, and costly operations according to endpoint needs.",
+      "Keep server credentials protected and follow each integration's documented security requirements.",
+      "Observe failures, abuse patterns, and suspicious usage so confirmed issues can be investigated."
+    ]
+  },
+  "15": {
+    "choices": [
+      "Keep the raw credentials because complete logs are always more useful than safe logs.",
+      "Delete only the visible log line and assume no copies or exposure exist.",
+      "Stop sensitive logging, restrict affected logs, assess exposure, and follow incident and credential-invalidation procedures."
+    ],
+    "correct": 2,
+    "explanation": "Credentials in logs can enable unauthorized access. Contain exposure and assess existing copies while replacing raw logging with safe fields. Simply deleting one line does not resolve potential compromise.",
+    "nodeDetails": [
+      "An audit record should identify the accountable actor and meaningful action.",
+      "Order, request, or operation references help investigation without copying entire sensitive payloads.",
+      "Passwords, raw session cookies, and secret keys must not become ordinary log fields.",
+      "Restrict log readers and apply defined retention, redaction, and incident-handling rules."
+    ]
+  },
+  "16": {
+    "choices": [
+      "Not automatically; keep visibility separate and permit only available variants under the store's rules.",
+      "Yes; one unavailable size makes every other size unsellable.",
+      "No; allow Medium purchases anyway because Large has stock."
+    ],
+    "correct": 0,
+    "explanation": "Products group variants, but each variant has its own availability. A store may keep the product visible while disabling Medium. Large stock cannot satisfy a purchase of the Medium variant.",
+    "nodeDetails": [
+      "The product holds shared description and groups related sellable variants.",
+      "This exact option combination has its own identity and may be unavailable.",
+      "Another variant can remain sellable with its own stock and price rules.",
+      "A stable SKU identifies a sellable item; stock belongs to the inventory model for that item.",
+      "Order items preserve the variant and agreed details even if the catalog later changes."
+    ]
+  },
+  "17": {
+    "choices": [
+      "On-hand 5, reserved 1, available 4, because expiry removes a physical unit.",
+      "On-hand 6, reserved 1, available 5; release the expired reservation exactly once.",
+      "On-hand 7, reserved 2, available 5, because expiry returns a new physical unit."
+    ],
+    "correct": 1,
+    "explanation": "Expiry releases a hold without changing physical on-hand stock. Available equals on-hand minus reserved: 6 minus 1 equals 5. The release must not repeat or affect an already finalized reservation.",
+    "nodeDetails": [
+      "Available-to-sell equals on-hand minus all active or committed allocations in this teaching model.",
+      "A protected hold makes units unavailable to competing purchases; payment commitment keeps that allocation protected.",
+      "Shipment decreases on-hand and the corresponding allocation together, once, so availability is not deducted twice.",
+      "A permitted cancellation or expiry releases an allocation once without decreasing on-hand. Races require guarded transitions."
+    ]
+  },
+  "18": {
+    "choices": [
+      "1.00, because the latest browser value overrides the catalog.",
+      "50.50, by averaging the browser amount and catalog amount.",
+      "100.00 from the server's validated rules; do not trust the browser-submitted total."
+    ],
+    "correct": 2,
+    "explanation": "The server determines the payable amount from trusted inputs and rules. A client can edit its total. If a valid displayed quote changes, show and confirm the revised proposal as required.",
+    "nodeDetails": [
+      "The customer identifies intended variants and quantities; the server validates them.",
+      "Load prices and currency from trusted catalog or pricing records.",
+      "Apply documented adjustment order and exact money rounding appropriate to the currency.",
+      "Persist the itemized calculation so the agreed amount can be explained and reconciled.",
+      "Create payment using the saved validated amount and currency, then verify provider evidence matches."
+    ]
+  },
+  "19": {
+    "choices": [
+      "Retries describe one intended merge; enforce a one-time source-cart transition or equivalent idempotent operation.",
+      "Each retry is a new intention and should add the source quantity again.",
+      "Avoid persistence so refresh always erases both carts and prevents duplicates."
+    ],
+    "correct": 0,
+    "explanation": "A timeout can hide an already completed merge. Repeating the same intended operation should return its result, not add items again. Atomic ownership-aware duplicate protection prevents repeat application.",
+    "nodeDetails": [
+      "Verify access to both the guest cart and account cart before combining their contents.",
+      "Apply a defined matching and quantity policy under a repeat-safe atomic operation.",
+      "Refresh prices, availability, discounts, and quantity limits; old cart facts are not permanent guarantees.",
+      "Return the chosen resulting cart and mark the source appropriately so retries cannot merge it again."
+    ]
+  },
+  "20": {
+    "choices": [
+      "Only when the coupon first appears on the product page.",
+      "Atomically at the defined reservation or commitment point, with release and duplicate-use rules.",
+      "After both payments succeed, simply give the discount to everyone who submitted it."
+    ],
+    "correct": 1,
+    "explanation": "Both customers can pass an earlier eligibility check. The final limited-use claim must be concurrency-safe at the specified commitment point. Failed or expired checkouts and duplicate events need explicit accounting.",
+    "nodeDetails": [
+      "Quote inputs include the current cart and delivery context; required inputs affect eligibility and totals.",
+      "Validate code eligibility, stacking, expiry, usage limits, and the configured calculation order.",
+      "Use approved delivery and tax configuration; do not invent business or legal policy.",
+      "A quote records a calculation valid under defined conditions and expiry, rather than reserving every rule forever.",
+      "Recheck mutable rules and claim limited uses atomically before the final business commitment."
+    ]
+  },
+  "21": {
+    "choices": [
+      "Trust the browser because the customer clicked the checkout button.",
+      "Recalculate on the server and require confirmation of the trusted purchase proposal.",
+      "Let the payment provider infer the correct product prices and discounts."
+    ],
+    "correct": 1,
+    "explanation": "Browser values can be edited. The server loads trusted prices and rules, saves the total and currency, and obtains confirmation. The payment provider cannot independently reconstruct the store's catalog and discount policy.",
+    "nodeDetails": [
+      "The cart expresses intended items and quantities. Its displayed prices are provisional and cannot authorize the final charge.",
+      "The server verifies product eligibility, quantities, delivery rules, discounts, prices, and stock policy using trusted records.",
+      "Save the agreed item details, amount components, currency, and expiry so later steps reference the same purchase proposal.",
+      "The customer approves the server's current proposal. Material changes require an appropriate refreshed confirmation.",
+      "Start or recover a payment attempt associated with the saved purchase and stable operation identifiers."
+    ]
+  },
+  "22": {
+    "choices": [
+      "Keep the attempt uncertain and recover its verified result from the provider.",
+      "Immediately mark payment failed because the browser did not receive a response.",
+      "Immediately mark payment successful because the customer approved it."
+    ],
+    "correct": 0,
+    "explanation": "A timeout describes missing information, not financial failure. Payment may already have succeeded. Recover the existing attempt through verified provider evidence instead of inventing an outcome or starting an unrelated charge.",
+    "nodeDetails": [
+      "The order describes the purchase agreement. Its payment history may include multiple attempts with separate results.",
+      "An individual attempt saves its amount, currency, provider reference, and progress, including any required customer action.",
+      "Another deliberate attempt may be needed after a resolved failure. An unresolved earlier attempt must be investigated before risking another charge.",
+      "Verified notifications or authenticated provider lookups establish payment outcomes. A browser success page alone is insufficient evidence."
+    ]
+  },
+  "23": {
+    "choices": [
+      "Rely on the provider to resend every event after any later worker crash.",
+      "Keep unfinished notifications only in the handler's memory.",
+      "Find the persisted unfinished work and process it through a recoverable worker."
+    ],
+    "correct": 2,
+    "explanation": "The successful acknowledgement may stop provider retries. Accepted work therefore needs a durable unfinished record that a worker can recover. Saving an event identifier does not itself prove that its business effects completed.",
+    "nodeDetails": [
+      "The external service sends an event and signature. Treat the notification as untrusted until the documented verification succeeds.",
+      "Check the signature, original request bytes, and applicable replay protections using the provider's documented method.",
+      "Persist the accepted event and recoverable work marker together so a restart cannot forget the task.",
+      "Return success promptly after durable acceptance. This confirms reliable receipt, rather than completion of every downstream effect.",
+      "Apply permitted state changes, resist stale or duplicate events, and record completion. Failed work remains visible and retryable."
+    ]
+  },
+  "24": {
+    "choices": [
+      "The browser must prevent all simultaneous requests.",
+      "Both reads can pass; a unique database rule and atomic claim must select one operation.",
+      "Different server processes automatically recognize matching business intentions."
+    ],
+    "correct": 1,
+    "explanation": "The initial reads do not exclude one another. A database uniqueness rule and protected claim resolve the race. External effects need their own provider-supported duplicate protection or recovery plan because local uniqueness cannot control a remote system.",
+    "nodeDetails": [
+      "Double clicks, network retries, or concurrent workers can submit overlapping requests even when the interface disables a button.",
+      "A stable key identifies one intended operation within the correct ownership scope. Changed parameters under the same key must be rejected.",
+      "A protected database claim decides which request performs the work. Other requests find its existing status or result.",
+      "Business updates execute once logically. Remote actions require matching provider keys or an explicit uncertain-result recovery process.",
+      "Retries receive the existing result or processing status rather than creating another purchase or refund."
+    ]
+  },
+  "25": {
+    "choices": [
+      "Mark payment failed and erase evidence of the provider's successful charge.",
+      "Mark the order fulfilled because a successful payment guarantees stock exists.",
+      "Keep payment success and fulfillment inability visible, with a separate refund or review case."
+    ],
+    "correct": 2,
+    "explanation": "Financial truth and fulfillment ability are separate facts. A late success cannot create missing stock. Preserve the payment record and follow a traceable corrective policy until the refund or review outcome is verified.",
+    "nodeDetails": [
+      "An old pending or uncertain attempt needs investigation rather than an assumed failure or a new charge.",
+      "Use saved provider references to retrieve authoritative status and verify the purchase association, amount, and currency.",
+      "Record a genuine successful payment even if the original checkout or reservation has already expired.",
+      "Recheck fulfillment eligibility under concurrency protection. Released stock may now belong to another purchase.",
+      "Follow the approved corrective policy with stable operation identity. Keep the case pending until its financial or staff-review outcome is known."
+    ]
+  },
+  "26": {
+    "choices": [
+      "Preserve payment and delivery history, then track the item return and any partial refund separately.",
+      "Replace the original payment history with unpaid.",
+      "Mark both items undelivered because one item was returned."
+    ],
+    "correct": 0,
+    "explanation": "Returning an item does not erase the original purchase or delivery. Separate return and refund records preserve what happened, while an overall summary can accurately say partially returned or partially refunded.",
+    "nodeDetails": [
+      "The order preserves what the customer agreed to buy. Its rules coordinate related processes without collapsing them into one overloaded status.",
+      "Payment records describe attempts, captured amounts, and money outcomes. They are distinct from shipment progress.",
+      "Fulfillment records describe preparation, shipments, item quantities, and delivery outcomes, including partial progress.",
+      "Returns describe goods coming back; refunds describe money being returned. Their progress may differ and must remain independently visible."
+    ]
+  },
+  "27": {
+    "choices": [
+      "Replace the purchased item and price with whichever catalog listing is currently available.",
+      "Keep the purchase-time description, variant, quantity, agreed money components, and currency.",
+      "Remove the order item because its storefront listing no longer exists."
+    ],
+    "correct": 1,
+    "explanation": "An order snapshot preserves the purchase agreement independently of the live catalog. Renaming, repricing, or archiving a product must not rewrite historical order facts or break customer order history.",
+    "nodeDetails": [
+      "Today's catalog price describes a purchase available now. Later edits can change it without changing older agreements.",
+      "The saved order price describes what this customer purchased then. Historical amounts and item details remain available after catalog changes."
+    ]
+  },
+  "28": {
+    "choices": [
+      "Whichever browser displayed the available unit first automatically owns it.",
+      "Both purchases may proceed because both earlier reads showed one unit.",
+      "An atomic availability check and reservation lets one claim succeed and the other fail safely."
+    ],
+    "correct": 2,
+    "explanation": "A read alone does not reserve stock. Combine the availability decision and reservation through a conditional update or correctly locked transaction. In this model payment confirms allocation; shipment consumes the matching on-hand and reserved quantities once.",
+    "nodeDetails": [
+      "Available quantity equals on-hand stock minus reserved quantities in this model. It describes units still eligible for another reservation.",
+      "Check availability and claim the units as one protected decision so competing checkouts cannot both reserve the last unit.",
+      "Verified payment confirms the allocation. It does not deduct on-hand stock in this accounting model, and confirmed allocations are excluded from unpaid expiry.",
+      "When eligible units ship, reduce their on-hand and reserved quantities together once, including correct handling of partial shipments.",
+      "Save uniquely identified inventory movements so repeated shipment or cancellation events cannot consume or release the same units twice."
+    ]
+  },
+  "29": {
+    "choices": [
+      "Show each shipment's actual status and an accurate partial-delivery summary.",
+      "Mark every item delivered when shipment A's delivery event arrives.",
+      "Change payment to unpaid until shipment B is collected."
+    ],
+    "correct": 0,
+    "explanation": "A delivery event applies to the quantities in its shipment. Shipment B remains awaiting pickup. Payment status is a separate process, and a label or tracking number alone does not prove carrier acceptance.",
+    "nodeDetails": [
+      "An order can contain several item quantities and several shipments. Overall fulfillment must reflect those underlying quantities.",
+      "Shipment A records which mugs and quantities it contains, with its own carrier reference and delivery status.",
+      "Shipment B independently records the bag and its delivery progress. Shipment A's delivery cannot update B as delivered.",
+      "Verify carrier updates, preserve relevant event history, and prevent late older events from incorrectly reversing current progress."
+    ]
+  },
+  "30": {
+    "choices": [
+      "Create a new refund operation immediately because the timeout proves the first one failed.",
+      "Recover the original refund using its saved reference and duplicate-protection identity.",
+      "Erase the pending refund and make the full amount refundable again."
+    ],
+    "correct": 1,
+    "explanation": "The provider may already have accepted the refund. Keep the amount reserved while its result is unresolved and reconcile the original operation. A new operation could return money twice or exceed the permitted refundable amount.",
+    "nodeDetails": [
+      "Identify the requested action, affected quantities, actor, eligibility, and policy before changing goods or money records.",
+      "Track approved returned quantities and their progress separately from cancellation and payment records.",
+      "Inspect received goods before deciding whether they can reenter sellable inventory. Damaged returns may require a different disposition.",
+      "Create an authorized refund operation with amount, currency, provider reference, and its own pending, successful, failed, or uncertain outcome.",
+      "Confirm the provider's actual refund result. Request acceptance or a browser message alone does not establish completed money movement."
+    ]
+  },
+  "31": {
+    "choices": [
+      "The queue guarantees the completed task can never appear again.",
+      "The crash automatically reverses every database and external side effect.",
+      "The job may be delivered again, so repeated execution must not repeat its business effect."
+    ],
+    "correct": 2,
+    "explanation": "A worker can finish a task before the queue learns it finished. After the temporary claim expires, redelivery is possible. Consumers need operation identity and duplicate-safe behavior rather than assuming every job runs exactly once.",
+    "nodeDetails": [
+      "The customer request completes required immediate work and records any work that can safely finish later.",
+      "Persist enough job information and stable identifiers to recover after process failure. Memory alone is not durable scheduling.",
+      "The queue holds pending work and may redeliver jobs after failures or expired worker claims.",
+      "A worker claims a job, performs its duplicate-safe task, and acknowledges completion. Claims must recover if the worker disappears.",
+      "A stored result or completion record makes progress observable and lets repeated jobs recognize an already completed logical operation."
+    ]
+  },
+  "32": {
+    "choices": [
+      "Mark it as needing input correction and provide a traceable way to resume afterward.",
+      "Retry unchanged input indefinitely until the postal code becomes valid.",
+      "Change the customer's postal code randomly and continue automatically."
+    ],
+    "correct": 0,
+    "explanation": "Waiting does not normally repair invalid input. Route the task to correction instead of producing endless retry traffic. Automatic retries belong to documented temporary failures and safe operations, with limits and visibility.",
+    "nodeDetails": [
+      "A failed attempt is evidence to inspect. It does not yet explain whether repeating the request is useful or safe.",
+      "Distinguish temporary failures, invalid input, rate limits, and uncertain remote effects. The classification determines the next action.",
+      "Retry eligible operations with capped delay, variation between callers, and an attempt or time budget.",
+      "Expose invalid or exhausted tasks for correction and investigation. Authorized replay preserves the original operation identity where required."
+    ]
+  },
+  "33": {
+    "choices": [
+      "Marking sent early guarantees that the queue has received the message.",
+      "A crash after the early mark could permanently lose the unpublished message.",
+      "The database automatically reverses the sent marker whenever the external queue is unavailable."
+    ],
+    "correct": 1,
+    "explanation": "Marking before publishing creates a loss window. Publishing first creates a possible duplicate window instead, which duplicate-safe consumers can handle. The outbox ensures recoverable publication, not universal exactly-once external effects.",
+    "nodeDetails": [
+      "Save the business change and its uniquely identified outgoing event in the same database transaction. Both commit or both roll back.",
+      "Read committed pending events and publish them. A crash after publication but before marking progress can cause publication again.",
+      "Carry published work to consumers. Message delivery may repeat, so a queue does not remove the need for duplicate handling.",
+      "Use event and operation identities to avoid repeating logical work. External effects still need their own duplicate protection or uncertainty handling.",
+      "The provider accepts or rejects the email request. A timeout can leave acceptance uncertain; delivery and read status are separate facts."
+    ]
+  },
+  "34": {
+    "choices": [
+      "Returning an honest temporary-unavailable result when the deadline is exhausted.",
+      "Reducing the number of simultaneous requests.",
+      "Retrying immediately without limits and increasing concurrent requests."
+    ],
+    "correct": 2,
+    "explanation": "Immediate unlimited retries add pressure to an already limited dependency. Follow documented retry timing, bound concurrency and retries, and keep results honest. Deferrable work may wait; critical outcomes must not be fabricated.",
+    "nodeDetails": [
+      "Identify the intended integration operation and whether it reads information or creates a remote side effect.",
+      "Apply connection and overall deadlines, request limits, and bounded concurrency so a slow dependency cannot consume unlimited resources.",
+      "The external service owns its API contract, limits, and outcomes. Missing responses do not prove its actions failed.",
+      "Check response shape, meaning, and association with the intended operation before trusting or applying it.",
+      "Persist useful references and verified results. Keep uncertain side effects visible so a retry or reconciliation can recover safely."
+    ]
+  },
+  "35": {
+    "choices": [
+      "It catches overdue unfinished records missed during downtime or delayed runs.",
+      "It guarantees the scheduler ran exactly once every previous minute.",
+      "It makes concurrent expiry and payment updates safe without any state checks."
+    ],
+    "correct": 0,
+    "explanation": "Selecting all eligible overdue records allows catch-up after missed runs. A narrow latest-minute window can strand older work. Safe claims and conditional transitions are still needed for repeated runs and competing payment updates.",
+    "nodeDetails": [
+      "Persist deadlines and current states on the records themselves. Eligibility must survive missed schedules and process restarts.",
+      "A scheduled run searches for overdue eligible records rather than assuming the previous run always completed.",
+      "Claim a bounded group with recoverable ownership so overlapping runs do not independently perform conflicting work.",
+      "Apply conditional state changes once and coordinate with live payment or cancellation actions. A deadline alone cannot resolve those races.",
+      "Record outcomes and monitor the oldest unfinished work as well as run success. A running scheduler can still leave a growing backlog."
+    ]
+  },
+  "36": {
+    "choices": [
+      "Equal prices guarantee a permanent order across requests.",
+      "Equal-price records need a unique tie-breaker to establish deterministic ordering.",
+      "Sorting only in the browser guarantees correct server page boundaries."
+    ],
+    "correct": 1,
+    "explanation": "A price alone does not order records with identical prices. Add a unique tie-breaker, and include the full position in a cursor when applicable. Live updates may still move records unless the system provides a stable snapshot.",
+    "nodeDetails": [
+      "The catalog contains many records and changing facts. Returning everything wastes network, memory, and database work.",
+      "Apply validated filters within the caller's visibility rules. Pagination must never expose unpublished or unauthorized records.",
+      "Define matching behavior and deterministic ordering, including a unique tie-breaker when other sort values are equal.",
+      "Return only a capped slice with the metadata needed to understand and continue the result set.",
+      "A page offset or cursor identifies continuation. Document how changing catalog data may affect results between requests."
+    ]
+  },
+  "37": {
+    "choices": [
+      "Add an index to every column before investigating the request.",
+      "Replace the database because each individual query is already fast.",
+      "Investigate the N+1 pattern, batch related reads where suitable, and measure total cost."
+    ],
+    "correct": 2,
+    "explanation": "Many individually fast requests can accumulate substantial round-trip cost. A suitable batch or join may help, but verify total work and correctness. Fewer queries alone do not prove that a large joined result is more efficient.",
+    "nodeDetails": [
+      "One query loads a list, then each of its N items triggers another query. The extra round trips can dominate response time.",
+      "A suitable batch or join loads related records together. Preserve ownership checks, result shape, and pagination behavior.",
+      "Inspect plans, rows processed, total duration, and query counts using representative data. Keep changes that improve measured performance without breaking correctness."
+    ]
+  },
+  "38": {
+    "choices": [
+      "Check authoritative availability and reserve atomically; explain the change if stock is gone.",
+      "Accept the order because the cached page promised stock.",
+      "Wait for cache expiry, then assume the unit is available without reserving it."
+    ],
+    "correct": 0,
+    "explanation": "A cached listing is a potentially stale copy. Checkout must make an authoritative, concurrency-safe stock decision. Cache expiry and invalidation improve displays but cannot substitute for atomic reservation rules.",
+    "nodeDetails": [
+      "A browsing request may use reusable data when a brief stale period is acceptable.",
+      "The cache holds a faster copy with explicit expiry, invalidation, key scope, and privacy rules.",
+      "The authoritative store owns the relevant business facts. Copies may lag behind recent purchases or product changes.",
+      "Before purchase, validate current prices, permissions, and stock through trusted rules. Reserve inventory atomically rather than trusting a cached availability label."
+    ]
+  },
+  "39": {
+    "choices": [
+      "Yes; possession of any storage path proves ownership.",
+      "Yes; signing in grants access to every stored invoice.",
+      "No; access requires ownership or explicit staff permission, with private storage enforcement."
+    ],
+    "correct": 2,
+    "explanation": "Knowing a path is not authorization. Private invoices require ownership or an allowed staff role. A signed download link can grant temporary access, so it must be appropriately scoped, protected, and short-lived.",
+    "nodeDetails": [
+      "Check who may upload and issue narrowly scoped, short-lived permissions with file size and intended-use limits.",
+      "Treat newly uploaded bytes as untrusted. A filename or browser content-type claim cannot establish that they are safe.",
+      "Check actual content, dimensions, and allowed formats, then perform required scanning or image processing before publication.",
+      "Publish an approved image or derivative under generated storage names. Keep private documents outside the public image-delivery path.",
+      "A content delivery network caches approved public assets near users. Private files still need a separate authorized access design."
+    ]
+  },
+  "40": {
+    "choices": [
+      "Every request completes in approximately 100 milliseconds.",
+      "The average hides a slow tail: roughly the slowest one percent reach eight seconds or more.",
+      "The system can safely handle any future traffic because its average is low."
+    ],
+    "correct": 1,
+    "explanation": "The p99 value exposes slow experiences hidden by an average. Investigate which requests and resources cause the tail. Readiness also depends on errors, queue age, dependency limits, and whether money and inventory remain correct under load.",
+    "nodeDetails": [
+      "Simulate realistic browsing, checkout, bursts, and background tasks using synthetic data in an isolated permitted environment.",
+      "Observe throughput, errors, tail latency, database connections, queue age, and dependency pressure rather than relying on average response time.",
+      "Identify the currently limiting resource. More application servers may worsen database connection exhaustion or external rate limiting.",
+      "Change the measured constraint with a bounded intervention, such as query improvement or connection-pool limits.",
+      "Repeat the comparable workload and verify stock, payment, duplicate handling, and access rules alongside response-time improvements."
+    ]
+  },
+  "41": {
+    "choices": [
+      "Unit: open the reset page. Integration: inspect its colors. Journey: check that the logo loads.",
+      "Unit: verify expiry math. Integration: reject used tokens. Journey: request reset, set a password, and sign in.",
+      "Unit: verify email wording. Integration: skip token checks. Journey: declare success after sending the email."
+    ],
+    "correct": 1,
+    "explanation": "Each level checks different behavior: isolated logic, connected token enforcement, and the complete customer journey. Appearance and email submission alone do not prove a secure working reset.",
+    "nodeDetails": [
+      "State the expected behavior clearly enough that a failure can be observed.",
+      "Isolate a small rule, such as expiry calculation, with controlled inputs.",
+      "Exercise connected components, such as token lookup, validity checks, and the password update.",
+      "Follow the user flow across its interfaces and verify the final behavior, including failure feedback."
+    ]
+  },
+  "42": {
+    "choices": [
+      "Two orders, two charges, and two allocations are correct because there were two clicks.",
+      "One response code is enough; stored orders, money, and inventory need no checks.",
+      "One intended order, at most one successful intended charge, and one allocation; on-hand changes only at shipment."
+    ],
+    "correct": 2,
+    "explanation": "Repeated requests for one operation must preserve one intended business outcome. Check records and effects, not just responses. In this model payment commits allocation; shipment decreases on-hand and allocation once.",
+    "nodeDetails": [
+      "A double-click or retry can create overlapping executions of the same intended purchase.",
+      "Both requests compete for the same available inventory and operation identity.",
+      "Atomic claims, constraints, and guarded transitions prevent repeated orders or allocations.",
+      "Exactly one allocation protects the purchased quantity; payment confirmation must not deduct physical on-hand stock."
+    ]
+  },
+  "43": {
+    "choices": [
+      "Real test-environment credential, endpoint, payload, webhook delivery, and signature-configuration mistakes.",
+      "A guarantee that every live bank, network outage, and production failure is now covered.",
+      "Only whether a hardcoded success message can be displayed."
+    ],
+    "correct": 0,
+    "explanation": "A sandbox connects actual provider testing components and exposes integration configuration mistakes. It provides stronger evidence than a fixed mock but cannot reproduce every production condition or establish universal correctness.",
+    "nodeDetails": [
+      "Mocks give controlled inputs for fast, repeatable local tests but can differ from the provider.",
+      "Contract checks compare expected message fields and behavior with the documented integration interface.",
+      "A sandbox journey checks configured components working together without deliberately making real purchases.",
+      "Live behavior still needs monitoring and reconciliation because test environments cannot reproduce every real condition."
+    ]
+  },
+  "44": {
+    "choices": [
+      "Metric: logo size. Log: password. Trace: the storefront color scheme.",
+      "Checkout error rate; release and correlation IDs with error category; the failing span and dependency timing.",
+      "Only total server uptime; checkout-level evidence cannot add useful information."
+    ],
+    "correct": 1,
+    "explanation": "Trend, release context, and the failing request path connect customer impact to a specific failure. Uptime alone can hide broken checkout, and raw credentials are unsafe debugging evidence.",
+    "nodeDetails": [
+      "Combine several evidence types to understand service behavior and customer impact.",
+      "Structured events explain what happened using safe references, categories, and relevant release context.",
+      "Aggregated timing and error trends reveal scope and changes over time.",
+      "A trace connects a request's steps and dependencies so the slow or failing span can be located."
+    ]
+  },
+  "45": {
+    "choices": [
+      "Assume the browser failed, rewrite checkout, and create another charge immediately.",
+      "Collect only screenshots; server and provider records cannot establish what happened.",
+      "Collect provider status/reference, timestamped request or webhook evidence, and saved local order/payment records."
+    ],
+    "correct": 2,
+    "explanation": "These records establish financial truth and local processing history before a fix is guessed. Missing UI confirmation does not prove failed payment, and creating another charge could compound the incident.",
+    "nodeDetails": [
+      "Define the expected and actual behavior, then find a safe reproducible case when possible.",
+      "Collect trustworthy request, provider, database, timing, and deployment evidence without exposing sensitive values.",
+      "Use a targeted check to distinguish a hypothesis from competing explanations.",
+      "Demonstrate the focused fix and safe recovery of affected records, including nearby regression checks."
+    ]
+  },
+  "46": {
+    "choices": [
+      "A deployed revert can restore compatible code behavior; it cannot unsend emails or automatically repair affected data.",
+      "A revert automatically recalls all sent emails and restores every external system.",
+      "A revert changes only the branch name and cannot affect application behavior."
+    ],
+    "correct": 0,
+    "explanation": "Version control reverses source changes, subject to deployment and data compatibility. External effects have already happened. Contain further duplicates and separately investigate impact and required reconciliation.",
+    "nodeDetails": [
+      "Keep a change focused so its purpose and impact can be reviewed.",
+      "Inspect actual modifications and their relationship to the requirement before accepting them.",
+      "Commit a known change with relevant verification evidence and the developer's established identity.",
+      "Record the deployed version so incidents can be linked to changes and recovery options assessed."
+    ]
+  },
+  "47": {
+    "choices": [
+      "Embed the private key in browser JavaScript and hide the variable name.",
+      "Store the private key server-side; send only provider-supported public or appropriately scoped short-lived checkout information.",
+      "Put the private key in a public image URL so checkout can retrieve it."
+    ],
+    "correct": 1,
+    "explanation": "Browser-delivered code and data are visible to clients. Private credentials belong in restricted server-side storage. Public identifiers and scoped checkout data must follow the integration's documented purpose and limits.",
+    "nodeDetails": [
+      "Local development uses its own configuration, test data, and appropriately separated credentials.",
+      "Staging checks integrated behavior without silently sharing production secrets or customer data.",
+      "Production uses controlled configuration and access for real operations.",
+      "Separate credentials and endpoints reduce cross-environment mistakes; never expose server secrets through client configuration."
+    ]
+  },
+  "48": {
+    "choices": [
+      "Deleting old fields automatically updates every running server and background worker.",
+      "Nullable fields never need data checks, deployment planning, or constraints.",
+      "Adding can preserve old code while adoption is staged; deleting can immediately break existing readers and jobs."
+    ],
+    "correct": 2,
+    "explanation": "Compatible additions allow old and new versions to overlap. Removal destroys something older code may still require. Additions still need checks for defaults, queries, constraints, data migration, and lock impact.",
+    "nodeDetails": [
+      "Introduce a schema change that does not immediately invalidate existing code or records.",
+      "Deploy readers and writers that support the transition while versions may overlap.",
+      "Backfill trustworthy data and verify correctness before switching requirements.",
+      "Remove obsolete structures only after remaining applications, jobs, and recovery plans no longer depend on them."
+    ]
+  },
+  "49": {
+    "choices": [
+      "The two-hour gap may omit orders, payments, refunds, and stock changes that need trustworthy reconciliation.",
+      "Restoring an older backup automatically recreates every later provider and database event.",
+      "Only page styling can be lost; financial and inventory records are unaffected by backup age."
+    ],
+    "correct": 0,
+    "explanation": "A restore recovers the saved point, not necessarily the latest truth. External payments may outlive missing local records. Identify and reconcile the lost interval before treating recovery as complete.",
+    "nodeDetails": [
+      "Capture required databases, files, and dependencies according to approved recovery objectives and access controls.",
+      "Restore away from production to test the procedure without overwriting live resources.",
+      "Check that records, totals, stock, references, and required files are usable and consistent.",
+      "Compare missing intervals with trustworthy external and other surviving evidence before resuming normal operations."
+    ]
+  },
+  "50": {
+    "choices": [
+      "No errors means zero checkouts can never indicate a problem.",
+      "Customers may be blocked outside monitored steps; compare traffic, attempts, payments, releases, and dependencies.",
+      "Zero checkouts proves that the payment provider stole every order."
+    ],
+    "correct": 1,
+    "explanation": "A missing business outcome can reveal blind spots or a real outage, but traffic changes are another possibility. Compare signals before selecting a cause; healthy server metrics alone are insufficient.",
+    "nodeDetails": [
+      "Measure customer-relevant outcomes as well as server health and dependency behavior.",
+      "Determine whether a signal reflects meaningful customer impact and warrants an actionable alert.",
+      "Use documented investigation, containment, escalation, and safe recovery steps.",
+      "Confirm actual business processing has recovered, not merely that an error stopped appearing."
+    ]
+  },
+  "51": {
+    "choices": [
+      "A function is a database table; it never receives input or returns results.",
+      "The function accepts every quantity because rejection belongs only in the browser.",
+      "It receives quantity, checks a condition, rejects values below one, and calculates a total for valid input."
+    ],
+    "correct": 2,
+    "explanation": "Functions transform inputs through rules into outputs or errors. The stated check rejects too-small quantities, but you should also inspect types, price authority, stock policy, and rounding rather than assume completeness.",
+    "nodeDetails": [
+      "Locate where the incoming request enters the actual application.",
+      "Read function inputs, conditions, types, and business rules before changing behavior.",
+      "Identify any stored reads or writes and their transaction and ownership boundaries.",
+      "Understand the returned data or error and how the interface responds."
+    ]
+  },
+  "52": {
+    "choices": [
+      "Server-derived totals; no cross-customer order access; paid status only from verified provider evidence matching the purchase.",
+      "Hide admin buttons, trust browser totals, and mark paid when the success URL opens.",
+      "Use a modern framework, make buttons green, and remove visible errors."
+    ],
+    "correct": 0,
+    "explanation": "Observable criteria identify trusted amounts, resource permissions, and authoritative payment evidence. A signed event or authenticated provider lookup may provide that evidence. Appearance and framework choice cannot prove these behaviors.",
+    "nodeDetails": [
+      "Describe the existing architecture and relevant files so the request fits the real system.",
+      "State business rules and invariants that must remain true across supported paths.",
+      "Define accepted inputs, trusted derivations, returned fields, and failure behavior.",
+      "Specify examples, checks, and observed results that make completion reviewable rather than merely asserted."
+    ]
+  },
+  "53": {
+    "choices": [
+      "Accept the success statement without inspecting changes or running any checks.",
+      "Request the diff, requirement mapping, actual commands/results, skipped checks, limitations, and a safe behavior demonstration.",
+      "Request a more confident success statement; detailed evidence is unnecessary."
+    ],
+    "correct": 1,
+    "explanation": "Evidence connects the actual change to the requirement and exposes untested assumptions. An AI summary is useful context but does not replace inspecting assertions and observing the relevant behavior.",
+    "nodeDetails": [
+      "Agree on a limited behavior change so unexpected modifications are easier to notice.",
+      "Read the actual diff and request plain explanations for unfamiliar conditions or data writes.",
+      "Run appropriate checks and demonstrate success and failure cases in a safe environment.",
+      "Accept based on observed results and visible limitations, with additional review for important unresolved risks."
+    ]
+  },
+  "54": {
+    "choices": [
+      "Ask for the largest possible timeout and deploy it immediately.",
+      "Ask AI to rewrite the entire service without gathering timing evidence.",
+      "Ask which measured duration and component support timeout, then request a check distinguishing delay from other failures."
+    ],
+    "correct": 2,
+    "explanation": "A generic error does not establish a timeout cause. Timing or tracing can distinguish slow work from rejection, dependency outage, and code errors. Raising the limit first may merely hide the symptom.",
+    "nodeDetails": [
+      "Separate what was actually observed from interpretations and guesses.",
+      "List plausible causes with the evidence that would support or weaken each.",
+      "Choose the smallest safe investigation that differentiates competing explanations.",
+      "Make a focused correction only after the cause has supporting evidence, then verify behavior."
+    ]
+  },
+  "55": {
+    "choices": [
+      "No; enforce server authorization for that specific order and directly test allowed and forbidden access.",
+      "Yes; a working UI proves that all endpoint callers are authorized.",
+      "Yes; an obscure order ID removes the need for ownership checks."
+    ],
+    "correct": 0,
+    "explanation": "Attackers can call endpoints directly and change identifiers. The server must authorize the resource for the verified caller on each relevant request. UI behavior and ID obscurity cannot supply that protection.",
+    "nodeDetails": [
+      "Demonstrate the agreed customer and staff flows beyond a single happy-path purchase.",
+      "Verify trust boundaries, input handling, ownership, roles, secrets, and payment authority.",
+      "Show that failed work, uncertain payments, and restored data can be recovered safely.",
+      "Assign the readiness decision and unresolved work to a responsible human reviewer with visible evidence."
+    ]
+  },
+  "56": {
+    "choices": [
+      "Duplicate the rule separately in the admin route and worker so they can disagree independently.",
+      "Use one shared inventory/order domain operation with required transaction, duplicate, and concurrency controls.",
+      "Move the rule entirely into the browser so both backend entry points can skip it."
+    ],
+    "correct": 1,
+    "explanation": "A shared domain operation keeps one business definition across entry points. It must still protect the actual state change. Duplicating rules or placing authority in the browser creates inconsistent inventory behavior.",
+    "nodeDetails": [
+      "The catalog owns product descriptions, variants, and publication facts rather than payment or stock transitions.",
+      "Inventory owns allocation and stock-movement rules that routes and workers reuse.",
+      "Checkout coordinates trusted proposals, customer confirmation, and purchase initiation across module boundaries.",
+      "Orders preserve purchase history and govern allowed order and fulfillment operations using shared domain rules."
+    ]
+  },
+  "57": {
+    "choices": [
+      "Only the endpoint's color and animation speed need definition.",
+      "Nothing else; a route and table automatically establish ownership and all response meanings.",
+      "Define caller permission, ownership, response sources, safe errors, privacy, historical prices, separate states, and verification."
+    ],
+    "correct": 2,
+    "explanation": "A route and table name do not define behavior. A complete contract explains who can access which facts, where those facts come from, and how success and failure are verified.",
+    "nodeDetails": [
+      "Identify what the user expects to do or learn on the approved screen.",
+      "Specify the request, response, permissions, errors, and field meanings explicitly.",
+      "Apply ownership and state rules in trusted server logic before revealing or changing data.",
+      "Read historical purchase values from snapshots and current process facts from their authoritative records."
+    ]
+  },
+  "58": {
+    "choices": [
+      "No; recover the existing attempt, verify provider truth, reconcile locally, and apply review or refund policy if fulfillment fails.",
+      "Yes; a failed order update proves that the external charge did not happen.",
+      "Delete the local attempt and create a fresh charge so the records look simpler."
+    ],
+    "correct": 0,
+    "explanation": "Local failure cannot undo or disprove external success. Stable identifiers allow recovery of the existing operation. A second blind charge risks double collection; impossible fulfillment needs explicit compensation or review.",
+    "nodeDetails": [
+      "Save the trusted confirmed purchase details and totals before coordinating external payment.",
+      "Allocate stock under the agreed expiry and concurrency policy.",
+      "Track a stable attempt and provider reference; retries must not start unrelated charges.",
+      "Use authenticated provider evidence and match purchase, amount, and currency before applying guarded state changes.",
+      "Maintain or recover the valid allocation; if fulfillment cannot be secured, follow the recorded review or compensation path."
+    ]
+  },
+  "59": {
+    "choices": [
+      "A new permission checkbox alone prevents all overlapping state changes.",
+      "Protect the state check and transition together, define the winner policy, and return a conflict to the losing action.",
+      "Let shipping and cancellation both succeed because both callers are authorized."
+    ],
+    "correct": 1,
+    "explanation": "Permission and concurrency solve different problems. Authorized actions can still conflict. A conditional update or appropriate lock protects the shared decision so incompatible transitions cannot both commit.",
+    "nodeDetails": [
+      "One domain policy defines allowed states, transitions, permissions, and conflict behavior.",
+      "Customer cancellation must recheck ownership and current eligibility at the protected transition.",
+      "Staff fulfillment must use the same current-state rules rather than trusting an earlier screen read.",
+      "Workers also use guarded transitions and stable operation identities so background processing cannot bypass policy."
+    ]
+  },
+  "60": {
+    "choices": [
+      "Yes; one working checkout proves every security and recovery path.",
+      "Yes; untested behavior can be marked complete if the interface looks finished.",
+      "No; verify duplicate handling, ownership, and restores, then document evidence, limits, and accountable review."
+    ],
+    "correct": 2,
+    "explanation": "The normal purchase demonstrates one path. Security, repeated events, and recovery require their own evidence. Readiness is assessed against explicit requirements and known limitations rather than inferred from a successful demo.",
+    "nodeDetails": [
+      "Define the agreed behaviors, invariants, operational needs, and scope before evaluating readiness.",
+      "Run representative customer, staff, failure, concurrency, and recovery scenarios in a suitable test environment.",
+      "Record actual results and unresolved gaps without turning assumptions into success claims.",
+      "A responsible reviewer assesses the evidence and remaining work against the requirements before operation."
+    ]
+  }
+}

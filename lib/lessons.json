@@ -1,0 +1,1762 @@
+[
+  {
+    "id": "01",
+    "module_id": 1,
+    "module_title": "How backends work",
+    "title": "Follow one request",
+    "question": "What happens after a customer clicks Add to cart?",
+    "definition": "The backend is server-side software that receives requests, applies business rules, reads or changes stored data, and returns a result. A request is one message asking the server to do something.",
+    "why": "The browser displays the store, but the server must protect shared facts such as stock, ownership, and prices. Every customer needs the same rules.",
+    "steps": [
+      "Trace the click into an HTTP request.",
+      "Identify server checks and database changes.",
+      "Trace the response back into the visible screen."
+    ],
+    "example": "A customer requests two blue shirts. The server identifies the cart, validates the variant and quantity, checks availability, saves the cart item, and returns the updated cart. Adding an item does not necessarily reserve stock; the store must define that rule.",
+    "misconception": "A successful screen animation proves the cart was saved.",
+    "prompt": "Trace Add to cart in this project without changing files. Identify the UI event, request, server handler, validation, database write, and response. Explain whether stock is reserved or only checked. Cite relevant file paths. List missing behavior and assumptions, then propose one small implementation step with success and failure checks.",
+    "exercise": "The screen shows quantity two, but refreshing removes the item. Name two possible broken links in the request journey.",
+    "answer": "The browser may have updated local screen state without sending a request. Alternatively, the server request may have failed or the database write may not have committed. Inspect the browser request, response, server logs, and saved cart record to locate the failure.",
+    "visual": {
+      "kind": "flow",
+      "nodes": [
+        "Customer click",
+        "Server checks",
+        "Database",
+        "Response",
+        "Updated screen"
+      ],
+      "caption": "Trace saved state as well as the response; a screen update alone does not prove persistence."
+    }
+  },
+  {
+    "id": "02",
+    "module_id": 1,
+    "module_title": "How backends work",
+    "title": "HTTP and JSON",
+    "question": "How do the browser and server understand each other?",
+    "definition": "HTTP is the request-and-response protocol used by web applications. JSON is a common text format for structured data. Requests include a method, URL, headers, and sometimes a body; responses include a status and data.",
+    "why": "Clear messages let separate parts of the application cooperate. Status codes and consistent data shapes also make failures easier to diagnose.",
+    "steps": [
+      "Choose the resource URL and HTTP method.",
+      "Describe request fields and response fields.",
+      "Use response status and data to update the screen."
+    ],
+    "example": "GET /products/sku-123 reads a product. POST /carts/current/items requests a cart change with JSON such as {\"variant_id\":\"v123\",\"quantity\":2}. A successful creation may return 201; invalid input may return 400 or 422. Define one consistent convention for the project.",
+    "misconception": "JSON automatically makes input safe or trustworthy.",
+    "prompt": "Define the HTTP contract for adding a variant to the current cart. Specify method, path, authentication, JSON request fields, success response, and errors for invalid quantity, unavailable variant, and missing cart access. Use the project's existing status conventions. Include example messages and explain which fields the server derives instead of trusting the browser.",
+    "exercise": "Which data belongs in the request: variant ID, quantity, customer-controlled final price, or server API secret?",
+    "answer": "The request can include variant ID and quantity. The server calculates the payable price from trusted data. An API secret must stay on the server. Sending data in JSON changes its format, not its trustworthiness.",
+    "visual": {
+      "kind": "compare",
+      "nodes": [
+        "Request: method + URL",
+        "Request: JSON body",
+        "Response: status",
+        "Response: JSON data"
+      ],
+      "caption": "HTTP carries the message; JSON structures the data inside it."
+    }
+  },
+  {
+    "id": "03",
+    "module_id": 1,
+    "module_title": "How backends work",
+    "title": "APIs are agreements",
+    "question": "How can frontend and backend work independently?",
+    "definition": "An API is an agreed interface for software interaction. Its contract defines accepted inputs, returned outputs, access rules, and errors. The contract describes behavior even when the internal code changes.",
+    "why": "A written contract prevents guesses about field names, missing data, and failure behavior. It also gives humans and AI a shared target to implement and verify.",
+    "steps": [
+      "List the operation and who may call it.",
+      "Specify input, output, and error examples.",
+      "Verify implementation against the agreed contract."
+    ],
+    "example": "The product-list contract accepts category, cursor, and limit, and returns items plus next_cursor. A cursor identifies where the next page begins. The frontend can build loading and empty states while the backend implements filtering and pagination.",
+    "misconception": "An API contract is only a list of endpoint URLs.",
+    "prompt": "Draft an API contract for a product listing using the approved screen. Include filters, stable sorting, pagination, maximum page size, product summary fields, empty results, invalid input, and visibility of unpublished products. Show request and response examples. Identify unresolved business choices before generating implementation code.",
+    "exercise": "The backend renames image_url to image. Why might this break a finished screen even if the database is unchanged?",
+    "answer": "The frontend depends on the response field name in the API contract. Changing it can make the frontend read an absent value. Coordinate the change, preserve compatibility during migration, or version the interface when necessary.",
+    "visual": {
+      "kind": "relationship",
+      "nodes": [
+        "API contract",
+        "Frontend",
+        "Backend",
+        "Contract checks"
+      ],
+      "caption": "Both sides implement the same agreement, including failures and access rules."
+    }
+  },
+  {
+    "id": "04",
+    "module_id": 1,
+    "module_title": "How backends work",
+    "title": "Validation and useful errors",
+    "question": "What should happen when a request is wrong?",
+    "definition": "Validation checks whether input has the correct shape and obeys business rules. A useful error explains the category of failure without exposing private data, secrets, or internal server details.",
+    "why": "Browsers can be modified or bypassed. Server validation protects stored data, while predictable errors help the interface guide customers toward a valid next action.",
+    "steps": [
+      "Check data types, lengths, and allowed values.",
+      "Check access and current business conditions.",
+      "Return a stable error code and safe message."
+    ],
+    "example": "Quantity 'many' fails a type check. Quantity 0 fails a range check. Quantity 5 may pass both but fail availability. A response can include code: QUANTITY_UNAVAILABLE and a safe message. Do not return database passwords or raw stack traces.",
+    "misconception": "Browser form validation is sufficient because customers use the website.",
+    "prompt": "Implement server validation for cart quantity using existing project conventions. Accept whole numbers from 1 to the configured limit; verify cart ownership, variant availability, and stock policy. Define stable error codes and safe field messages. Keep business checks inside the operation that saves the change where concurrency matters. Verify malformed, negative, excessive, unauthorized, and valid requests.",
+    "exercise": "A quantity was available when the product page loaded. Why must the server check again during purchase?",
+    "answer": "Other purchases or stock adjustments can change availability after the page loads. Earlier validation is useful feedback, but the final stock decision must occur in a concurrency-safe purchase or reservation operation.",
+    "visual": {
+      "kind": "flow",
+      "nodes": [
+        "Input shape",
+        "Permission check",
+        "Business rules",
+        "Save or safe error"
+      ],
+      "caption": "Valid formatting does not guarantee that an action is permitted or possible."
+    }
+  },
+  {
+    "id": "05",
+    "module_id": 1,
+    "module_title": "How backends work",
+    "title": "Immediate work and background jobs",
+    "question": "Should checkout wait while an email is sent?",
+    "definition": "Synchronous work finishes before the request returns. Asynchronous work continues later, often through a durable queue of jobs. A worker processes those jobs independently of the customer's browser request.",
+    "why": "Slow external services should not unnecessarily delay customers. Background jobs need retry rules and durable records so temporary failures do not silently lose required work.",
+    "steps": [
+      "Keep purchase-critical checks in the required path.",
+      "Persist follow-up work for a background worker.",
+      "Retry safely and expose persistent failures."
+    ],
+    "example": "The backend saves an order and records an email job. The response confirms the saved order. A worker sends the confirmation later. If sending fails, the order remains valid and the job can retry without creating another order.",
+    "misconception": "Starting an untracked task in memory guarantees it will finish after the request ends.",
+    "prompt": "Design order-confirmation email as durable background work. Explain how the order and pending job are recorded without a lost-job gap, using a transaction or outbox pattern appropriate to this project. Define retry limits, duplicate handling, observability, and manual recovery. Verify worker restart and email-provider timeout scenarios. Do not treat email delivery as payment confirmation.",
+    "exercise": "An email service is unavailable for ten minutes. Which facts should still be saved, and which task should retry?",
+    "answer": "The order and its verified payment state should remain saved, along with a durable pending notification job. The email task retries according to policy. It must not repeat the purchase or charge the customer again.",
+    "visual": {
+      "kind": "sequence",
+      "nodes": [
+        "Save order + job",
+        "Return order",
+        "Worker reads job",
+        "Send email",
+        "Mark result"
+      ],
+      "caption": "Example timing: the durable worker runs independently and may overlap the customer response."
+    }
+  },
+  {
+    "id": "06",
+    "module_id": 2,
+    "module_title": "Data foundations",
+    "title": "Entities and relationships",
+    "question": "Which facts should the store save separately?",
+    "definition": "An entity is a kind of thing the system stores, such as a customer or order. Relationships connect entities: one customer can have many orders, and each order can contain many order items.",
+    "why": "Separate records avoid uncontrolled duplication and make ownership explicit. Some facts also need historical snapshots so later catalog edits cannot rewrite an existing purchase.",
+    "steps": [
+      "Name the real things and their responsibilities.",
+      "Draw how many records can connect.",
+      "Separate current catalog facts from purchase snapshots."
+    ],
+    "example": "A product describes a shirt; variants describe its sizes and colors. An order belongs to a customer and contains order items. Each item stores the purchased title, variant description, quantity, and price, even if the product is renamed later.",
+    "misconception": "An old order can always display today's product name and price.",
+    "prompt": "Propose a minimal relational data model for products, variants, customers, carts, orders, and order items. State each relationship and ownership rule. Identify which order fields must be purchase-time snapshots. Explain guest orders and catalog deletion behavior. Provide a small example dataset before suggesting schema changes; do not assume existing tables are empty.",
+    "exercise": "A shirt costs 800 when purchased and 950 next week. Which amount should the order show, and where should it come from?",
+    "answer": "The order should show its saved purchase-time amount, 800, together with its currency and applicable adjustments. It must not recalculate history from the product's current price. Later refunds are separate recorded events.",
+    "visual": {
+      "kind": "flow",
+      "nodes": [
+        "Customer",
+        "Order",
+        "Order item",
+        "Variant",
+        "Product"
+      ],
+      "caption": "These are data relationships, not runtime actions: customers have orders; order items identify variants belonging to products."
+    }
+  },
+  {
+    "id": "07",
+    "module_id": 2,
+    "module_title": "Data foundations",
+    "title": "Keys and database constraints",
+    "question": "How does the database protect important rules?",
+    "definition": "A primary key identifies a record. A foreign key links it to another record. Constraints are database-enforced rules, such as uniqueness, required fields, and allowed numeric ranges.",
+    "why": "Application checks can race or be accidentally skipped. Database constraints provide a final shared defense for rules that must hold across every write path.",
+    "steps": [
+      "Give each entity a stable primary key.",
+      "Connect related records with foreign keys.",
+      "Encode durable uniqueness and range rules."
+    ],
+    "example": "Each variant has a unique SKU. An order item's order_id must reference an existing order. Quantity must be positive. A payment-provider event ID can be unique so two deliveries of the same event cannot create two processing records.",
+    "misconception": "Checking for an existing record before insertion guarantees uniqueness under simultaneous requests.",
+    "prompt": "Review the proposed variant and order-item schema. Add appropriate primary keys, foreign keys, required fields, uniqueness, and quantity constraints. Explain deletion policies and how existing invalid rows would be handled during migration. Show illustrative SQL and the application's response to constraint conflicts. Verify two concurrent attempts to create the same SKU.",
+    "exercise": "Two requests both check that SKU BLUE-M does not exist, then insert it. What prevents two rows from surviving?",
+    "answer": "A database uniqueness constraint on the SKU prevents both inserts from committing with the same value. One operation succeeds; the other receives a conflict that the application should handle safely. A prior lookup alone cannot guarantee this.",
+    "visual": {
+      "kind": "relationship",
+      "nodes": [
+        "Primary key: identity",
+        "Foreign key: connection",
+        "Unique: no duplicates",
+        "Check: valid values"
+      ],
+      "caption": "Database rules protect shared facts even when requests happen simultaneously."
+    }
+  },
+  {
+    "id": "08",
+    "module_id": 2,
+    "module_title": "Data foundations",
+    "title": "SQL and everyday data operations",
+    "question": "How does code read and change stored records?",
+    "definition": "SQL is a language for relational databases. CRUD names four common operations: create, read, update, and delete. Queries select relevant records, while writes change them under the database's rules.",
+    "why": "Understanding what a query selects or changes helps you review AI-generated code. A wrong filter can expose another customer's order or update far more records than intended.",
+    "steps": [
+      "Identify the table and intended records.",
+      "Apply ownership, filters, and pagination.",
+      "Bind input values as parameters; inspect affected rows."
+    ],
+    "example": "Illustrative SQL: SELECT id, status FROM orders WHERE customer_id = :current_customer ORDER BY created_at DESC, id DESC LIMIT :page_size. The server derives current_customer from the verified identity. Parameters keep data separate from SQL instructions; access checks remain necessary.",
+    "misconception": "A query is safe solely because its SQL syntax is valid.",
+    "prompt": "Explain and implement the current customer's order-history query using the project's database library. Derive identity server-side, select only required fields, apply stable pagination, and bind user inputs as parameters. Show the query's effective filters. Verify empty history, multiple pages, malformed input, and attempts to read another customer's records.",
+    "exercise": "An UPDATE statement changes an order status but has no WHERE clause. What must you determine before running it?",
+    "answer": "Without a WHERE clause it may update every order. Establish the exact intended order IDs, verify authorization and permitted state transitions, preview the selected rows, and use an appropriately scoped operation. Never run an unexplained bulk mutation.",
+    "visual": {
+      "kind": "flow",
+      "nodes": [
+        "Verified identity",
+        "Scoped query",
+        "Bound parameters",
+        "Selected records"
+      ],
+      "caption": "Correct data access requires both safe query construction and correct record scope."
+    }
+  },
+  {
+    "id": "09",
+    "module_id": 2,
+    "module_title": "Data foundations",
+    "title": "Transactions and competing requests",
+    "question": "What if two customers buy the final item together?",
+    "definition": "A transaction groups database changes so they commit together or roll back together. Concurrency means multiple operations overlap. Correct transactions also need suitable locks, conditional updates, or isolation to protect shared decisions.",
+    "why": "A purchase can affect orders, reservations, and inventory. Partial writes or competing stock checks can create missing orders, duplicate effects, or overselling.",
+    "steps": [
+      "State the shared rule that must always hold.",
+      "Make the check and change concurrency-safe.",
+      "Commit related writes together and handle conflicts."
+    ],
+    "example": "One unit remains. Two requests both read one. A simple read followed by a write can sell twice. An atomic conditional update or locked transaction allows only one successful allocation. The losing request receives an availability response. External payment calls need coordination beyond a database transaction.",
+    "misconception": "Wrapping ordinary reads and writes in any transaction automatically prevents every race condition.",
+    "prompt": "Implement allocation of the final inventory unit without overselling. State the stock invariant, selected isolation or locking approach, conflict behavior, and retry policy. Keep reservation and order changes atomic where they share a database. Separate external payment coordination. Verify two simultaneous purchases, duplicate retries, rollback, and expired reservations with a realistic concurrency test.",
+    "exercise": "Stock is one. Two concurrent purchases both read one before either writes. Why is checking stock first insufficient?",
+    "answer": "Both checks used a value that could change before allocation. The decision and stock change must be protected together, for example by a conditional update requiring sufficient stock, or appropriate locking within a transaction. Exactly one request should allocate the final unit.",
+    "visual": {
+      "kind": "race",
+      "nodes": [
+        "Customer A",
+        "Customer B",
+        "Claim one unit",
+        "One succeeds"
+      ],
+      "caption": "The availability check and claim must be one protected decision."
+    }
+  },
+  {
+    "id": "10",
+    "module_id": 2,
+    "module_title": "Data foundations",
+    "title": "Migrations and indexes",
+    "question": "How can a live database evolve safely?",
+    "definition": "A migration is a versioned change to database structure or data. An index is an additional lookup structure that can speed certain queries, while consuming storage and adding work to writes.",
+    "why": "Production data already exists. Changes must preserve valid records and coordinate with running application versions. Index choices should solve measured query needs rather than accumulate without purpose.",
+    "steps": [
+      "Inspect existing data and query patterns.",
+      "Plan compatible schema changes and data backfills.",
+      "Verify constraints, query plans, and deployment order."
+    ],
+    "example": "To require a new currency field, first add it compatibly, update application writers, backfill existing rows from verified business data, validate results, and only then enforce required values. An order-history query may benefit from an index beginning with customer_id and its sort fields.",
+    "misconception": "An index speeds every query, or a migration can assume all tables are empty.",
+    "prompt": "Plan a migration adding required currency to existing orders. Inspect the current schema and data assumptions first. Define verified backfill rules, compatibility with old application instances, deployment sequence, validation queries, and recovery if a step fails. Separately inspect the order-history query and explain whether an index is justified by its query plan.",
+    "exercise": "Why might immediately adding a required column without a value fail on a populated table?",
+    "answer": "Existing rows do not yet contain the required value. Add a compatible field, update application writers, backfill trustworthy values, check for missing data, and then enforce the constraint. Confirm compatibility with old application instances, database-specific behavior, and lock impact.",
+    "visual": {
+      "kind": "sequence",
+      "nodes": [
+        "Add compatibly",
+        "Update writers",
+        "Backfill + verify",
+        "Enforce rule"
+      ],
+      "caption": "A staged change lets existing data and running code move forward together."
+    }
+  },
+  {
+    "id": "11",
+    "module_id": 3,
+    "module_title": "Identity and security",
+    "title": "Authentication versus authorization",
+    "question": "Does being signed in permit every action?",
+    "definition": "Authentication establishes who is making a request. Authorization decides whether that identity may perform this action on this resource. Both decisions must be enforced by trusted server-side code.",
+    "why": "A valid customer account must not grant access to other customers' orders or administrative actions. Identity alone does not describe the scope of permitted work.",
+    "steps": [
+      "Verify the requesting identity.",
+      "Identify the action and target resource.",
+      "Check ownership, role, and relevant business conditions."
+    ],
+    "example": "A signed-in customer requests /orders/order-27. The server verifies the session, then checks whether order-27 belongs to that customer. An administrator may have separate permission to view it. Hiding the admin button in the browser does not enforce either rule.",
+    "misconception": "A protected route is secure as soon as it checks that someone is logged in.",
+    "prompt": "Review authorization for viewing an order. Identify how identity is verified, where ownership is enforced, and which explicit staff permissions can override customer scope. Enforce checks server-side for every access path. Define safe behavior for absent and inaccessible records. Verify own order, another customer's order, guest access, and an authorized staff account.",
+    "exercise": "A customer changes an order ID in the address bar and sees someone else's order. Which check is missing?",
+    "answer": "Resource authorization is missing or incorrect. The server must ensure the authenticated customer owns the requested order or has an explicit staff permission. Guess-resistant IDs and hidden links cannot replace that check.",
+    "visual": {
+      "kind": "flow",
+      "nodes": [
+        "Who are you?",
+        "Which resource?",
+        "May you act?",
+        "Allow or deny"
+      ],
+      "caption": "Identity answers who; authorization answers whether this particular action is allowed."
+    }
+  },
+  {
+    "id": "12",
+    "module_id": 3,
+    "module_title": "Identity and security",
+    "title": "Sessions, cookies, and tokens",
+    "question": "How does the server remember a signed-in customer?",
+    "definition": "A session represents an authenticated visit. A cookie is browser-managed data sent according to cookie rules. A token is a credential representing claims or access. Cookie storage and token format are separate design choices.",
+    "why": "Credentials must be protected, expire appropriately, and stop working when required. A secure sign-in flow also needs clear behavior for logout, renewal, theft, and cross-site requests.",
+    "steps": [
+      "Use established authentication components.",
+      "Protect credential transport, storage, and lifetime.",
+      "Define renewal, logout, revocation, and request protections."
+    ],
+    "example": "A server can set an opaque session ID in a Secure, HttpOnly cookie and look up the session server-side. SameSite settings and CSRF protection depend on the request flow. A signed token is not necessarily encrypted; its readable contents must not contain secrets.",
+    "misconception": "Using a token automatically makes authentication stateless, encrypted, or secure.",
+    "prompt": "Explain this project's existing session architecture before changing it. Identify cookie or token storage, HTTPS requirements, expiry, renewal, logout, revocation, and CSRF protections for state-changing requests. Recommend improvements using maintained authentication components. Verify expired sessions, logout, protected actions, and cross-site request behavior. Never log raw credentials or invent custom cryptography.",
+    "exercise": "A customer logs out, but a copied old credential still works. What behavior needs investigation?",
+    "answer": "Investigate whether logout only removed the browser copy or also invalidated the server session or relevant token capability. The expected revocation policy must be explicit. Check expiry, renewal credentials, distributed session storage, and whether old credentials remain valid by design.",
+    "visual": {
+      "kind": "sequence",
+      "nodes": [
+        "Sign in",
+        "Issue credential",
+        "Protected request",
+        "Verify session",
+        "Expire or revoke"
+      ],
+      "caption": "Authentication includes the complete credential lifecycle, not only the login form."
+    }
+  },
+  {
+    "id": "13",
+    "module_id": 3,
+    "module_title": "Identity and security",
+    "title": "Ownership, roles, and least privilege",
+    "question": "What should customers, support staff, and admins each do?",
+    "definition": "Ownership links a resource to the person or organization controlling it. A role groups permissions. Least privilege means granting only the access needed for a task, with access denied unless explicitly allowed.",
+    "why": "Staff duties differ. Giving every staff account full control increases the damage from mistakes or compromised credentials. Customer-owned resources also need consistent scope across all endpoints.",
+    "steps": [
+      "Create an action-by-role permission matrix.",
+      "Add ownership and organization scope to checks.",
+      "Enforce permissions on the server and verify denials."
+    ],
+    "example": "Customers can view their own orders. Fulfillment staff can update shipment records but cannot change product prices. Refund permission may belong to a narrower staff group. The server derives trusted roles; the browser cannot award itself the admin role.",
+    "misconception": "One is_admin flag is always enough for every staff workflow.",
+    "prompt": "Create a permission matrix for customer, support, fulfillment, catalog manager, and administrator. Cover order viewing, shipping updates, price changes, customer data export, and refunds. Specify customer ownership and organization boundaries. Map permissions to server checks using existing project conventions. Verify every allowed action and representative denied actions; do not trust client-supplied roles.",
+    "exercise": "A fulfillment worker needs shipment access. Should that automatically grant refund and product-price permissions? Explain.",
+    "answer": "No. Grant shipment permissions required for fulfillment. Refunds and price changes are separate capabilities with separate business ownership. Explicit permissions make accidental overreach less likely and make access reviews easier.",
+    "visual": {
+      "kind": "relationship",
+      "nodes": [
+        "Access decision",
+        "Trusted identity",
+        "Trusted roles",
+        "Resource owner",
+        "Requested action"
+      ],
+      "caption": "Combine verified identity, trusted roles, ownership, and the requested action to decide permission."
+    }
+  },
+  {
+    "id": "14",
+    "module_id": 3,
+    "module_title": "Identity and security",
+    "title": "Secrets and abuse protection",
+    "question": "What changes when someone sends hostile requests?",
+    "definition": "A secret is a credential that must remain confidential. Abuse protection limits harmful or excessive behavior. It combines server validation, access checks, request limits, safe integrations, monitoring, and controls appropriate to each endpoint.",
+    "why": "Public endpoints can be called outside the website. Exposed credentials or unlimited expensive operations can compromise data, create unwanted costs, and interrupt service for legitimate customers.",
+    "steps": [
+      "Keep server credentials outside browser bundles and source control.",
+      "Validate inputs and limit resource consumption.",
+      "Monitor failures and rotate exposed credentials."
+    ],
+    "example": "A browser may use a deliberately public payment identifier, while the provider's secret key stays server-side. Login and password-reset endpoints need abuse controls. Product search should limit query size and result count. File uploads require separate type, size, storage, and access rules.",
+    "misconception": "A hidden frontend field or an unlisted URL keeps a secret safe.",
+    "prompt": "Review secrets and abuse risks for checkout, login, search, and uploads. Identify server-only credentials, public configuration, request-size limits, rate-limit keys, expensive operations, and safe error behavior. Use placeholders in examples. Propose fixes for confirmed issues, including credential rotation if exposure occurred. Verify controls without printing secrets or disrupting production traffic.",
+    "exercise": "A secret payment key was committed to a private repository and then deleted. Is deletion alone enough?",
+    "answer": "No. Treat the credential as potentially exposed and revoke or rotate it according to the provider's process. Update legitimate deployments, review available usage evidence, and remove it from ordinary development workflows. Deleting the latest file does not erase history or existing copies.",
+    "visual": {
+      "kind": "flow",
+      "nodes": [
+        "Public endpoint",
+        "Validate + authorize",
+        "Limit workload",
+        "Protected integration",
+        "Monitor"
+      ],
+      "caption": "A public interface needs controls even when the normal website behaves correctly."
+    }
+  },
+  {
+    "id": "15",
+    "module_id": 3,
+    "module_title": "Identity and security",
+    "title": "Privacy and audit history",
+    "question": "Which information should the store keep, show, or record?",
+    "definition": "Privacy controls limit personal-data collection, use, access, and retention. An audit log records significant actions with who acted, what changed, when it happened, and a safe reference to the affected resource.",
+    "why": "Operational teams need useful evidence without collecting unnecessary sensitive details. Audit history helps investigate refunds, price edits, and access changes while preserving accountability.",
+    "steps": [
+      "List necessary personal data and its purpose.",
+      "Restrict access and define retention rules.",
+      "Record significant changes without logging credentials or excess data."
+    ],
+    "example": "A refund audit record can contain actor ID, order ID, refund reference, amount, currency, time, and reason code. It should not contain a full payment-card number, session cookie, or raw secret. Legal retention and deletion requirements require jurisdiction-specific review.",
+    "misconception": "Logging every request body is the easiest safe way to debug the store.",
+    "prompt": "Design safe audit records for product-price changes and refund requests. Specify actor, resource, action, timestamp, request reference, outcome, and carefully scoped before/after values. Define access, retention, tamper protection, and redaction. Map collected personal data to its business purpose. Flag legal decisions for qualified review rather than inventing retention rules.",
+    "exercise": "A debugging log contains customer passwords and session cookies. What should the team do next?",
+    "answer": "Stop recording those values, restrict access to affected logs, and follow the incident process. Assess exposure and invalidate affected credentials where appropriate. Replace raw payload logging with safe fields and redaction. Handle existing log copies according to the incident and retention plan.",
+    "visual": {
+      "kind": "compare",
+      "nodes": [
+        "Useful: actor + action",
+        "Useful: safe reference",
+        "Exclude: credentials",
+        "Control: access + retention"
+      ],
+      "caption": "Good evidence is specific enough to investigate and limited enough to protect people."
+    }
+  },
+  {
+    "id": "16",
+    "module_id": 4,
+    "module_title": "Ecommerce catalog and cart",
+    "title": "Products, variants, and SKUs",
+    "question": "What exactly does a customer purchase?",
+    "definition": "A product groups a catalog offering. A variant is a purchasable combination of options, such as size and color. A SKU is a stock-keeping identifier for a sellable item within the store's inventory system.",
+    "why": "Different sizes or colors can have different stock, prices, images, and availability. Orders must identify the exact sellable item rather than only its shared product page.",
+    "steps": [
+      "Separate shared product details from variant details.",
+      "Give each sellable variant a stable identity.",
+      "Define publication and availability rules."
+    ],
+    "example": "The product is Everyday Shirt. Blue / Medium and Blue / Large are separate variants with separate SKUs and stock. A product can remain published while one variant is unavailable. Preserve purchased variant details on order items if catalog entries change later.",
+    "misconception": "The product title uniquely identifies everything the customer bought.",
+    "prompt": "Model a shirt catalog with color and size variants. Specify product fields, variant fields, unique SKU rules, valid option combinations, price overrides, publication, and unavailable variants. Map the approved product page to API data. Verify selecting an unavailable size, duplicate SKU, invalid option combination, and an order retaining its purchased variant details.",
+    "exercise": "Blue / Medium has zero stock and Blue / Large has five. Should the whole product automatically disappear?",
+    "answer": "Not necessarily. Product visibility and variant availability are separate business rules. The page can remain visible while showing Medium as unavailable and allowing purchase of Large. The server must validate the specific selected variant during checkout.",
+    "visual": {
+      "kind": "relationship",
+      "nodes": [
+        "Everyday Shirt",
+        "Blue / Medium",
+        "Blue / Large",
+        "SKU + stock",
+        "Order snapshot"
+      ],
+      "caption": "Customers browse products but purchase specific variants."
+    }
+  },
+  {
+    "id": "17",
+    "module_id": 4,
+    "module_title": "Ecommerce catalog and cart",
+    "title": "Inventory and reservation rules",
+    "question": "When does an item stop being available to others?",
+    "definition": "Inventory records stock quantities and movements. A reservation temporarily allocates units to a purchase. Under one common model, available-to-sell equals on-hand stock minus active reservations, with explicit rules for expiry, fulfillment, and returns.",
+    "why": "A number labeled stock is ambiguous without defined meanings. Clear reservation transitions prevent overselling, permanently blocked stock, and accidental double deductions.",
+    "steps": [
+      "Define on-hand, reserved, and available quantities.",
+      "Allocate and release reservations atomically.",
+      "Record fulfillment, expiry, and restock movements once."
+    ],
+    "example": "On-hand is 10 and reserved is 2, so available is 8. Reserving one makes reserved 3. Shipping that reserved unit decreases on-hand to 9 and reserved to 2, leaving available 7. Expiry releases a reservation without reducing on-hand. Other inventory models require equally explicit semantics.",
+    "misconception": "Adding to cart always reserves stock, or payment and shipping should both deduct the same unit.",
+    "prompt": "Define and implement this store's inventory model. Specify reservation start, expiry, payment-delay handling, shipment consumption, cancellation release, and inspected-return restocking. State quantity invariants. Use atomic transitions and unique operation references to prevent repeated effects. Verify final-unit competition, duplicate events, expiry racing payment, partial shipment, and reservation release. Do not assume cart addition reserves stock.",
+    "exercise": "On-hand is 6 and reserved is 2. One reservation expires. What changes under this model?",
+    "answer": "Reserved becomes 1, on-hand remains 6, and available becomes 5. The expiry transition must occur once and must not release a reservation already consumed or otherwise finalized. Competing payment and expiry operations need an explicit atomic decision and recovery policy.",
+    "visual": {
+      "kind": "stock",
+      "nodes": [
+        "Available",
+        "Reserved",
+        "Ship",
+        "Release"
+      ],
+      "caption": "Reserved stock branches: shipment consumes on-hand and reserved quantities; eligible release frees the hold without reducing on-hand."
+    }
+  },
+  {
+    "id": "18",
+    "module_id": 4,
+    "module_title": "Ecommerce catalog and cart",
+    "title": "Authoritative prices and money",
+    "question": "Who decides the final amount to charge?",
+    "definition": "Authoritative pricing means trusted server rules determine payable amounts. Money needs an explicit currency and precise representation, commonly integer minor units where appropriate or an exact decimal type with documented currency and rounding rules.",
+    "why": "Customers can alter browser values. Imprecise arithmetic or inconsistent rounding can also make the order, payment, and refund amounts disagree.",
+    "steps": [
+      "Load trusted prices and currency server-side.",
+      "Apply defined adjustments and rounding rules.",
+      "Save the final calculation and verify payment amounts."
+    ],
+    "example": "Two items at 12.50 each produce a 25.00 subtotal before adjustments. In a currency with two decimal minor units this may be stored as 2500. Not every currency uses two decimals. Store currency, line amounts, discount, shipping, tax, and total with an auditable calculation.",
+    "misconception": "A total submitted by the checkout page is safe because it was originally displayed by the server.",
+    "prompt": "Implement a server-side cart pricing function. Accept variant IDs, quantities, discount codes, delivery inputs, and verified customer context, then load trusted prices. Specify supported currencies, amount representation, rounding stage, discount order, and quote validity. Return line breakdowns and total. Verify tampered browser prices, currency mismatch, rounding boundaries, and price changes before payment creation.",
+    "exercise": "The browser submits total 1.00 for a cart priced at 100.00. Which amount should initialize payment, and why?",
+    "answer": "The payment amount must come from the server's validated calculation, 100.00 under the stated rules. The browser's total is an untrusted hint at most. If the displayed quote has changed, inform the customer and require the appropriate confirmation before proceeding.",
+    "visual": {
+      "kind": "flow",
+      "nodes": [
+        "Variant + quantity",
+        "Trusted prices",
+        "Rules + rounding",
+        "Saved breakdown",
+        "Payment amount"
+      ],
+      "caption": "One trusted calculation should explain the order total and the payment amount."
+    }
+  },
+  {
+    "id": "19",
+    "module_id": 4,
+    "module_title": "Ecommerce catalog and cart",
+    "title": "Cart lifecycle and guest merging",
+    "question": "What happens to a guest cart after sign-in?",
+    "definition": "A cart is an editable purchase intention, not a completed order. It may belong to a guest session or customer account. Merging combines eligible cart contents under explicit rules when identity changes.",
+    "why": "Customers expect continuity across refreshes and sign-in. Unclear ownership or merge behavior can lose items, duplicate quantities, or expose another customer's cart.",
+    "steps": [
+      "Define cart ownership, expiry, and persistence.",
+      "Merge matching variants with explicit quantity limits.",
+      "Reprice and revalidate availability before checkout."
+    ],
+    "example": "The guest cart has one Blue / Medium shirt; the account cart has two. A chosen merge rule may produce three, capped by quantity policy and current availability. A retried merge must not add the guest quantity again. Old totals and discounts require revalidation.",
+    "misconception": "A saved cart guarantees its old prices, discounts, or stock availability indefinitely.",
+    "prompt": "Design guest-to-account cart merging for this project. Specify secure guest-cart identification, ownership checks, matching by variant and relevant options, quantity caps, unavailable items, discount conflicts, and pricing refresh. Make merging safe to retry and define which cart remains active. Verify repeated sign-in requests, two browser tabs, expired carts, and another user's cart identifier.",
+    "exercise": "The same merge request is retried twice after a timeout. Why should a guest quantity of one not become three?",
+    "answer": "Retries represent the same intended merge. Record or otherwise enforce that the source cart is merged only once, using an atomic transition or equivalent idempotent design. Repeated execution should return the resulting cart rather than adding source quantities again.",
+    "visual": {
+      "kind": "flow",
+      "nodes": [
+        "Both owned carts",
+        "Merge once",
+        "Revalidate",
+        "Active cart"
+      ],
+      "caption": "Merging needs ownership checks, explicit rules, and safe retry behavior."
+    }
+  },
+  {
+    "id": "20",
+    "module_id": 4,
+    "module_title": "Ecommerce catalog and cart",
+    "title": "Discounts, tax, and delivery quotes",
+    "question": "Why can checkout totals change after an address is entered?",
+    "definition": "A quote is a time-bound calculation using current cart, customer, delivery, and configuration inputs. Discounts, tax configuration, and shipping methods have eligibility rules that affect both the breakdown and final payable total.",
+    "why": "A code may expire, an address may change delivery eligibility, and quotes can become stale. Explicit inputs and rule order make totals explainable and reproducible.",
+    "steps": [
+      "Define eligibility, rule order, and rounding.",
+      "Calculate delivery and configured tax from required inputs.",
+      "Expire or revalidate quotes before payment."
+    ],
+    "example": "A free-shipping threshold may use the subtotal after discounts. A remote postal code may have different delivery options. Tax-inclusive and tax-exclusive prices need different presentation. Implement tax rules supplied by qualified business guidance or a configured service; this lesson does not determine tax obligations.",
+    "misconception": "A coupon that worked in the browser remains valid regardless of expiry, usage limits, or checkout changes.",
+    "prompt": "Specify checkout quote rules before implementation. Cover discount eligibility, stacking, usage limits, free-shipping threshold basis, address-dependent delivery methods, configured tax calculation, currency, rounding, and quote expiry. Return an itemized breakdown and reasons for unavailable options. Verify expired coupons, concurrent last-use redemption, changed addresses, and stale quotes. Flag unanswered tax-policy questions for qualified review.",
+    "exercise": "A coupon has one redemption remaining and two customers check out together. When must the limit be enforced?",
+    "answer": "Enforce the redemption rule atomically at the defined commitment point, using a reservation or committed-use policy appropriate to payment delays. A preliminary quote check is insufficient. Specify release on failed or expired checkout and prevent duplicate redemption when requests or payment events repeat.",
+    "visual": {
+      "kind": "flow",
+      "nodes": [
+        "Cart + address",
+        "Discount rules",
+        "Delivery + tax config",
+        "Expiring quote",
+        "Revalidate + commit"
+      ],
+      "caption": "Quotes explain current prices; final commitment must recheck rules that can change."
+    }
+  },
+  {
+    "id": 21,
+    "module_id": 5,
+    "module_title": "Checkout and payments",
+    "title": "Checkout: agree on the final purchase",
+    "question": "What exactly is the customer agreeing to pay for?",
+    "definition": "Checkout turns a changeable cart into a server-validated purchase proposal: items, quantities, prices, discounts, shipping, tax, currency, and an expiry. The customer confirms the final amount before payment starts.",
+    "why": "A cart can become outdated. A saved checkout proposal makes the amount explainable and prevents browser edits from changing what the server charges.",
+    "steps": [
+      "Reload current products, prices, stock rules, delivery eligibility, and discount eligibility on the server.",
+      "Calculate totals using precise money values and a documented rounding policy; save the proposal and expiry.",
+      "Show changed amounts for confirmation, then link the payment attempt to that saved proposal."
+    ],
+    "example": "Two mugs cost 25 each. Subtotal 50 minus discount 5 plus shipping 3 plus tax 4 gives 52. The server saves those components and currency. If a mug price changes before confirmation, checkout refreshes the proposal rather than silently charging a different amount.",
+    "misconception": "The total sent by the browser is the amount the payment provider should charge.",
+    "prompt": "Design checkout for an existing ecommerce UI. Treat browser prices as untrusted. Explain server validation, saved item and total components, currency, precise money representation, rounding, expiry, and price-change confirmation. Assume tax and shipping follow supplied business rules; list missing rules instead of inventing them. Show acceptance cases for a changed price, expired discount, unavailable variant, and edited browser total. Stop at a data-flow plan before implementation.",
+    "exercise": "A customer changes the browser total from 52 to 1. Where should the purchase be stopped or corrected?",
+    "answer": "The server recalculates from trusted catalog and business rules, so the browser's 1 is never accepted as authoritative. The customer must confirm the server's current proposal. The payment request uses its saved total and currency, and payment confirmation must match the intended purchase.",
+    "visual": {
+      "kind": "flow",
+      "nodes": [
+        "Cart",
+        "Server checks",
+        "Saved proposal",
+        "Customer confirms",
+        "Payment attempt"
+      ],
+      "caption": "The server establishes the amount; the customer confirms it before payment."
+    }
+  },
+  {
+    "id": 22,
+    "module_id": 5,
+    "module_title": "Checkout and payments",
+    "title": "Payments: track each attempt",
+    "question": "Does opening the success page prove that money was collected?",
+    "definition": "A payment attempt records one effort to pay for an order, with provider reference, amount, currency, and status. Provider-hosted checkout or maintained payment components collect card details; the backend receives provider references rather than raw card data.",
+    "why": "Customers close tabs, networks fail, and banks respond later. Separate attempts preserve evidence and prevent a browser redirect from becoming proof of payment.",
+    "steps": [
+      "Create or reuse a deliberate payment attempt tied to the approved purchase and a stable operation identifier.",
+      "Follow the provider's required customer actions; keep pending or uncertain outcomes visible.",
+      "Accept verified provider evidence before recording successful capture; distinguish authorization from capture when applicable."
+    ],
+    "example": "Order A has an attempt awaiting bank approval. The customer closes the page. A verified notification later confirms capture, so the order becomes paid without the browser returning. If authorization only reserved spending capacity, shipment follows the store's capture policy rather than assuming collection already succeeded.",
+    "misconception": "One order has only one payment field, and a success URL can safely set it to paid.",
+    "prompt": "Explain payment attempts for our saved checkout proposal. Use provider-hosted checkout or maintained payment components to collect details; send provider references, not raw card data, to the backend. Include amount, currency, provider reference, customer-action requirements, pending, successful, failed, and uncertain outcomes. Explain authorization versus capture without assuming every method supports both. Identify authoritative confirmation and allowed transitions. Cover browser closure, response timeout, and customer requests for another attempt. Never create a fresh charge while an earlier attempt's result is unknown.",
+    "exercise": "The browser reports a timeout after the customer approves payment. Should the order immediately become failed?",
+    "answer": "No. A timeout reports that the application did not receive a result in time; payment may already have succeeded. Keep the attempt pending or uncertain, query or reconcile with the provider, and show a checking-payment message. Do not initiate an unrelated new charge simply to resolve uncertainty.",
+    "visual": {
+      "kind": "relationship",
+      "nodes": [
+        "One order",
+        "Attempt A",
+        "Attempt B",
+        "Provider evidence"
+      ],
+      "caption": "Attempts belong to an order; each keeps its own history and provider reference."
+    }
+  },
+  {
+    "id": 23,
+    "module_id": 5,
+    "module_title": "Checkout and payments",
+    "title": "Webhooks: verify, save, then process",
+    "question": "How can the store trust a payment notification and recover after a crash?",
+    "definition": "A webhook is an incoming event notification from another service. Signature verification checks its origin and integrity. Durable receipt means saving accepted work so a process restart cannot silently lose it.",
+    "why": "Notifications can be forged, repeated, delayed, or delivered out of order. Reliable receipt separates fast acknowledgement from slower, recoverable business processing.",
+    "steps": [
+      "Verify the signature using the provider's documented method, original request bytes, and replay protections.",
+      "Persist the event and recoverable work marker together; acknowledge success only after durable acceptance.",
+      "Process allowed state changes safely; record completion and make repeated business effects harmless."
+    ],
+    "example": "The same success event arrives three times. Its event identifier is unique in the receipt table. A worker changes the payment once and schedules one logical receipt. An older pending event cannot overwrite success. If needed, the worker fetches current provider state before deciding.",
+    "misconception": "Saving an event identifier means its business work has already completed.",
+    "prompt": "Plan a payment webhook intake and worker. Verify signatures with the provider's documented verifier and replay rules. Atomically save accepted events plus recoverable work, then acknowledge promptly. Keep received, processing, completed, and failed outcomes distinct. Explain duplicate event identifiers, different events for one payment, concurrent workers, and out-of-order delivery. Include crash-after-save and crash-after-update cases. Acceptance: no lost accepted event, no stale state reversal, and no repeated stock or refund effect.",
+    "exercise": "The handler saves a notification, returns success, and crashes before updating the order. What must recover it?",
+    "answer": "The persisted event must remain discoverable as unfinished work, through a database work record or reliably published queue job. A worker retries it. The payment update and local completion marker should commit together where possible; external effects need stable operation identifiers and reconciliation.",
+    "visual": {
+      "kind": "flow",
+      "nodes": [
+        "Signed event",
+        "Verify",
+        "Save work",
+        "Acknowledge",
+        "Worker processes"
+      ],
+      "caption": "Acknowledgement means accepted for reliable processing, not that every business effect is already complete."
+    }
+  },
+  {
+    "id": 24,
+    "module_id": 5,
+    "module_title": "Checkout and payments",
+    "title": "Idempotency: repeat safely",
+    "question": "What prevents two clicks from creating two purchases?",
+    "definition": "An operation is idempotent when repeating the same intended request does not repeat its business effect. An idempotency key identifies that operation across retries; database rules protect it against simultaneous requests.",
+    "why": "Disabling a button cannot prevent network retries, concurrent requests, or worker crashes. Duplicate protection belongs where the business effect is committed.",
+    "steps": [
+      "Scope one stable key to the authorized customer and intended operation; compare the original request details.",
+      "Use a unique database rule and transaction to claim work or return its existing outcome.",
+      "Reuse the matching provider operation key; recover uncertain results before attempting another external effect."
+    ],
+    "example": "Two requests try to place checkout C using key K. A unique database rule lets one claim the operation; the other receives its existing result or processing status. If K is reused with a different cart, the server rejects the mismatch rather than silently treating it as the original purchase.",
+    "misconception": "An application-level check for an existing key is sufficient, even when two requests run together.",
+    "prompt": "Design duplicate protection for place-order and request-refund operations. Define key scope, stored request fingerprint, processing status, result, retention, and ownership checks. Protect concurrent claims with a database uniqueness rule and transaction. Reject changed parameters under the same key. Explain the separate provider key and the crash window after external success but before local recording. Show tests for simultaneous requests, response loss, worker retry, and two different events describing one payment.",
+    "exercise": "Both requests read 'key not found' before either inserts. Why is checking first insufficient?",
+    "answer": "Both can proceed because the read and later action are separate moments. A database uniqueness rule and atomic claim decide which request owns the operation. The loser reads the existing operation instead. External requests still require provider-supported duplicate protection or a documented recovery procedure; local uniqueness alone cannot cover a remote system.",
+    "visual": {
+      "kind": "flow",
+      "nodes": [
+        "Two requests",
+        "Same operation key",
+        "Atomic claim",
+        "One business effect",
+        "Shared outcome"
+      ],
+      "caption": "Repeat the request, reuse the operation identity, preserve one business outcome."
+    }
+  },
+  {
+    "id": 25,
+    "module_id": 5,
+    "module_title": "Checkout and payments",
+    "title": "Reconcile uncertain and late payments",
+    "question": "What if payment succeeds after the store releases the reserved stock?",
+    "definition": "Reconciliation compares local records with authoritative external records and resolves differences. A compensation is a deliberate corrective action, such as a refund, when a completed step can no longer lead to the intended purchase.",
+    "why": "Webhooks can be missed, responses can disappear, and payment can finish after inventory expires. Financial truth must be recovered without inventing stock or charging twice.",
+    "steps": [
+      "Find old pending attempts and mismatches; retrieve provider status using saved references.",
+      "Verify order association, amount, currency, and payment outcome before applying guarded local changes.",
+      "If fulfillment is impossible, follow a recorded refund or manual-review policy with duplicate-safe corrective operations."
+    ],
+    "example": "A reservation expires at 10:15 and its last unit sells to someone else. At 10:18 the original payment is confirmed. The store records that payment truthfully, prevents automatic fulfillment, and opens one refund or review case according to policy. It does not silently mark payment failed or create negative stock.",
+    "misconception": "If our application timed out or canceled checkout, the bank must also have canceled payment.",
+    "prompt": "Design reconciliation for payments older than our pending threshold. Define authoritative lookup, saved references, mismatch detection, safe state changes, and an audit trail. Cover missing webhook, late success, wrong amount or currency, expired stock reservation, unavailable stock, and refund timeout. Explain cancellation races and provider-specific finality. Acceptance: record real payment results, never charge again merely to investigate, never oversell, and create at most one logical compensation with unresolved cases visible to staff.",
+    "exercise": "A late payment is real, but the item cannot be supplied. Which two facts must stay visible?",
+    "answer": "The payment succeeded, and the order cannot currently be fulfilled. Keep both facts rather than overwriting one to make statuses look simple. A separate refund or review case tracks the corrective action until its verified outcome. The customer receives an accurate status and staff can trace the reason.",
+    "visual": {
+      "kind": "flow",
+      "nodes": [
+        "Pending attempt",
+        "Provider lookup",
+        "Verified success",
+        "Stock unavailable",
+        "Refund or review"
+      ],
+      "caption": "Example: late success after stock expires; record payment truth, then follow the refund or review policy."
+    }
+  },
+  {
+    "id": 26,
+    "module_id": 6,
+    "module_title": "Orders and fulfillment",
+    "title": "Keep three kinds of status separate",
+    "question": "Can an order be paid, partly shipped, and awaiting a refund at the same time?",
+    "definition": "An order records the purchase agreement. Payment records money movement. Fulfillment records preparing and delivering items. Separate states describe these independent processes; transition rules define which changes each process allows.",
+    "why": "One overloaded status cannot explain partial shipments, payment delays, cancellations, and partial refunds. Separate states let staff and automation take the correct next action.",
+    "steps": [
+      "Define order, payment, and fulfillment states in plain language, including uncertain and partial outcomes.",
+      "List allowed transitions, who may trigger them, and the evidence each transition requires.",
+      "Check cross-process rules before actions such as shipment, cancellation, or refund; record the reason and actor."
+    ],
+    "example": "An order contains two items and is paid. One item ships; fulfillment is partial. The second item is canceled and its refund is processing. The order history must show all three developments. Changing one generic status to 'refunded' would hide the package already traveling to the customer.",
+    "misconception": "Paid means shipped, and refunded means that every ordered item was canceled or returned.",
+    "prompt": "Create a state table for order agreement, payment, refund, and fulfillment. Define every label before using it. Include partial shipment, partial refund, pending payment, cancellation before shipment, and attempted cancellation after shipment. List event, current state, permitted next state, authorization, and evidence. Distinguish stored authoritative states from a summary displayed in the UI. Give five impossible transitions the backend must reject and explain why.",
+    "exercise": "A customer returns one of two delivered items. Should the entire order become simply 'unpaid'?",
+    "answer": "No. Original payment remains recorded, delivery history remains recorded, and one return plus any partial refund are tracked separately. A user-facing summary may say 'partially returned' or 'partially refunded', but it should be derived from accurate underlying records rather than erase the purchase history.",
+    "visual": {
+      "kind": "relationship",
+      "nodes": [
+        "Order agreement",
+        "Payment records",
+        "Fulfillment records",
+        "Return and refund records"
+      ],
+      "caption": "Related processes can move independently; one generic status cannot describe them all."
+    }
+  },
+  {
+    "id": 27,
+    "module_id": 6,
+    "module_title": "Orders and fulfillment",
+    "title": "Save what was actually purchased",
+    "question": "Should changing today's product price rewrite last month's order?",
+    "definition": "An order-item snapshot saves the purchase-time description, variant details, quantity, unit price, discounts, tax components, and currency. It preserves historical facts even when the live catalog changes.",
+    "why": "Receipts, support, returns, and financial checks depend on the original agreement. A link to today's product record cannot preserve that agreement by itself.",
+    "steps": [
+      "Save the confirmed item details and money components when creating the order.",
+      "Keep useful catalog references, but display historical order facts from the saved snapshot.",
+      "Record later adjustments as explicit events or records; retain the original purchase and authorized change history."
+    ],
+    "example": "A customer buys 'Mug, blue, 350 ml' for 25. The merchant later renames it, changes the price to 30, and removes blue from sale. The old order still shows the purchased blue mug at 25. A later refund is a separate adjustment rather than a rewrite to the original unit price.",
+    "misconception": "Order items only need product_id and quantity; all other values can always be loaded from the current catalog.",
+    "prompt": "Propose an order-item snapshot model from our confirmed checkout. Include variant identity and description, quantity, unit money, allocated discounts and tax, currency, and any delivery facts our rules require. Keep live catalog references optional for historical display. Explain what happens when a product is renamed, repriced, or archived. Show how adjustments and refunds preserve the original facts. Provide sample before-and-after records without storing unnecessary personal data.",
+    "exercise": "A purchased product is removed from the storefront. Which information must the order still be able to show?",
+    "answer": "The purchased item description and variant, quantity, agreed unit price, discounts, tax and total components, and currency must remain available from the order snapshot. Removing a storefront listing must not break the order history. Retention and access rules still govern personal data and delivery details.",
+    "visual": {
+      "kind": "compare",
+      "nodes": [
+        "Catalog now: 30",
+        "Order history: 25"
+      ],
+      "caption": "A live catalog describes what can be bought now; an order snapshot describes what was agreed then."
+    }
+  },
+  {
+    "id": 28,
+    "module_id": 6,
+    "module_title": "Orders and fulfillment",
+    "title": "Reserve stock without overselling",
+    "question": "What happens when two customers try to buy the last unit?",
+    "definition": "A reservation holds sellable stock for a purchase until a deadline. Verified payment confirms its allocation. Under this model, available stock equals on-hand minus reserved quantities; shipment reduces on-hand and reserved quantities together once.",
+    "why": "Reading a stock number does not lock it. Time-limited reservations coordinate checkout with payment while ensuring abandoned purchases eventually release their holds.",
+    "steps": [
+      "Use on-hand minus reserved quantities; reserve through an atomic availability check.",
+      "Verified payment confirms the allocation; shipment reduces on-hand and reserved quantities together once.",
+      "Release eligible unpaid expired or canceled holds once; reconcile late payment through an explicit policy."
+    ],
+    "example": "On-hand stock is 3 and reserved is 1, so availability is 2. Reserving 2 makes reserved 3. Payment confirms that allocation without changing quantities. Shipping those 2 changes on-hand to 1 and reserved to 1; availability stays 0. Duplicate events cannot repeat the deductions.",
+    "misconception": "Check stock in one request and subtract it later; a database will automatically prevent overselling.",
+    "prompt": "Design variant-level reservations using on-hand minus reserved quantities as availability. Reserve atomically; verified payment confirms the allocation without deducting on-hand. Shipment consumes matching on-hand and reserved quantities once. Define deadlines, confirmed allocations excluded from expiry, purchase association, partial shipments, and unique movement references. Cover expiry racing payment, cancellation, late payment without available stock, and duplicate shipment events. Acceptance: availability never becomes negative; one purchase cannot reserve, release, or consume the same quantity twice. Verify competing last-unit requests and repeated events with final-state assertions.",
+    "exercise": "Two checkouts both read stock=1. Which backend rule decides who receives the unit?",
+    "answer": "An atomic conditional update or correctly locked transaction must combine availability checking with reserving. One request succeeds; the other sees insufficient availability after the first claim. A prior read alone is insufficient. The chosen accounting model and unique reservation identity prevent later duplicate deductions or releases.",
+    "visual": {
+      "kind": "flow",
+      "nodes": [
+        "Available stock",
+        "Atomic reservation",
+        "Payment: confirm allocation",
+        "Shipment: consume once",
+        "Recorded movement"
+      ],
+      "caption": "Payment confirms the allocation; shipment consumes on-hand and reserved quantities together, once."
+    }
+  },
+  {
+    "id": 29,
+    "module_id": 6,
+    "module_title": "Orders and fulfillment",
+    "title": "Shipments: track items and quantities",
+    "question": "How do you represent two packages arriving on different days?",
+    "definition": "A shipment records a package or delivery movement, including the order-item quantities it contains, carrier reference, tracking information, and delivery events. One order can have multiple shipments and partial fulfillment.",
+    "why": "Order-level tracking alone cannot explain split deliveries or prevent staff from shipping the same quantity twice. Item-level allocation keeps the fulfillment record accurate.",
+    "steps": [
+      "Allocate remaining eligible item quantities to a shipment through an authorized, duplicate-safe action.",
+      "Save carrier references and verify incoming tracking updates; preserve event history and avoid stale status reversal.",
+      "Derive partial or complete fulfillment from item quantities, and expose tracking only to permitted users."
+    ],
+    "example": "An order has two mugs and one bag. Shipment A contains both mugs; shipment B contains the bag. The first delivery cannot mark the whole order delivered. Creating a shipping label is recorded separately from the carrier actually accepting or delivering the package.",
+    "misconception": "A tracking number proves that the carrier has received the package and that every item has shipped.",
+    "prompt": "Model split shipments for an order with multiple item quantities. Define allocation, label creation, carrier acceptance, transit, delivery, and exceptions. Prevent allocated or shipped quantities from exceeding eligible purchased quantities under concurrent staff actions. Include ownership checks for tracking access and verified carrier updates. Show a partial shipment, a failed label request with an uncertain outcome, and a delayed old tracking event. Explain how the UI summary is derived.",
+    "exercise": "Shipment A is delivered, while shipment B is awaiting pickup. What should the order show?",
+    "answer": "Show each shipment's current status and included items, with an overall summary such as partially delivered. Do not mark all quantities delivered because one carrier event arrived. A label-created status should remain distinct from carrier acceptance, and canceled or returned quantities should follow the store's explicit summary rules.",
+    "visual": {
+      "kind": "relationship",
+      "nodes": [
+        "One order",
+        "Mugs: shipment A",
+        "Bag: shipment B",
+        "Separate tracking events"
+      ],
+      "caption": "Track quantities inside shipments so one delivered package does not imply the whole order arrived."
+    }
+  },
+  {
+    "id": 30,
+    "module_id": 6,
+    "module_title": "Orders and fulfillment",
+    "title": "Cancellations, returns, and refunds",
+    "question": "Does approving a return immediately put money and stock back?",
+    "definition": "Cancellation stops eligible unfulfilled work. A return tracks goods coming back. A refund returns an approved amount through the payment provider. These are related operations with separate rules, evidence, and outcomes.",
+    "why": "Goods and money move at different speeds. Separate records prevent duplicate refunds, incorrect restocking, and claims that a refund succeeded before the provider confirms it.",
+    "steps": [
+      "Check ownership, policy, item quantities, shipment progress, and captured amounts before approving the requested action.",
+      "Create a unique cancellation, return, or refund operation; preserve partial quantities and uncertain external outcomes.",
+      "Verify money movement and inspect returned goods before eligible restocking; record every adjustment once."
+    ],
+    "example": "One of two mugs arrives broken. Staff approve a return and a partial refund. The refund remains processing until verified; the broken mug is not restocked as sellable. Another staff click reuses or detects the same refund operation instead of refunding twice.",
+    "misconception": "A return approval, refund request, successful refund, and stock restoration are the same event.",
+    "prompt": "Design cancellation, return, and refund workflows with separate records. Include authorization, item eligibility, partial quantities, shipment races, refund-pending status, provider verification, and inspection before restocking. Define how concurrent refund requests reserve the remaining refundable amount, so completed plus pending refunds cannot exceed the allowed captured amount. Use stable operation keys for retries. Show duplicate request, refund timeout, returned damaged stock, and cancellation after dispatch acceptance cases.",
+    "exercise": "A refund request times out. Is it safe to press 'refund again' with a brand-new operation?",
+    "answer": "No. The provider may have accepted the original refund. Retrieve or reconcile that operation using its saved reference and duplicate-protection key. Keep the refundable amount reserved while the result is unresolved, and show a pending or review status. Create a distinct refund only when policy and the verified remaining amount allow it.",
+    "visual": {
+      "kind": "relationship",
+      "nodes": [
+        "Customer request",
+        "Return record",
+        "Goods inspection",
+        "Refund record",
+        "Verified money result"
+      ],
+      "caption": "Returning goods and returning money are linked processes, not interchangeable statuses."
+    }
+  },
+  {
+    "id": 31,
+    "module_id": 7,
+    "module_title": "Async work and integrations",
+    "title": "Queues and workers: finish work later",
+    "question": "Why should checkout not wait while the store generates a large invoice?",
+    "definition": "A queue holds jobs for later processing. A worker takes a job and performs its task outside the customer's request. Reliable queues commonly deliver at least once, so the same job may run again.",
+    "why": "Slow tasks can delay responses and fail after the browser leaves. Background work provides controlled retries and independent capacity, while preserving critical checkout decisions in the correct transaction.",
+    "steps": [
+      "Choose tasks that can finish later, and save a durable intention to run them.",
+      "Let workers claim jobs with recoverable ownership, perform duplicate-safe effects, and acknowledge completed work.",
+      "Track waiting time, failures, and unfinished jobs; recover claims when a worker crashes."
+    ],
+    "example": "The store confirms an order after its required database changes commit. It queues invoice generation and email. If a worker crashes after creating the invoice but before acknowledging, the job returns. A unique invoice-per-order rule lets the next worker reuse the invoice instead of creating another logical document.",
+    "misconception": "Putting work in a queue guarantees that it executes exactly once and immediately.",
+    "prompt": "Separate our checkout tasks into must-finish-before-response and can-run-later. Design a durable invoice job with order reference, operation identity, attempt tracking, worker claim expiry, completion acknowledgement, and failure visibility. Explain at-least-once delivery in beginner language. Show crashes before execution, after the side effect, and before acknowledgement. Acceptance: order confirmation remains truthful, work is recoverable, and repeated execution does not create multiple logical invoices.",
+    "exercise": "A worker completes the task but crashes before acknowledging the message. What should you expect?",
+    "answer": "The queue may deliver the job again after its temporary claim expires. Another worker must recognize the already completed operation or safely repeat it without an extra business effect. The queue's delivery guarantees do not automatically make a database write, email, or external request execute exactly once.",
+    "visual": {
+      "kind": "flow",
+      "nodes": [
+        "Customer request",
+        "Durable job",
+        "Queue",
+        "Worker",
+        "Recorded result"
+      ],
+      "caption": "The request schedules recoverable work; a worker finishes it under separate timing and retry rules."
+    }
+  },
+  {
+    "id": 32,
+    "module_id": 7,
+    "module_title": "Async work and integrations",
+    "title": "Retries: wait, limit, and investigate",
+    "question": "Why can retrying faster make an outage worse?",
+    "definition": "A retry repeats a failed attempt. Backoff increases the waiting interval; jitter adds variation so many callers do not retry together. A dead-letter queue holds repeatedly failing jobs for investigation instead of endless execution.",
+    "why": "Temporary failures may recover, but invalid requests need correction. Bounded, spaced retries protect dependencies and keep broken jobs visible without repeatedly triggering business effects.",
+    "steps": [
+      "Classify failures as retryable, permanent, or uncertain; check that repeating the operation is safe.",
+      "Use capped waiting intervals, jitter, provider retry guidance, and a maximum attempt or time budget.",
+      "Move exhausted jobs to visible review, alert an owner, and replay only after diagnosis with preserved identity."
+    ],
+    "example": "An email service is briefly unavailable. Jobs retry after varied increasing delays. An invalid recipient address fails validation and goes to a correction path instead. A timed-out charge is uncertain, so the store investigates its original operation rather than repeatedly starting new charges.",
+    "misconception": "Retry every error immediately until it works; more attempts always improve reliability.",
+    "prompt": "Create a retry policy for email, shipment creation, and payment-status lookup. Distinguish temporary failure, invalid input, rate limiting, and uncertain side effects. Specify connection and overall timeouts, capped backoff with jitter, retry budget, dead-letter review, and safe replay identity. Follow documented Retry-After guidance when available. Avoid retry multiplication across application layers. Give test scenarios for dependency outage, malformed job, exhausted budget, and success followed by a lost response.",
+    "exercise": "An integration rejects an invalid postal code. Should the worker retry the unchanged job every minute?",
+    "answer": "No. The unchanged input is unlikely to recover through waiting. Mark the task as needing correction and expose the issue to the appropriate user or staff member. Reserve automatic retries for documented temporary failures and safe operations, with limits and observation. After correction, replay through an authorized, traceable workflow.",
+    "visual": {
+      "kind": "retry_branch",
+      "nodes": [
+        "Failure",
+        "Classify",
+        "Safe retry",
+        "Correct or review"
+      ],
+      "caption": "Temporary safe failures may retry; permanent or exhausted failures go to correction or review."
+    }
+  },
+  {
+    "id": 33,
+    "module_id": 7,
+    "module_title": "Async work and integrations",
+    "title": "The outbox: remember what must be sent",
+    "question": "What if an order saves successfully but the email job is never created?",
+    "definition": "The outbox pattern saves a business change and a message-to-send record in the same database transaction. A separate publisher sends committed messages later. Publication may repeat, so consumers still need duplicate-safe processing.",
+    "why": "Saving an order and publishing a queue message are two writes to different systems. An outbox closes the gap where only one of those writes succeeds.",
+    "steps": [
+      "Commit the order change and uniquely identified outbox event together in one database transaction.",
+      "Publish pending committed events; record publication progress and retry after failures.",
+      "Make each consumer duplicate-safe; monitor old unsent events and do not claim universal exactly-once email delivery."
+    ],
+    "example": "An order and its confirmation-email event commit together. The publisher sends the event, then crashes before marking it sent. It publishes again after restart. The email consumer uses the event identity, and provider duplicate protection when available, to reduce repeats; uncertain delivery remains traceable rather than falsely guaranteed impossible.",
+    "misconception": "An outbox makes every external effect exactly once, including email delivery.",
+    "prompt": "Explain the outbox pattern using order confirmation email. Show the business row and outbox row committing together, a recoverable publisher, and an email consumer. Cover rollback, crash before publish, crash after publish before marking sent, and email-provider timeout after acceptance. Define event identity, consumer duplicate protection, delivery status, and monitoring. State which guarantees are local and which depend on the provider. Do not promise exactly-once external delivery.",
+    "exercise": "Why should the publisher not mark an outbox event sent before actually publishing it?",
+    "answer": "A crash between marking and publishing would leave a message permanently missing. Publishing before marking allows duplicates if a crash occurs afterward, but duplicates can be detected or handled safely. This is why the outbox combines recoverable at-least-once publication with idempotent consumers and explicit handling of uncertain external delivery.",
+    "visual": {
+      "kind": "flow",
+      "nodes": [
+        "Order + outbox commit",
+        "Publisher",
+        "Queue",
+        "Duplicate-safe consumer",
+        "Email provider"
+      ],
+      "caption": "Atomic saving prevents forgotten work; duplicate protection remains necessary after publication."
+    }
+  },
+  {
+    "id": 34,
+    "module_id": 7,
+    "module_title": "Async work and integrations",
+    "title": "External APIs: expect limits and delays",
+    "question": "What should the store do while the shipping provider is unavailable?",
+    "definition": "An external API connects the backend to another service. Its response time, availability, rate limits, and data contract are outside the store's control. A timeout limits waiting; it does not prove the remote action failed.",
+    "why": "Unbounded waiting consumes server resources. Clear deadlines and failure policies keep one slow dependency from disabling unrelated store functions or causing duplicate actions.",
+    "steps": [
+      "Document the API contract, required credentials, timeouts, limits, and safe retry behavior.",
+      "Validate responses, redact sensitive logs, and save references for requests that can create external effects.",
+      "Bound concurrency and retries; expose an honest pending, unavailable, or review result when the dependency cannot respond."
+    ],
+    "example": "Shipment creation times out after the carrier may have created a label. The store keeps the operation pending and looks it up with its saved reference or repeats it using documented duplicate protection. It does not create a fresh label blindly. A shipping-price lookup can show temporary unavailability rather than inventing a rate.",
+    "misconception": "Any request without a response definitely did nothing, so repeating it with new identifiers is harmless.",
+    "prompt": "Design the boundary to our shipping API. Use documented request and response fields, server-side credentials, connection and overall deadlines, bounded concurrency, rate-limit handling, and response validation. Distinguish read-only rate lookup from label creation. Explain uncertain creation results, saved operation references, safe retries, and manual review if the provider offers no recovery mechanism. Define the customer and staff messages during an outage. Do not log secrets or personal addresses unnecessarily.",
+    "exercise": "The provider responds with rate limiting. What should the backend avoid doing?",
+    "answer": "Avoid immediate unlimited retries or multiplying concurrent requests. Respect documented retry timing, reduce request pressure, and stay within a bounded deadline. Cache suitable non-sensitive lookups when valid, queue deferrable work, and report temporary unavailability honestly. An outage fallback must follow business rules rather than fabricate authoritative shipping or payment outcomes.",
+    "visual": {
+      "kind": "flow",
+      "nodes": [
+        "Backend request",
+        "Bounded API call",
+        "Provider",
+        "Validate result",
+        "Saved outcome"
+      ],
+      "caption": "Each integration needs time limits, a trusted contract, and a defined path for uncertain results."
+    }
+  },
+  {
+    "id": 35,
+    "module_id": 7,
+    "module_title": "Async work and integrations",
+    "title": "Scheduled jobs: repair and maintain",
+    "question": "What if the expiry job misses its scheduled minute or runs twice?",
+    "definition": "A scheduled job runs work at planned times, such as releasing expired reservations or checking stale payments. Schedulers can miss, overlap, or repeat runs, so jobs must use persisted facts and recoverable progress.",
+    "why": "Time-based work keeps abandoned and uncertain records from remaining stuck. Designing for missed schedules and repeated runs makes maintenance recoverable instead of dependent on perfect timing.",
+    "steps": [
+      "Select records by stored deadlines or reconciliation criteria, not by assuming the previous run always happened.",
+      "Claim batches safely and apply conditional, duplicate-safe updates; coordinate races with live requests.",
+      "Persist progress, record run outcomes, alert on stale work, and support authorized catch-up runs."
+    ],
+    "example": "An expiry job is unavailable for twenty minutes. On restart it searches for all active reservations whose deadlines have passed, in bounded batches. Each release changes an active hold only once. A concurrent payment confirmation must compete through guarded transitions rather than both releasing and selling the same hold.",
+    "misconception": "A job scheduled every minute is guaranteed to run exactly once each minute and finish before the next run.",
+    "prompt": "Plan scheduled reservation expiry and payment reconciliation jobs. Define stored selection criteria, time-zone assumptions, bounded batches, safe claims, overlap handling, progress, retry behavior, and alerts for stale work. Explain an outage lasting twenty minutes and a run that crashes halfway. Cover expiry racing with payment success. Acceptance: catch up missed records, avoid duplicate release or refund, preserve uncertain cases, and expose last successful run plus oldest unfinished work.",
+    "exercise": "Why should expiry select deadline <= now rather than only records from the latest minute?",
+    "answer": "Selecting all overdue active records catches work missed during downtime or delayed execution. Selecting only one narrow minute can strand older reservations forever. Batching and conditional transitions keep catch-up manageable and duplicate-safe, while recorded progress and age-based alerts show whether the backlog is actually clearing.",
+    "visual": {
+      "kind": "flow",
+      "nodes": [
+        "Stored deadlines",
+        "Scheduled scan",
+        "Claim batch",
+        "Guarded updates",
+        "Progress and alerts"
+      ],
+      "caption": "A schedule wakes the job; persisted eligibility and progress make missed or repeated runs recoverable."
+    }
+  },
+  {
+    "id": 36,
+    "module_id": 8,
+    "module_title": "Speed and scale",
+    "title": "Pagination, filtering, and search",
+    "question": "Why should the backend avoid sending the entire product catalog at once?",
+    "definition": "Pagination returns a bounded slice of results. Filtering narrows eligible records. Search finds relevant matches. Stable sorting, validated inputs, and explicit limits make these features predictable as the catalog grows.",
+    "why": "Huge responses waste network, memory, and database work. Bounded queries improve responsiveness while clear ordering and search rules prevent confusing duplicates, gaps, or unexpected results.",
+    "steps": [
+      "Define allowed filters, search behavior, sort fields, and a maximum page size; reject unsupported input.",
+      "Use deterministic ordering with a unique tie-breaker; choose offset or cursor pagination for the access pattern.",
+      "Measure representative queries and explain how catalog changes may affect paging; preserve authorization on every query."
+    ],
+    "example": "Products sort by price, then product ID to break ties. A cursor records the last position rather than simply skipping thousands of rows. If prices change during browsing, results may move; the API documents that behavior. Admin-only or unpublished records remain excluded according to the caller's permissions.",
+    "misconception": "Adding a page number alone guarantees stable results even while data changes.",
+    "prompt": "Design a product-list API with category, price-range, availability, and text search inputs. Define validated fields, page-size cap, deterministic ordering with unique tie-breaker, and response metadata. Compare offset and cursor pagination for small catalogs and deep browsing. Explain live catalog changes and any consistency limits. Use bound query parameters and allowlisted sort fields. Give tests for tied prices, invalid filters, oversized pages, empty results, and unauthorized visibility.",
+    "exercise": "Twenty products share the same price. Why is sorting by price alone insufficient for predictable paging?",
+    "answer": "Equal prices leave their relative order undefined, so page boundaries can vary. Add a unique tie-breaker such as product ID, and encode the full sort position in a cursor when using cursor pagination. Updates can still move records unless a stable snapshot is used, so document the intended browsing behavior.",
+    "visual": {
+      "kind": "flow",
+      "nodes": [
+        "Catalog",
+        "Authorized filter",
+        "Search and sort",
+        "Bounded page",
+        "Next position"
+      ],
+      "caption": "Return a predictable slice of permitted results, with a clear way to continue."
+    }
+  },
+  {
+    "id": 37,
+    "module_id": 8,
+    "module_title": "Speed and scale",
+    "title": "Indexes and the cost of database work",
+    "question": "Why can one page cause a hundred database requests?",
+    "definition": "An index is an extra data structure that helps locate or order records. A query plan shows how the database expects to execute a query. N+1 means loading a list, then fetching related data separately for each item.",
+    "why": "Slow queries and repeated round trips can dominate response time. Measuring query shape identifies useful changes; indiscriminately adding indexes increases storage and slows writes.",
+    "steps": [
+      "Measure query counts, durations, and realistic data sizes before choosing an optimization.",
+      "Inspect execution plans and actual behavior safely; consider indexes matching filters, joins, and ordering.",
+      "Replace unnecessary per-item queries with suitable joins or batched reads; compare performance and correctness afterward."
+    ],
+    "example": "An admin page loads 50 orders in one query, then sends one customer query per order: 51 queries. A suitable joined or batched read reduces round trips. An index on a frequently filtered customer reference may help, but the query plan and measurements decide whether it is useful.",
+    "misconception": "Every column needs an index, and fewer queries always means the least total work.",
+    "prompt": "Review a slow order-list endpoint using supplied query logs, schema, row counts, filters, and sort order. Count database round trips and identify possible N+1 access. Explain candidate indexes and their write/storage cost. Inspect a query plan using safe representative data; remember execution-analysis tools may run the query. Propose one focused change, preserve permissions and pagination, and compare before/after duration, rows processed, query count, and output correctness.",
+    "exercise": "The list query is fast, but each of 100 items triggers another query. What should be investigated first?",
+    "answer": "Investigate the N+1 pattern and its accumulated round-trip cost. Batch related reads or use a suitable join, then measure again. Avoid one enormous join that duplicates large amounts of data without checking its result size. Query count is useful evidence, but total time, work, and correctness determine whether the change helps.",
+    "visual": {
+      "kind": "compare",
+      "nodes": [
+        "Before: 1 + N reads",
+        "After: batched reads",
+        "Measure plan + cost"
+      ],
+      "caption": "Reduce avoidable round trips, then verify the plan and total work rather than optimizing a number blindly."
+    }
+  },
+  {
+    "id": 38,
+    "module_id": 8,
+    "module_title": "Speed and scale",
+    "title": "Caching: decide what may be stale",
+    "question": "Can a cached product page decide whether the last unit can be sold?",
+    "definition": "A cache stores a reusable copy of data for faster access. Expiry limits its lifetime; invalidation removes or replaces it when facts change. The original authoritative store still decides critical business actions.",
+    "why": "Repeated reads can be expensive, but stale or shared private data can mislead customers. A cache needs explicit freshness, ownership, and failure rules, not just a speed goal.",
+    "steps": [
+      "Choose data with an acceptable stale period; define cache keys including relevant store, locale, and permission boundaries.",
+      "Set expiry and invalidation rules; prevent many requests from rebuilding the same missing entry simultaneously.",
+      "Revalidate purchase-critical price and stock against authoritative data; test cache failure and private-data isolation."
+    ],
+    "example": "A public category page may use a short-lived cached product summary. Checkout still verifies current price and reserves stock atomically. A personalized order page must never be served from a cache key shared by all customers. A product update triggers invalidation, with expiry as a fallback limit on staleness.",
+    "misconception": "Once a value is cached, it can replace database checks for payment, permissions, and stock decisions.",
+    "prompt": "Create a cache plan for public product summaries, search results, and customer order history. For each, define acceptable staleness, key scope, expiry, update invalidation, private-data protection, and behavior during cache outage. Explain concurrent cache rebuilds and invalidation races. Keep checkout price validation, authorization, and stock reservation authoritative. Show tests for a price update, last-unit sale, two different customers, expired entries, and a failed invalidation event.",
+    "exercise": "A cached listing says 'in stock', but another customer just bought the final unit. What should checkout do?",
+    "answer": "Checkout checks authoritative stock and attempts an atomic reservation; it does not trust the listing's cached availability. If no unit remains, it explains the change and refreshes the customer's purchase proposal. Short expiry or invalidation reduces stale displays but cannot replace concurrency-safe inventory rules.",
+    "visual": {
+      "kind": "relationship",
+      "nodes": [
+        "Customer read",
+        "Cached copy",
+        "Authoritative database",
+        "Checkout revalidation"
+      ],
+      "caption": "Cached reads may be briefly stale; purchase decisions still require authoritative checks."
+    }
+  },
+  {
+    "id": 39,
+    "module_id": 8,
+    "module_title": "Speed and scale",
+    "title": "Files, validated uploads, and delivery",
+    "question": "Why is a file named photo.jpg not automatically a safe image?",
+    "definition": "Object storage holds files separately from application records. Upload validation checks whether a file is allowed and safe for its intended use. A content delivery network, or CDN, serves cached files from locations closer to users.",
+    "why": "Uploads consume storage and can contain unexpected content. Clear validation, access rules, and delivery paths protect the store while keeping product images fast to load.",
+    "steps": [
+      "Authorize uploads, bound size and dimensions, generate storage names, and use narrowly scoped short-lived upload permissions.",
+      "Keep uploads untrusted until actual content is checked and required scanning or image processing completes.",
+      "Publish approved derivatives through suitable delivery rules; keep private files behind authorized, time-limited access."
+    ],
+    "example": "An admin uploads a mug photo into an untrusted area. The backend verifies content and dimensions, creates an approved image derivative, and publishes it with a generated name. An invoice is stored privately; its download permission is checked separately, and an expiring link grants temporary access rather than making the whole folder public.",
+    "misconception": "The file extension and browser-supplied content type prove the uploaded content is safe.",
+    "prompt": "Plan product-image uploads and private-invoice downloads. Define authorized actors, size and dimension limits, allowed actual file formats, generated names, untrusted storage, content inspection, processing, publication, and cleanup. Explain short-lived scoped upload permissions and their limits. Keep invoices private with ownership checks and expiring download access. Include oversized files, misleading extensions, abandoned uploads, processing failure, and replacement images. Use versioned public file URLs to make cache refresh predictable.",
+    "exercise": "A customer finds another customer's invoice storage path. Should knowing the path grant access?",
+    "answer": "No. Private download access requires authorization against the invoice's owner or an allowed staff role. The storage policy must enforce privacy, and any signed download link acts as a temporary bearer credential that must be scoped, short-lived, and protected. An obscure filename alone is not an access-control mechanism.",
+    "visual": {
+      "kind": "flow",
+      "nodes": [
+        "Authorized upload",
+        "Untrusted storage",
+        "Inspect and process",
+        "Approved image",
+        "CDN delivery"
+      ],
+      "caption": "Public delivery begins after approval; private files follow a separate authorized download path."
+    }
+  },
+  {
+    "id": 40,
+    "module_id": 8,
+    "module_title": "Speed and scale",
+    "title": "Scale from measured bottlenecks",
+    "question": "Will adding application servers fix a database already at its connection limit?",
+    "definition": "Scaling adds or uses capacity to handle more work. Load testing simulates realistic traffic to find limits before real customers encounter them. A bottleneck is the resource or dependency currently restricting useful throughput.",
+    "why": "More servers can multiply database connections and external requests. Measuring the limiting resource lets the team improve capacity without weakening inventory, payment, or privacy rules.",
+    "steps": [
+      "Define realistic browsing and purchasing traffic, target response times, error limits, and correctness checks.",
+      "Test in an isolated permitted environment; observe database load, connections, queues, dependencies, and tail response times.",
+      "Change the measured bottleneck, repeat the same workload, and verify business invariants alongside speed."
+    ],
+    "example": "A promotion test shows fast catalog pages but slow checkout because database connections are exhausted. Adding web servers worsens pool pressure. The team bounds pools, shortens expensive transactions, and measures again. It also checks that the tested workload produced no oversold stock, duplicate orders, or repeated refund effects.",
+    "misconception": "If average response time is good, the system is ready for a sale event.",
+    "prompt": "Create an isolated load-test plan using synthetic users and simulated payment dependencies for bulk traffic. Use limited sandbox calls only within provider-permitted testing limits. Include browsing, realistic checkout, bursts, and long-running work. Define throughput, error rate, p95/p99 latency, database connections, and queue age. Check inventory, order, payment, and authorization invariants. Avoid real charges and unapproved third-party load. Identify the limiting resource before proposing changes; compare the same workload afterward. Report observed results, untested conditions, and simulation limits rather than claiming universal proof.",
+    "exercise": "The average response is 100 ms, but p99 is 8 seconds. What does that reveal?",
+    "answer": "Most requests are fast, but approximately the slowest one percent take around eight seconds or longer at that percentile boundary. Investigate which requests and resources cause the tail. Average latency hides that experience. Capacity decisions should also consider errors, queue age, dependency limits, and whether purchases remain correct during concurrent load.",
+    "visual": {
+      "kind": "flow",
+      "nodes": [
+        "Realistic workload",
+        "Measure limits",
+        "Find bottleneck",
+        "Focused change",
+        "Retest correctness"
+      ],
+      "caption": "Scale the measured constraint while preserving the rules that make purchases and money movement correct."
+    }
+  },
+  {
+    "id": 41,
+    "module_id": 9,
+    "module_title": "Testing and debugging",
+    "title": "Tests prove specific claims",
+    "question": "How do we know a backend feature works?",
+    "definition": "A test checks an observable result against an expected result. Unit tests isolate logic; integration tests check connected parts; end-to-end tests exercise a complete user journey.",
+    "why": "Different failures need different checks. A correct discount function does not prove checkout saves an order, and one successful purchase does not prove every rule.",
+    "steps": [
+      "Write acceptance criteria before implementation.",
+      "Choose the smallest test that can reveal each failure.",
+      "Inspect test commands, assertions, and observed results."
+    ],
+    "example": "Rule: an expired coupon must not reduce the total. A unit test checks expiry logic, an integration test checks server rejection, and a journey test checks the customer's message.",
+    "misconception": "A green test suite proves the entire store is correct.",
+    "prompt": "Context: our checkout applies coupons on the server. Inspect the existing code and test setup. Acceptance criteria: expired coupons give no discount; valid coupons affect eligible items only; order totals match saved amounts. Propose unit, integration, and journey checks with reasons. Add focused tests using existing tools. Report exact commands, results, and untested assumptions. Do not claim coverage beyond the assertions.",
+    "exercise": "For password reset, name one unit test, one integration test, and one complete journey check.",
+    "answer": "Unit: validate expiry calculation. Integration: reject a used or expired token without changing the password. Journey: request a reset, follow a valid link, set a password, and sign in. Also check account privacy and failure messages.",
+    "visual": {
+      "kind": "relationship",
+      "nodes": [
+        "Business rule",
+        "Unit check",
+        "Integration check",
+        "Journey check"
+      ],
+      "caption": "Each test level provides evidence about a different part of the same promise."
+    }
+  },
+  {
+    "id": 42,
+    "module_id": 9,
+    "module_title": "Testing and debugging",
+    "title": "Test what happens when things go wrong",
+    "question": "What should happen beyond a successful purchase?",
+    "definition": "A happy path is an expected successful journey. Failure cases check rejection and recovery. Concurrency cases check actions that overlap in time and compete for shared data.",
+    "why": "Customers retry, payment systems delay, and buyers compete for stock. These conditions can produce duplicate orders, overselling, or money and order records that disagree.",
+    "steps": [
+      "List success, invalid input, timeout, retry, and permission cases.",
+      "Identify operations that can overlap or repeat.",
+      "Assert final data and side effects, not only response codes."
+    ],
+    "example": "Two shoppers try to buy the last item. A concurrency test starts both requests together and verifies only the allowed quantity is allocated. A retry test repeats one purchase request and checks one intended operation without repeating reservation or shipment effects.",
+    "misconception": "Clicking the checkout button once is enough to validate checkout.",
+    "prompt": "Inspect reservation, order creation, payment confirmation, and shipment. Invariants: availability never becomes negative; a purchase retry cannot create duplicate charges or orders; inventory movements cannot repeat. Design deterministic tests for final-unit competition, duplicate requests, payment failure, expiry, and repeated shipment events. Verify payment confirms allocation without reducing on-hand, and shipment consumes matching on-hand and reserved quantities once. Use controlled concurrent requests or transactions. Inspect final records and side effects. Explain remaining race risks; do not use real customers.",
+    "exercise": "A customer double-clicks Pay. Write three final-state assertions that would detect a duplicate-processing bug.",
+    "answer": "There is one intended order, at most one successful charge for its intended payment, and one stock allocation for the purchased quantity. Payment confirmation must not deduct on-hand. If shipment is tested, its repeated event must reduce on-hand and reserved quantities only once. Also check consistent retry results and notification behavior.",
+    "visual": {
+      "kind": "sequence",
+      "nodes": [
+        "Two requests",
+        "Shared stock",
+        "Atomic decision",
+        "One stock allocation"
+      ],
+      "caption": "Concurrent requests must preserve the business rule even when they arrive together."
+    }
+  },
+  {
+    "id": 43,
+    "module_id": 9,
+    "module_title": "Testing and debugging",
+    "title": "Test external services safely",
+    "question": "How do we test payments and delivery connections?",
+    "definition": "A sandbox is a provider's testing environment. A contract describes request and response expectations. Contract checks detect mismatches between the backend and an external API or event format.",
+    "why": "Mocked responses make tests fast, but they may drift from reality. Sandbox checks reveal configuration and integration mistakes without intentionally creating real purchases.",
+    "steps": [
+      "Separate test credentials and endpoints from production.",
+      "Test documented success, failure, timeout, and webhook cases.",
+      "Combine mocks, contract checks, and sandbox journeys."
+    ],
+    "example": "A local test simulates a declined payment. A contract check validates the event fields the handler expects. A sandbox journey verifies checkout and a signed webhook update the same test order.",
+    "misconception": "A mocked payment success proves real provider integration works.",
+    "prompt": "Inspect our payment adapter, webhook handler, and provider documentation. Plan isolated tests plus a sandbox journey. Cover declined payments, timeouts, invalid signatures, duplicate events, and unexpected event order. Confirm credentials and data stay in the test environment. Verify the stored payment and order states. Use official test scenarios; report what mocks cannot prove and which sandbox checks were actually observed.",
+    "exercise": "What can a sandbox journey reveal that a hardcoded successful mock cannot?",
+    "answer": "Wrong credentials, endpoint configuration, payload assumptions, webhook delivery or signature setup, and integration behavior across real provider components. A sandbox still may not reproduce every live failure, timing pattern, or production setting.",
+    "visual": {
+      "kind": "compare",
+      "nodes": [
+        "Mock: controlled",
+        "Contract: compatible",
+        "Sandbox: connected",
+        "Production: monitored"
+      ],
+      "caption": "Use several kinds of evidence; each leaves different uncertainty."
+    }
+  },
+  {
+    "id": 44,
+    "module_id": 9,
+    "module_title": "Testing and debugging",
+    "title": "See what the backend is doing",
+    "question": "How do we investigate a problem we cannot see?",
+    "definition": "Logs record individual events. Metrics summarize quantities over time. Traces connect work across a request and its dependencies. A correlation identifier helps link relevant records.",
+    "why": "A customer sees a failed checkout, but the cause may be in payment, inventory, or a worker. Connected evidence narrows the search and reveals customer impact.",
+    "steps": [
+      "Record useful events with request, order, or job identifiers.",
+      "Measure errors, latency, traffic, and queue backlog.",
+      "Protect sensitive values and control access and retention."
+    ],
+    "example": "A support report includes an order reference. Its trace shows checkout succeeded but notification delivery timed out. A metric shows the same failure affects many orders, so the team investigates the notification service.",
+    "misconception": "Log every request body so debugging is easy.",
+    "prompt": "Inspect checkout observability. Propose structured events for order creation, payment updates, stock decisions, and job failures. Include correlation identifiers and useful error categories. Exclude credentials, payment secrets, and unnecessary personal data. Add metrics for checkout failures and latency. Demonstrate how one test order can be followed through logs and dependencies, and identify missing visibility.",
+    "exercise": "Checkout errors rise after a release. Which metric, log field, and trace detail would help first?",
+    "answer": "Metric: error rate or failed checkouts over time. Log field: release version plus correlation identifier and error category. Trace detail: the failing span and its dependency response or duration. Compare before and after the release without exposing sensitive payloads.",
+    "visual": {
+      "kind": "relationship",
+      "nodes": [
+        "Observability",
+        "Event logs",
+        "Latency metrics",
+        "Dependency trace"
+      ],
+      "caption": "Events, trends, and request paths answer different debugging questions."
+    }
+  },
+  {
+    "id": 45,
+    "module_id": 9,
+    "module_title": "Testing and debugging",
+    "title": "Debug with evidence",
+    "question": "How do we move from a symptom to a verified fix?",
+    "definition": "Debugging is a structured investigation: reproduce an issue, gather evidence, form a testable explanation, isolate its cause, and verify a focused correction. Incident triage first assesses impact and containment.",
+    "why": "Changing several things at once hides the cause and can add failures. During an incident, restoring service may be more urgent than completing the full diagnosis.",
+    "steps": [
+      "State expected behavior, actual behavior, scope, and timing.",
+      "Test one explanation using the smallest safe reproduction.",
+      "Verify the fix and check nearby behavior for regressions."
+    ],
+    "example": "Paid orders remain pending after a release. Triage checks affected orders and recent changes. Evidence shows webhook verification rejects valid events. The team contains impact, corrects configuration, and safely reconciles affected orders.",
+    "misconception": "The first plausible explanation is the root cause.",
+    "prompt": "Investigate this issue using the attached redacted request, error, timestamp, and recent diff. Expected: a verified payment marks the correct order paid once. Actual: it remains pending. First summarize evidence and missing facts. Rank hypotheses, propose one discriminating check each, and avoid guessing credentials or editing production data. Make the smallest supported fix, add a regression check, and explain safe recovery for affected orders.",
+    "exercise": "An order is missing after payment. Name three facts to collect before proposing a code change.",
+    "answer": "Collect the provider's payment status and reference, relevant request or webhook evidence with timestamps, and the application's saved order/payment records. Also inspect deployment timing and retry history. Do not infer payment failure from a missing browser confirmation alone.",
+    "visual": {
+      "kind": "flow",
+      "nodes": [
+        "Reproduce",
+        "Gather evidence",
+        "Test explanation",
+        "Verify correction"
+      ],
+      "caption": "Evidence should decide the next action, rather than a chain of guesses."
+    }
+  },
+  {
+    "id": 46,
+    "module_id": 10,
+    "module_title": "Delivery and operations",
+    "title": "Use Git as a change record",
+    "question": "How can a team review and recover changes?",
+    "definition": "Git records versions of files. A branch isolates a line of work; a commit records a change; a diff shows what changed. Review checks whether the change satisfies its purpose.",
+    "why": "Small, understandable changes make failures easier to locate and corrections easier to assess. Recovery requires knowing which version ran and what other changes it depends on.",
+    "steps": [
+      "Start from a known version and use a focused branch.",
+      "Review code, configuration, migrations, and verification evidence.",
+      "Record a release version and a realistic recovery plan."
+    ],
+    "example": "A coupon fix lives on harshitgupta31415/fix-coupon-expiry. The diff changes validation and a regression check. If the release fails, the team can identify its exact version and assess whether reverting is safe.",
+    "misconception": "Reverting code automatically restores databases and external effects.",
+    "prompt": "Inspect the current diff for the coupon expiry fix. Explain each changed file and whether it supports the acceptance criteria. Check unrelated edits, credentials, schema changes, and behavior changes. Run relevant existing checks and report results. Suggest a clear commit message using the repository's conventions. Describe recovery limits: reverting code must not be presented as undoing database mutations, sent messages, or completed payments.",
+    "exercise": "A release sent duplicate confirmation emails. What can reverting its commit undo, and what can it not undo?",
+    "answer": "A revert can restore earlier source behavior after it is deployed, subject to compatibility. It cannot unsend emails or automatically repair affected data. The team must stop further duplicates, identify impact, and decide whether separate reconciliation or customer communication is needed.",
+    "visual": {
+      "kind": "flow",
+      "nodes": [
+        "Focused branch",
+        "Review diff",
+        "Verified commit",
+        "Tracked release"
+      ],
+      "caption": "Version history connects a proposed change to the version that customers receive."
+    }
+  },
+  {
+    "id": 47,
+    "module_id": 10,
+    "module_title": "Delivery and operations",
+    "title": "Separate environments and secrets",
+    "question": "Why should testing have its own configuration?",
+    "definition": "An environment is a deployment with its own settings and connected resources. Configuration selects behavior and endpoints. Secrets are sensitive credentials that require controlled storage, access, and rotation.",
+    "why": "A developer should be able to test failures without changing real orders or charging customers. Correct code can still fail when deployed with the wrong settings.",
+    "steps": [
+      "Separate development, staging, and production resources.",
+      "Validate required configuration when the service starts.",
+      "Store secrets securely and expose only appropriate public values."
+    ],
+    "example": "Staging uses a test database and payment sandbox. Production uses separate credentials and endpoints. A startup check rejects a missing webhook secret before the application accepts checkout requests.",
+    "misconception": "Putting a secret in a frontend environment variable keeps it private.",
+    "prompt": "Inspect configuration use across browser code, server code, build steps, and deployment files. Create a variable inventory with purpose, environment, sensitivity, and validation. Identify values that can enter browser bundles. Do not print secret values. Check staging cannot reach production payment or database resources. Propose focused corrections and a safe credential rotation plan for any confirmed exposure.",
+    "exercise": "Where should a private payment API key live, and what should the browser receive instead?",
+    "answer": "The private key belongs in server-side secret storage with restricted access. The browser receives only the provider-supported public configuration or short-lived, appropriately scoped checkout information. Exact fields depend on the integration. Never send the private API key to the client.",
+    "visual": {
+      "kind": "compare",
+      "nodes": [
+        "Development",
+        "Staging",
+        "Production",
+        "Separate secrets"
+      ],
+      "caption": "Environment boundaries keep experimental work away from live customer resources."
+    }
+  },
+  {
+    "id": 48,
+    "module_id": 10,
+    "module_title": "Delivery and operations",
+    "title": "Release code and data safely",
+    "question": "How does a change reach customers safely?",
+    "definition": "Continuous integration checks proposed changes automatically. Delivery pipelines build and deploy a known version. A database migration changes schema or data and needs a compatibility and recovery plan.",
+    "why": "Releases can briefly run old and new application versions together. A database change that removes something the old version still needs can break an otherwise valid deployment.",
+    "steps": [
+      "Run relevant checks and build a traceable artifact.",
+      "Apply compatible schema changes before dependent behavior.",
+      "Verify deployment health and delay destructive cleanup."
+    ],
+    "example": "To rename an order field, first add the new field and compatible reads/writes. Migrate and verify existing data. Switch usage in a later release. Remove the old field only after compatibility is no longer needed.",
+    "misconception": "If a migration succeeds, reverting the application is always safe.",
+    "prompt": "Review this proposed order-schema migration and deployment plan. Identify old/new application compatibility, locks, data volume, backfill strategy, and partial-failure behavior. Propose staged changes with checks and stop conditions. Define pre-deployment backup requirements and post-deployment validation. Explain which changes can be reversed, which need a forward correction, and what must be tested before production.",
+    "exercise": "Why is adding a new nullable field usually easier to stage than immediately deleting an old field?",
+    "answer": "Adding a field can preserve old application behavior while new code is introduced. Deleting a field can immediately break any old code or job that still reads it. Compatibility still depends on defaults, constraints, queries, and how the migration is applied.",
+    "visual": {
+      "kind": "sequence",
+      "nodes": [
+        "Add compatibly",
+        "Deploy support",
+        "Migrate + verify",
+        "Remove later"
+      ],
+      "caption": "Separate introduction, adoption, and removal so releases can overlap safely."
+    }
+  },
+  {
+    "id": 49,
+    "module_id": 10,
+    "module_title": "Delivery and operations",
+    "title": "Backups need a restore plan",
+    "question": "Can we recover the store after losing data?",
+    "definition": "A backup is a recoverable copy of data. Recovery point objective describes acceptable data loss in time; recovery time objective describes acceptable restoration time. A restore drill tests the plan.",
+    "why": "A completed backup job does not prove recovery will work. Recovery may require databases, files, configuration, credentials, and reconciliation with external payment records.",
+    "steps": [
+      "Define acceptable loss and downtime with the business.",
+      "Back up required resources and protect backup access.",
+      "Restore into isolation and verify business records."
+    ],
+    "example": "A database backup exists, but product images live in separate storage. A drill discovers the gap. The team updates its plan and checks that restored orders, totals, stock, and file references remain usable.",
+    "misconception": "Having backups means the latest orders are guaranteed recoverable.",
+    "prompt": "Create a recovery plan for our store using the actual hosting and storage setup. Inventory database, uploaded files, configuration dependencies, and external payment references. Ask for business-approved recovery objectives rather than inventing them. Design an isolated restore drill with integrity checks, measured recovery time, and documented data gaps. Include payment/order reconciliation and a cutover decision. Do not overwrite production during the drill.",
+    "exercise": "If the latest usable backup is two hours old, what additional problem remains after restoring it?",
+    "answer": "Changes during those two hours may be missing: orders, payments, refunds, inventory movements, and account updates. The team must identify and reconcile those changes from trustworthy records before normal operations resume. Recovery speed alone does not resolve data loss.",
+    "visual": {
+      "kind": "flow",
+      "nodes": [
+        "Back up",
+        "Restore in isolation",
+        "Verify records",
+        "Reconcile gaps"
+      ],
+      "caption": "Recovery is demonstrated by a usable, checked restore, not a backup status message."
+    }
+  },
+  {
+    "id": 50,
+    "module_id": 10,
+    "module_title": "Delivery and operations",
+    "title": "Monitor what customers depend on",
+    "question": "How will we notice and handle a live failure?",
+    "definition": "Monitoring observes service health and business outcomes. An alert requests attention when a meaningful condition occurs. A runbook gives practical investigation, containment, recovery, and escalation steps.",
+    "why": "A server can be running while customers cannot pay. Useful alerts connect technical symptoms to customer impact and give the responder a clear next action.",
+    "steps": [
+      "Monitor checkout outcomes, dependency health, and delayed work.",
+      "Set actionable alerts with an owner and investigation link.",
+      "Document containment, recovery, escalation, and verification."
+    ],
+    "example": "Payment webhooks are arriving but processing is delayed. An alert combines queue age with pending paid orders. The runbook checks worker health, prevents unsafe duplicate work, and explains controlled replay and reconciliation.",
+    "misconception": "Alert on every error so nothing can be missed.",
+    "prompt": "Using our checkout and job architecture, propose a small alert set for failed checkouts, payment/order mismatches, queue age, and exhausted retries. Define each signal, impact, owner, investigation steps, and recovery verification. Mark thresholds that need baseline traffic data. Draft a runbook for delayed payment events, including safe replay and duplicate protection. Avoid alerts without a clear action.",
+    "exercise": "Why might a sudden fall to zero successful checkouts matter even when the server reports no errors?",
+    "answer": "Customers may be blocked before the monitored server step, a dependency may fail without a recorded error, or traffic may have changed. Compare visits, checkout attempts, successful payments, deployment timing, and provider status before choosing an explanation.",
+    "visual": {
+      "kind": "flow",
+      "nodes": [
+        "Observe outcomes",
+        "Detect impact",
+        "Follow runbook",
+        "Verify recovery"
+      ],
+      "caption": "An alert is useful when someone knows what to investigate and how to confirm recovery."
+    }
+  },
+  {
+    "id": 51,
+    "module_id": 11,
+    "module_title": "Working precisely with AI",
+    "title": "Read the system before changing it",
+    "question": "What minimum technical literacy does AI work require?",
+    "definition": "A repository holds project files and history. A function accepts inputs and produces behavior; conditions select paths; types describe expected values. Terminal commands run tools within a chosen directory and environment.",
+    "why": "Understanding the existing path prevents duplicate systems and misplaced code. Basic literacy helps you question explanations, inspect changes, and recognize commands that modify important resources.",
+    "steps": [
+      "Trace one request from entry point to saved data.",
+      "Identify functions, conditions, value types, and permissions.",
+      "Understand command purpose, target, and side effects before running."
+    ],
+    "example": "Before changing Add to cart, locate its request handler, validation, cart storage, and tests. Read the stock condition and quantity type. Check whether the proposed terminal command only reads files or mutates a database.",
+    "misconception": "AI can safely modify an unfamiliar repository without establishing context.",
+    "prompt": "Inspect this repository without editing files or executing mutations. Map runtime entry points, API routes, database access, authentication, background jobs, and existing checks. Trace Add to cart with file references and explain its inputs, conditions, and outputs in plain English. Identify uncertainties and required configuration without exposing values. Explain any proposed terminal command, directory, environment, and side effects before recommending it.",
+    "exercise": "In plain language, explain a function that receives a quantity, rejects values below one, and returns a cart total.",
+    "answer": "The function takes a quantity as input. A condition checks whether it is allowed. Invalid quantities cause a defined error. Valid quantities are used in the total calculation, which becomes the output. Also ask about numeric type, stock limits, pricing source, and rounding.",
+    "visual": {
+      "kind": "flow",
+      "nodes": [
+        "Request entry",
+        "Function + rules",
+        "Database action",
+        "Response"
+      ],
+      "caption": "Trace the runtime path; separate tests verify its behavior."
+    }
+  },
+  {
+    "id": 52,
+    "module_id": 11,
+    "module_title": "Working precisely with AI",
+    "title": "Write a specification AI can check",
+    "question": "What makes a prompt precise enough to implement?",
+    "definition": "A feature specification states context, intended behavior, inputs, outputs, invariants, constraints, acceptance criteria, and verification. An invariant is a rule that must remain true across all supported paths.",
+    "why": "Vague requests leave business decisions to guesses. Explicit examples and failure cases turn a broad instruction into observable behavior that a person can review.",
+    "steps": [
+      "Provide relevant architecture, files, and business rules.",
+      "Specify allowed inputs, outputs, and failure behavior.",
+      "Define acceptance examples, verification, and unresolved decisions."
+    ],
+    "example": "Instead of 'add coupons,' specify expiry timezone, eligible items, minimum spend, stacking policy, server validation, error response, persisted discount amount, and examples showing expected totals.",
+    "misconception": "A longer prompt is precise even when its rules contradict each other.",
+    "prompt": "Feature: apply one percentage coupon to eligible cart items. Context: inspect existing cart and pricing code first. Inputs: coupon code and cart reference. Output: server-calculated totals or a defined validation error. Invariants: no negative totals; browser prices are untrusted; expired codes never apply. Preserve existing currency rounding. Acceptance cases: valid, expired, ineligible, and changed cart. Flag missing timezone or stacking rules before implementation. Propose a small change, focused tests, and verification evidence.",
+    "exercise": "Rewrite 'make checkout secure' as three observable acceptance criteria.",
+    "answer": "Example criteria: the server recalculates amounts from trusted records; customers cannot access another customer's order; only verified provider evidence can trigger the configured paid-state transition. Evidence may be a valid signed event or an authenticated provider status lookup, with matching purchase, amount, and currency. Each criterion needs explicit tests and implementation inspection.",
+    "visual": {
+      "kind": "relationship",
+      "nodes": [
+        "Context",
+        "Rules + invariants",
+        "Inputs + outputs",
+        "Acceptance + evidence"
+      ],
+      "caption": "Precision comes from explicit decisions and checkable behavior, not prompt length."
+    }
+  },
+  {
+    "id": 53,
+    "module_id": 11,
+    "module_title": "Working precisely with AI",
+    "title": "Keep AI changes small and reviewable",
+    "question": "How can someone review code they did not write?",
+    "definition": "A reviewable change has a clear purpose, limited scope, understandable data flow, and evidence. Human verification compares the actual diff and observed behavior with the agreed specification.",
+    "why": "AI can produce plausible code that ignores a rule or changes unrelated behavior. Small changes let you ask better questions and validate one promise at a time.",
+    "steps": [
+      "Agree on a focused implementation plan and boundaries.",
+      "Read the diff and request explanations for unfamiliar logic.",
+      "Run checks yourself and demonstrate success and failure."
+    ],
+    "example": "For coupon expiry, review the timestamp comparison, server clock assumptions, error response, and tests. Confirm the diff does not alter payment logic. Run the checks and manually observe valid and expired examples.",
+    "misconception": "An AI statement that tests passed is sufficient verification.",
+    "prompt": "Implement only the agreed coupon-expiry rule using existing project patterns. Avoid unrelated refactoring and new dependencies unless justified first. Explain changed conditions, types, data writes, and error paths. Add a regression check that fails without the fix. Report exact commands and output summaries, including failures and skipped checks. Then give me a short manual verification script. Do not present your own review as independent proof.",
+    "exercise": "AI reports 'all done, tests pass.' What evidence should you request before accepting the change?",
+    "answer": "Request the exact diff, the requirement-to-change explanation, commands actually run, results including failures or skips, and known limitations. Inspect assertions and demonstrate expected behavior in a safe environment. For important changes, obtain independent review where practical.",
+    "visual": {
+      "kind": "flow",
+      "nodes": [
+        "One agreed change",
+        "Inspect diff",
+        "Run + observe",
+        "Accept evidence"
+      ],
+      "caption": "Keep the reviewer connected to actual files and observed behavior."
+    }
+  },
+  {
+    "id": 54,
+    "module_id": 11,
+    "module_title": "Working precisely with AI",
+    "title": "Give AI evidence when debugging",
+    "question": "How do we prevent a debugging conversation from drifting?",
+    "definition": "A useful debugging packet contains expected behavior, actual behavior, reproduction steps, redacted errors, relevant versions, recent changes, and affected scope. Hypotheses remain provisional until evidence supports them.",
+    "why": "Without evidence, AI may repeatedly rewrite working code around a guessed cause. A bounded investigation reduces unnecessary changes and makes each next step purposeful.",
+    "steps": [
+      "Collect a minimal reproduction and redact sensitive data.",
+      "Separate observed facts from explanations and guesses.",
+      "Ask for discriminating checks before implementing a fix."
+    ],
+    "example": "Instead of 'checkout is broken,' provide the request shape, error category, timestamp, environment, release version, and whether all carts fail. A suggested query should answer a specific hypothesis before code changes begin.",
+    "misconception": "Pasting the entire application and raw logs guarantees a better diagnosis.",
+    "prompt": "Expected: one paid order after sandbox checkout. Actual: two orders with one payment reference. Evidence: redacted request traces, relevant handler, schema constraints, and recent diff attached. Separate facts from hypotheses. Rank likely causes and propose the smallest read-only checks that distinguish them. Do not edit code until a cause is supported. Then propose a focused correction, duplicate-request regression test, and safe plan for existing affected records.",
+    "exercise": "AI suggests increasing a timeout after seeing a generic error. What should you ask next?",
+    "answer": "Ask which observed duration and failing component support a timeout hypothesis. Request a trace or timing check that distinguishes slow work from rejection, unavailable dependencies, or a code error. Increasing a timeout may hide the symptom without addressing its cause.",
+    "visual": {
+      "kind": "sequence",
+      "nodes": [
+        "Observed facts",
+        "Rank hypotheses",
+        "Distinguishing check",
+        "Supported fix"
+      ],
+      "caption": "Each debugging action should reduce a stated uncertainty."
+    }
+  },
+  {
+    "id": 55,
+    "module_id": 11,
+    "module_title": "Working precisely with AI",
+    "title": "Review security and launch evidence",
+    "question": "What must be true before real customers use it?",
+    "definition": "Launch readiness combines verified customer journeys, security controls, reliable operations, and clear ownership. A security review examines who can perform actions, what data they can access, and which inputs cross trust boundaries.",
+    "why": "A working demo does not show that unauthorized requests are blocked or recovery works. Launch decisions require evidence for both normal operation and important failure conditions.",
+    "steps": [
+      "Review access, validation, secrets, dependencies, and payment boundaries.",
+      "Verify critical journeys, failure recovery, and monitoring.",
+      "Assign unresolved risks, owners, and launch stop conditions."
+    ],
+    "example": "A store passes its purchase demo but exposes order details through predictable identifiers. A direct authorization test finds the issue. Launch waits for a verified fix, while backup restoration and payment reconciliation are also checked.",
+    "misconception": "An AI security review certifies that the backend is safe.",
+    "prompt": "Review the backend against our launch scope. Trace customer and admin authorization, input validation, secret exposure, payment verification, duplicate protection, and data access. Cite concrete files and supported findings; label uncertainty. Check evidence for checkout failures, stock races, backups, alerts, and rollback limits. Propose fixes and meaningful verification, then produce a readiness list with owners and unresolved launch blockers. Do not certify security from a scan or generated review alone.",
+    "exercise": "A feature works in the UI, but its endpoint allows another customer's order identifier. Is it ready? Explain the required check.",
+    "answer": "No. The server must verify the authenticated user's permission for that specific order on every relevant request. Test both allowed and forbidden access by calling the endpoint directly. Hiding a link or button does not enforce permission.",
+    "visual": {
+      "kind": "relationship",
+      "nodes": [
+        "Customer journeys",
+        "Security checks",
+        "Recovery evidence",
+        "Accountable owner"
+      ],
+      "caption": "Readiness is a decision supported by evidence and responsibility across the whole service."
+    }
+  },
+  {
+    "id": "56",
+    "module_id": 12,
+    "module_title": "Assemble the complete backend",
+    "title": "Choose boundaries before extra services",
+    "question": "How can one application stay understandable as the store grows?",
+    "definition": "Architecture decides where responsibilities live and how parts communicate. A modular monolith groups catalog, checkout, orders and other domains inside one deployable application, with clear internal interfaces.",
+    "why": "Clear boundaries make changes easier to trace. Splitting services introduces deployment, network and consistency work, so it needs a demonstrated reason.",
+    "steps": [
+      "Group behavior by domain and identify which module owns each record.",
+      "Keep business rules behind explicit interfaces instead of duplicating them across handlers.",
+      "Measure pain or scale before separating a module into another service."
+    ],
+    "example": "The order module owns order transitions. The admin API and payment worker call the same transition rules. They do not each invent a different definition of a paid or refundable order.",
+    "misconception": "More services automatically make a small store more reliable or easier to change.",
+    "prompt": "Inspect our existing architecture before proposing changes. Map catalog, inventory, checkout, payments and orders to their owning files and data. Identify duplicated business rules and unclear ownership with concrete examples. Propose the smallest useful boundary improvement, preserving existing contracts. Explain costs and verification. Do not introduce new services without evidence of a need.",
+    "exercise": "The admin route and payment worker both decide when stock is committed. Where should the shared rule live?",
+    "answer": "Put the rule in one inventory/order domain operation and call it from both entry points. Protect the state change with the required transaction and duplicate/concurrency controls. Separate entry points do not justify separate definitions of the same stock movement.",
+    "visual": {
+      "kind": "compare",
+      "nodes": [
+        "Catalog module",
+        "Inventory module",
+        "Checkout module",
+        "Orders module"
+      ],
+      "caption": "One app can contain clear domain boundaries. These boxes are not separate servers."
+    }
+  },
+  {
+    "id": "57",
+    "module_id": 12,
+    "module_title": "Assemble the complete backend",
+    "title": "Connect records to API contracts",
+    "question": "Can you trace every important screen action to its authoritative records?",
+    "definition": "A backend blueprint connects user actions, API contracts, domain rules, stored records and external providers. It turns separate topics into an agreed design that can be implemented and verified.",
+    "why": "A screen can look finished while its data ownership and failure behavior remain undefined. A blueprint exposes these gaps before implementation.",
+    "steps": [
+      "List customer and staff actions from the completed UI.",
+      "For each action, specify input, output, permission, rules and authoritative data.",
+      "Record failures, retries and tests beside the contract."
+    ],
+    "example": "View order uses an order ID, authenticated ownership, saved order items, payment summary and shipment status. It must not reconstruct the customer's original purchase price from today's catalog price.",
+    "misconception": "Creating database tables and endpoint names is a complete backend specification.",
+    "prompt": "Using the completed UI and actual repository, create a backend blueprint for product detail, cart, checkout, order history and staff fulfillment. For each action include request/response examples, actor and ownership, authoritative records, business invariants, error cases and acceptance tests. Mark missing business decisions. Reuse existing project contracts where suitable. Do not implement yet.",
+    "exercise": "What must be specified beyond GET /orders/:id and an orders table?",
+    "answer": "Specify who may read the order, how ownership is checked, response fields and their sources, not-found/forbidden behavior, sensitive data rules and tests. Clarify that item prices come from purchase snapshots, and define the separate payment and shipment states exposed.",
+    "visual": {
+      "kind": "flow",
+      "nodes": [
+        "Screen action",
+        "API contract",
+        "Business rule",
+        "Authoritative data"
+      ],
+      "caption": "Every visible action needs a traceable behavior and data source."
+    }
+  },
+  {
+    "id": "58",
+    "module_id": 12,
+    "module_title": "Assemble the complete backend",
+    "title": "Trace the complete purchase journey",
+    "question": "What evidence links one customer's cart to a paid, fulfillable order?",
+    "definition": "A purchase spans local database changes and external payment activity. Shared identifiers, validated state transitions, reservations and reconciliation connect these steps without pretending they form one database transaction.",
+    "why": "Failures can happen between any two steps. Explicit boundaries let the store recover without losing payment evidence, selling unavailable stock or creating duplicate orders.",
+    "steps": [
+      "Validate a server quote, preserve order details and allocate stock using the agreed policy.",
+      "Create or recover the payment attempt with stable identifiers and safe retry rules.",
+      "Apply verified provider outcomes, reconcile uncertainty and release or compensate stock when required."
+    ],
+    "example": "A payment succeeds after the stock reservation expired. The backend checks current availability under concurrency control. If allocation is impossible, the order enters a defined review/refund path instead of being automatically fulfilled.",
+    "misconception": "A database rollback can undo a charge that already succeeded at an external payment provider.",
+    "prompt": "Trace our checkout from cart through payment confirmation and fulfillment readiness. Show local transaction boundaries, stock reservation policy, payment attempt IDs, request idempotency and event deduplication. Include lost responses, duplicate/out-of-order events and payment success after reservation expiry. Define reconciliation and compensation paths. Produce a sequence explanation and a test matrix before changing code.",
+    "exercise": "The provider charged the customer, but the order update failed. Should the backend create another charge?",
+    "answer": "No new charge should be created blindly. Recover or query the existing payment attempt using stable identifiers, reconcile the local order and apply the result safely. If the order cannot be fulfilled, use the approved review/refund process. A failed local update does not prove payment failure.",
+    "visual": {
+      "kind": "sequence",
+      "nodes": [
+        "Quote + order",
+        "Reserve stock",
+        "Payment attempt",
+        "Verify outcome",
+        "Allocate or resolve"
+      ],
+      "caption": "The provider boundary needs recovery; it is not one local database transaction."
+    }
+  },
+  {
+    "id": "59",
+    "module_id": 12,
+    "module_title": "Assemble the complete backend",
+    "title": "Make staff and customer actions agree",
+    "question": "What happens when a customer cancels while staff prepare a shipment?",
+    "definition": "Operational workflows combine permission, current state, business policy and an atomic change. Customer, staff and background actions must all respect the same allowed transitions and leave useful evidence.",
+    "why": "Valid actions can conflict when performed together. Checking state only in the UI allows stale decisions to create contradictory records.",
+    "steps": [
+      "Define which actor may request each transition and when it is permitted.",
+      "Check the current state and apply the transition atomically with conflict handling.",
+      "Record actor, reason and related external work without exposing sensitive data."
+    ],
+    "example": "Cancellation is allowed before shipment handoff under this store's policy. If a fulfillment operation wins the state change first, a concurrent cancellation receives the defined conflict result and can enter the returns process.",
+    "misconception": "Hiding the cancel button guarantees that the backend cannot receive an invalid cancellation.",
+    "prompt": "Implement the agreed cancellation-versus-fulfillment rules in the existing domain layer. Require customer ownership or authorized staff access. Recheck the current order/shipment state atomically, reject invalid transitions and coordinate any stock release/refund through safe retryable operations. Add a concurrent cancellation/fulfillment test. Report final order, stock, refund and audit states for each outcome.",
+    "exercise": "Two authorized requests both read an unshipped order, then one ships while the other cancels. What is missing?",
+    "answer": "The state check and transition need concurrency protection, such as a conditional update or lock inside the correct transaction. Define which transition may win and the conflict response for the other. Permission checks alone cannot prevent this race.",
+    "visual": {
+      "kind": "relationship",
+      "nodes": [
+        "Shared transition rules",
+        "Customer action",
+        "Staff action",
+        "Background worker"
+      ],
+      "caption": "All entry points use the same current-state checks and business policy."
+    }
+  },
+  {
+    "id": "60",
+    "module_id": 12,
+    "module_title": "Assemble the complete backend",
+    "title": "Demonstrate readiness with evidence",
+    "question": "What would convince another developer that the store is ready to operate?",
+    "definition": "Readiness is a reviewable set of behavior, security, integration and recovery evidence. It includes known limitations and operating procedures, rather than relying on an AI-generated success claim or a single successful purchase.",
+    "why": "Customers, money and inventory depend on the paths that fail as well as those that succeed. Evidence makes the launch decision assessable.",
+    "steps": [
+      "Demonstrate the complete customer and staff journeys in a production-like test environment.",
+      "Prove ownership, money, stock, duplicate handling, failure recovery and operational checks.",
+      "Document results, limitations, monitoring, recovery steps and the responsible reviewer."
+    ],
+    "example": "The final review includes a paid test order, last-unit race, replayed webhook, cross-customer access denial, refund reconciliation, failed-job recovery, tested restore and release procedure. Unresolved failures remain visible with an owner and next action.",
+    "misconception": "Passing tests guarantees the entire application is correct, secure and production-ready.",
+    "prompt": "Assess this ecommerce backend against the agreed requirements and recorded evidence. Build a readiness matrix covering customer/staff flows, permissions, money, inventory, payment failures/duplicates, recovery, migrations, backups and monitoring. For each item show evidence, gaps and the next action. Distinguish observed results from assumptions. Produce a prioritized remaining-work list and a reviewable launch checklist.",
+    "exercise": "A normal checkout works, but duplicate events, ownership checks and restore procedures are untested. Is the evidence complete?",
+    "answer": "No. A successful purchase proves one path. Verify the missing security, duplicate-processing and recovery behaviors, then record results and remaining limits. Readiness should be assessed against explicit requirements with evidence and accountable review.",
+    "visual": {
+      "kind": "flow",
+      "nodes": [
+        "Requirements",
+        "Demonstrations",
+        "Evidence + gaps",
+        "Readiness review"
+      ],
+      "caption": "The final decision follows verified behavior and visible limitations."
+    }
+  }
+]

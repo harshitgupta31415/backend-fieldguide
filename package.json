@@ -1,0 +1,19 @@
+{
+  "name": "harshitgupta31415-backend-fieldguide",
+  "version": "1.0.0",
+  "private": true,
+  "author": "harshitgupta31415",
+  "description": "An interactive ecommerce backend learning lab with 60 lessons, simulations and precise prompt practice.",
+  "scripts": {
+    "dev": "next dev --hostname 127.0.0.1",
+    "build": "next build",
+    "test": "node --test tests/*.test.mjs",
+    "start": "next start --hostname 127.0.0.1"
+  },
+  "dependencies": {
+    "next": "16.4.2",
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  },
+  "engines": { "node": ">=20.9.0" }
+}

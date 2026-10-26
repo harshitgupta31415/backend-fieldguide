@@ -1,0 +1,296 @@
+{
+  "modules": [
+    {
+      "id": 1,
+      "title": "How backends work",
+      "outcome": "Trace a request from a customer action to a saved result.",
+      "color": "#087F83"
+    },
+    {
+      "id": 2,
+      "title": "Data foundations",
+      "outcome": "Explain relationships and protect stored data from invalid changes.",
+      "color": "#355C9A"
+    },
+    {
+      "id": 3,
+      "title": "Identity and security",
+      "outcome": "Protect identities, ownership, secrets and sensitive data.",
+      "color": "#9B5C2D"
+    },
+    {
+      "id": 4,
+      "title": "Catalog and cart",
+      "outcome": "Model sellable items, quantities, carts and trustworthy totals.",
+      "color": "#7E5A9B"
+    },
+    {
+      "id": 5,
+      "title": "Checkout and payments",
+      "outcome": "Handle verified payments, duplicates and uncertain outcomes.",
+      "color": "#C25C45"
+    },
+    {
+      "id": 6,
+      "title": "Orders and fulfillment",
+      "outcome": "Keep orders, stock, shipments and refunds consistent.",
+      "color": "#497A46"
+    },
+    {
+      "id": 7,
+      "title": "Async work and integrations",
+      "outcome": "Finish background work reliably when other systems fail.",
+      "color": "#087F83"
+    },
+    {
+      "id": 8,
+      "title": "Speed and scale",
+      "outcome": "Measure bottlenecks and improve speed without losing correctness.",
+      "color": "#355C9A"
+    },
+    {
+      "id": 9,
+      "title": "Testing and debugging",
+      "outcome": "Prove behavior and investigate failures with useful evidence.",
+      "color": "#9B5C2D"
+    },
+    {
+      "id": 10,
+      "title": "Delivery and operations",
+      "outcome": "Release changes, recover data and operate the store.",
+      "color": "#7E5A9B"
+    },
+    {
+      "id": 11,
+      "title": "Working precisely with AI",
+      "outcome": "Specify, inspect, verify and improve AI-assisted changes.",
+      "color": "#C25C45"
+    },
+    {
+      "id": 12,
+      "title": "Assemble the complete backend",
+      "outcome": "Connect the parts and demonstrate an end-to-end working store.",
+      "color": "#497A46"
+    }
+  ],
+  "glossary": [
+    {
+      "term": "API",
+      "meaning": "A defined way for software to request data or actions from other software."
+    },
+    {
+      "term": "Contract",
+      "meaning": "The agreed request shape, response shape, errors and behavior of an interface."
+    },
+    {
+      "term": "Constraint",
+      "meaning": "A database rule that rejects invalid stored data."
+    },
+    {
+      "term": "Concurrency",
+      "meaning": "Several operations happening during overlapping time periods."
+    },
+    {
+      "term": "Transaction",
+      "meaning": "A group of database changes committed or rolled back together."
+    },
+    {
+      "term": "Authentication",
+      "meaning": "Verifying which identity is making a request."
+    },
+    {
+      "term": "Authorization",
+      "meaning": "Deciding whether that identity may perform this action on this resource."
+    },
+    {
+      "term": "Session",
+      "meaning": "A way to associate several requests with an authenticated user."
+    },
+    {
+      "term": "Invariant",
+      "meaning": "A rule that must remain true across allowed operations."
+    },
+    {
+      "term": "Idempotency",
+      "meaning": "Repeating the same logical operation has no additional intended effect."
+    },
+    {
+      "term": "Webhook",
+      "meaning": "An external system sends an HTTP notification to your application."
+    },
+    {
+      "term": "Reconciliation",
+      "meaning": "Comparing independent records to find and resolve differences."
+    },
+    {
+      "term": "Queue and worker",
+      "meaning": "A queue holds pending work; a worker executes it separately from the customer request."
+    },
+    {
+      "term": "Backoff and jitter",
+      "meaning": "Wait longer between retries and vary that delay to spread retry traffic."
+    },
+    {
+      "term": "Outbox",
+      "meaning": "A record of work to publish, saved in the same transaction as the business change."
+    },
+    {
+      "term": "Dead-letter queue",
+      "meaning": "A place for repeatedly failing jobs that require investigation or controlled replay."
+    },
+    {
+      "term": "Cache",
+      "meaning": "A temporary copy of data used to reduce repeated work."
+    },
+    {
+      "term": "Index",
+      "meaning": "A database structure that accelerates selected queries at storage and write cost."
+    },
+    {
+      "term": "Migration",
+      "meaning": "A versioned change to database structure or stored data."
+    },
+    {
+      "term": "Observability",
+      "meaning": "Using logs, metrics and traces to understand a running system."
+    },
+    {
+      "term": "CI/CD",
+      "meaning": "Automated checks and a controlled process for preparing and releasing changes."
+    },
+    {
+      "term": "RPO and RTO",
+      "meaning": "Targets for acceptable data loss and time to restore service."
+    },
+    {
+      "term": "Rollback",
+      "meaning": "Returning application behavior to an earlier known state, where compatible."
+    },
+    {
+      "term": "Source of truth",
+      "meaning": "The authoritative record for a fact; copies and caches may lag behind."
+    }
+  ],
+  "sources": [
+    {
+      "id": "S01",
+      "title": "MDN: HTTP overview",
+      "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Overview",
+      "note": "Network prework and Part 1: requests, responses and the client/server model."
+    },
+    {
+      "id": "S02",
+      "title": "MDN: HTTP methods and status codes",
+      "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods",
+      "note": "Part 1: method semantics. Also see the linked MDN HTTP status-code reference."
+    },
+    {
+      "id": "S03",
+      "title": "OWASP: Authorization",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html",
+      "note": "Part 3: deny by default, object ownership and server-side permission checks."
+    },
+    {
+      "id": "S04",
+      "title": "OWASP: Session management",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html",
+      "note": "Security prework and Part 3: sessions, cookie controls and session lifecycle."
+    },
+    {
+      "id": "S05",
+      "title": "OWASP: Authentication and recovery",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html",
+      "note": "Security prework: credential handling and safe authentication behavior."
+    },
+    {
+      "id": "S06",
+      "title": "OWASP: REST security and file uploads",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html",
+      "note": "Security prework and Parts 3 and 8: validation, limits and safe API behavior. File upload companion: cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html"
+    },
+    {
+      "id": "S07",
+      "title": "PostgreSQL: Transactions",
+      "url": "https://www.postgresql.org/docs/current/tutorial-transactions.html",
+      "note": "Part 2: all-or-nothing groups of database changes. Examples are conceptual; use your database documentation."
+    },
+    {
+      "id": "S08",
+      "title": "PostgreSQL: Constraints",
+      "url": "https://www.postgresql.org/docs/current/ddl-constraints.html",
+      "note": "Part 2: primary keys, foreign keys, uniqueness and validation at the data boundary."
+    },
+    {
+      "id": "S09",
+      "title": "PostgreSQL: Indexes and isolation",
+      "url": "https://www.postgresql.org/docs/current/indexes.html",
+      "note": "Parts 2 and 8: query acceleration and tradeoffs. Isolation companion: postgresql.org/docs/current/transaction-iso.html"
+    },
+    {
+      "id": "S10",
+      "title": "Shopify: Product variants",
+      "url": "https://help.shopify.com/en/manual/products/variants",
+      "note": "Parts 4 and 6: options, sellable variants and inventory. Used as a domain reference, not a required platform."
+    },
+    {
+      "id": "S11",
+      "title": "Shopify: Inventory states",
+      "url": "https://help.shopify.com/en/manual/inventory-and-locations/fundamentals/inventory-states",
+      "note": "Parts 4 and 6: distinguish physical stock, commitments and availability. Exact terms vary by platform."
+    },
+    {
+      "id": "S12",
+      "title": "Stripe: Webhooks",
+      "url": "https://docs.stripe.com/webhooks",
+      "note": "Part 5: signatures, retries, duplicate notifications and ordering. Confirm the chosen provider's actual contract."
+    },
+    {
+      "id": "S13",
+      "title": "Stripe: Idempotent requests",
+      "url": "https://docs.stripe.com/api/idempotent_requests",
+      "note": "Part 5: stable request keys and safe retry behavior. Retention windows and API semantics are provider-specific."
+    },
+    {
+      "id": "S14",
+      "title": "AWS: Transactional outbox",
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/transactional-outbox.html",
+      "note": "Part 7: persist a business change and pending publication together; make consumers safe for duplicates."
+    },
+    {
+      "id": "S15",
+      "title": "AWS: Timeouts, retries and backoff",
+      "url": "https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/",
+      "note": "Part 7: bounded retries, jitter and uncertain outcomes after timeouts."
+    },
+    {
+      "id": "S16",
+      "title": "OpenTelemetry: Observability concepts",
+      "url": "https://opentelemetry.io/docs/concepts/observability-primer/",
+      "note": "Part 9: logs, metrics and traces, with identifiers that connect related work."
+    },
+    {
+      "id": "S17",
+      "title": "Playwright: Testing best practices",
+      "url": "https://playwright.dev/docs/best-practices",
+      "note": "Part 9: verify behavior through independent tests. This is an example testing tool, not a stack requirement."
+    },
+    {
+      "id": "S18",
+      "title": "Git: Recording changes",
+      "url": "https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository",
+      "note": "Part 10: inspect and record small changes in version control."
+    },
+    {
+      "id": "S19",
+      "title": "PostgreSQL: Backup and restore",
+      "url": "https://www.postgresql.org/docs/current/backup.html",
+      "note": "Part 10: backup methods and recovery. Use your host and database procedures, and test restoration."
+    },
+    {
+      "id": "S20",
+      "title": "OWASP: Secrets management",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html",
+      "note": "Parts 3 and 10: limited access, rotation and avoiding credential leaks."
+    }
+  ]
+}
