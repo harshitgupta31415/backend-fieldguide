@@ -58,7 +58,7 @@ flowchart LR
 
 1. The browser submits the question, optional current lesson and recent conversation to `POST /api/tutor`.
 2. The server checks the request host/origin, access code, input bounds and local request limits.
-3. Deterministic lexical retrieval searches the bundled lesson content and selects up to four relevant excerpts. There is no embedding API, vector database, uploaded document corpus or live web search.
+3. Deterministic lexical retrieval searches the bundled lesson content and selects up to two relevant excerpts. There is no embedding API, vector database, uploaded document corpus or live web search.
 4. The server supplies those excerpts and recent messages to a model with instructions to teach from the course and cite supported claims as `[Lesson N]`.
 5. The response includes the answer and the retrieved lesson sources so the learner can inspect the supporting material.
 

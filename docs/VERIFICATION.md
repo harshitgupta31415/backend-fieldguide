@@ -1,0 +1,36 @@
+# Verification record
+
+Checked locally on 26 October 2026. The application was not deployed and no commerce-provider resources were created.
+
+## Automated checks
+
+`npm test` checks the curriculum contracts, original lesson identities, progress import/export, mission state machines, retrieval relevance, language coverage and server-side tutor behavior. Provider tests use deterministic fake responses for key rotation, quota cooldowns, credential errors, empty/classifier answers, cancellation and provider failover. They do not consume API quota.
+
+`npm run build` creates the local production build, including the dynamic `/api/tutor` route. The preview uses `npm start` bound to `127.0.0.1`.
+
+## Browser checks
+
+- Opened the expanded 108-lesson / 28-part course and all 16 practical mission entries.
+- Completed the synthetic shipment mission: uncertain booking, duplicate prevention, reconciliation and four decisions earned one 50 XP award.
+- Repaired the environment sorting/configuration exercise. Completed a lesson through quiz, checklist and the completion flow.
+- Exercised the three arcade games and the inventory, payment and API labs. Repeated rewards did not add duplicate credit.
+- Exported full progress, imported an older export and checked that missing optional fields received defaults. An all-lessons fixture displayed 108/108 and 100%; original learner progress was restored after testing.
+- Changed the language setting and opened practical teaching material in Hinglish. Course identifiers, code, ownership rules, numeric examples and saved learner text remain stable. English navigation/headings are deliberately preserved.
+- Checked the tutor, home, arcade, last lesson and capstone at a 390-pixel viewport: no horizontal overflow. Computed body background was `rgb(255, 250, 240)` and rendered gradient count was zero. Source styles also contain no gradient functions.
+- Checked a real tutor request through the browser, local API, retrieval index and provider. The answer explained why a browser payment redirect is not proof of payment and referred to lessons 22 and 95. Retrieved lesson cards were visible.
+
+## Live provider checks
+
+Small text requests succeeded with Gemini, Groq and Free.ai using server-side credentials. OpenRouter authenticated but its free router also produced an empty answer and a classifier-only response during checks. The adapter now rejects those unusable responses and tries another configured key/provider. A complete browser tutor request successfully returned an answer from Gemini.
+
+These checks establish that the configured providers answered at the time of testing, not continuing availability or remaining quota. Actual quota exhaustion was also observed during content preparation; automatic cooldown and bounded fallback behavior are covered by the deterministic provider tests. Additional keys do not increase shared account/project quotas.
+
+## Scope and limitations
+
+Retrieval uses authored course material and its local light-Hinglish dictionary. It does not browse live documentation, inspect a learner's repository, execute proposed code or prove that a real ecommerce integration works. Payment, shipping, auth, deployment and recovery exercises remain synthetic.
+
+Language checks cover every lesson's teaching fields, prompts, quiz feedback and practical decisions. Critical payment uncertainty, refund, inventory, RLS and session passages received additional meaning checks. This is an instructional translation, not a separate technical specification; code, numeric examples and official references remain authoritative anchors.
+
+Cooldowns, request limits and key-pool positions are process-local. A public multi-instance service would need shared limits and stronger per-user access controls. No hosting configuration was activated.
+
+The release packaging check scans source files, browser bundles, Git history and the ZIP for the configured credentials. Real environment files remain outside the public repository and source archive; `.env.example` contains empty key fields.

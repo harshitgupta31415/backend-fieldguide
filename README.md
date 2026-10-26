@@ -4,7 +4,7 @@ An interactive ecommerce backend course by [harshitgupta31415](https://github.co
 
 Understand what happens behind the storefront, connect the services, investigate failures, and guide AI with precise instructions. **28 parts · 108 lessons · 16 practical missions · 3 games · 3 labs.**
 
-![Backend Fieldguide learning interface](docs/preview.png)
+![Backend Fieldguide learning interface](docs/preview.jpg)
 
 Designed for learners who already understand their intended UI/UX and want to understand the backend well enough to direct, inspect and verify its implementation. You can start without memorizing syntax. The course teaches responsibilities, data, permissions, money, stock, failure recovery and evidence.
 
@@ -51,6 +51,8 @@ Automatic failover tries another configured key/provider after quota, credential
 Tutor questions, recent conversation and retrieved excerpts are sent to the selected provider. Course notes, progress and prompt drafts are not attached. Tutor conversation and access-code entry stay in page memory and are not included in progress exports. See [AI_TUTOR.md](docs/AI_TUTOR.md) for configuration, request limits, privacy, failover and troubleshooting.
 
 ## The learning experience
+
+The interface uses a flat cream canvas with violet, cyan, pink, peach and light-lime accents. There are no gradients or dark-green theme elements. **Settings → Course language** switches between English and light Hinglish: familiar English headings and controls, with a little everyday Roman Hindi in the explanations.
 
 - **A visual path:** foundation and practical tracks, a next-lesson card, progress indicators and milestones.
 - **Four steps per lesson:** Understand → Explore → Solve → Apply.
