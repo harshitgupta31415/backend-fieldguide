@@ -184,7 +184,7 @@ If the owner later configures their own Vercel project, use the variables above,
 | Symptom | Check |
 | --- | --- |
 | Tutor is not configured | Fill one provider's key field, include it in `AI_PROVIDER_ORDER`, and restart. Placeholder values are ignored. |
-| Access code required/not configured | Enter the server owner's code; ensure the server value has at least 16 characters. A non-loopback forwarded address requires a code even when a local hostname is involved. |
+| Access code required/not configured | Open Settings → AI access and check the server owner's code. The server value must have 12–256 characters. A non-loopback forwarded address requires a code even when a local hostname is involved. |
 | Provider credentials/credit error | Check that provider's key validity, restrictions, model permissions and available credit. Replace invalid values server-side. |
 | Model configuration error | Check the exact model ID and provider support. A model rejection is not retried with other keys. |
 | Rate limited or cooling down | Wait for the provider's reset and reduce request volume. Shared project/account quotas can affect every key. |

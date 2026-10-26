@@ -1,6 +1,6 @@
 # Verification record
 
-Checked locally on 26 October 2026. The application was not deployed and no commerce-provider resources were created.
+Checked locally on 26 October 2026. No new hosting project or commerce-provider resources were created.
 
 ## Automated checks
 
@@ -8,10 +8,13 @@ All 138 automated tests passed. `npm test` checks the curriculum contracts, orig
 
 Access-code tests cover the lowercase `code` variable across tutor, AI search, speech and transcription: matching, missing and wrong values; whitespace trimming; precedence over `TUTOR_ACCESS_CODE`; legacy fallback; 12–256 character bounds; localhost/public behavior; and status responses that never expose credentials. Denied requests never reach the injected provider stubs. Settings validation also covers 13-character codes, same-origin checks, malformed/oversized bodies, credential-free responses, rate limiting and cooldown. It requires no provider configuration or model request.
 
-`npm run build` creates the local production build, including the dynamic search, tutor and two audio routes. The preview uses `npm start` bound to `127.0.0.1`.
+`npm run build` creates the local production build, including the dynamic access, search, tutor and two audio routes. The preview uses `npm start` bound to `127.0.0.1`.
 
 ## Browser checks
 
+- Settings → AI access rejected an incorrect code and accepted a configured 13-character code. Tutor and AI search then returned real provider answers without another code entry. Removing the code and refreshing each returned Settings to Locked; the tutor's access shortcut closed the dock and opened Settings. Chat and search contain no access-code fields.
+- After the existing Git integration updated `backend-fieldguide.vercel.app`, its Settings page accepted the owner's code and displayed Unlocked. A live tutor request then returned a Groq answer about APIs with course references, using the same checked code. The owner credential is not included in these records or the repository.
+- The access form fits a 390×844 viewport with no horizontal overflow. The canvas remains cream with zero computed gradients. The code stays masked while entered and the field is removed after a successful check.
 - Opened the expanded 108-lesson / 28-part course and all 16 practical mission entries.
 - Completed the synthetic shipment mission: uncertain booking, duplicate prevention, reconciliation and four decisions earned one 50 XP award.
 - Repaired the environment sorting/configuration exercise. Completed a lesson through quiz, checklist and the completion flow.
