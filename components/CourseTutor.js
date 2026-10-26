@@ -113,8 +113,9 @@ const tutorHinglish = {
 };
 
 function useTutorLanguage() {
-  const { language, t: translateCourse } = useLanguage();
-  return { language, t: value => typeof value === 'string' && language === 'hinglish' ? tutorHinglish[value] || translateCourse(value) : value };
+  const { language } = useLanguage();
+  // Keep interface labels familiar; the selected language changes teaching answers.
+  return { language, t: value => value };
 }
 
 function TutorIcon({ name = 'spark', size = 20 }) {

@@ -9,7 +9,7 @@ import { localizeValue, normalizeLanguage, translateText } from '../lib/language
 import { cleanProgress, emptyProgress } from '../lib/progress.mjs';
 
 const DEVANAGARI = /\p{Script=Devanagari}/u;
-const ROMAN_HINDI = /\b(?:hai|hain|ho|hota|hoti|hote|tha|thi|nahi|nahin|kyunki|kyun|pehle|baad|karo|karna|karein|karke|ko|se|aur|mein|par|mat|chahiye|rakho|taaki|toh|yeh|iska)\b/i;
+const ROMAN_HINDI = /\b(?:hai|hain|ho|hota|hoti|hote|tha|thi|nahi|nahin|kyunki|kyun|pehle|baad|karo|karna|karein|karke|ko|se|aur|mein|par|mat|chahiye|rakho|taaki|toh|yeh|iska|bas|yaad|dhyan|samjho)\b/i;
 const requiredLessonFields = ['title', 'question', 'definition', 'why', 'example', 'misconception', 'prompt', 'exercise', 'answer', 'steps', 'details', 'debugClues', 'completionChecks', 'prompts', 'visual'];
 const excludedFields = new Set(['id', 'moduleId', 'module_id', 'kind', 'simulator', 'language', 'code', 'url', 'href', 'icon', 'correct', 'orderStart', 'start', 'reviewed', 'source', 'date', 'sources', 'references', 'color', 'track']);
 
@@ -68,11 +68,14 @@ test('the complete dictionary is nonempty Roman-script text without Devanagari',
     assert.ok(value.trim(), `empty translation: ${source.slice(0, 60)}`);
     assert.equal(DEVANAGARI.test(value), false, `Devanagari in: ${source.slice(0, 80)}`);
   }
-  for (const lesson of lessons) {
-    const value = translated(lesson.definition);
-    assert.ok(value && ROMAN_HINDI.test(value), `lesson${lesson.id} has an actual Roman-Hindi explanation rather than English fallback`);
-    assert.notEqual(value, lesson.definition, `lesson${lesson.id} definition changed language`);
-  }
+  // The requested style is English-first with occasional familiar Hindi words.
+  // Individual definitions may remain English; do not force Hindi into every
+  // sentence or translate navigation merely to satisfy a per-string assertion.
+  const explanatoryEntries = lessons.flatMap(lesson => teachingStrings({ definition: lesson.definition, why: lesson.why, example: lesson.example, answer: lesson.answer, details: lesson.details }, `lesson-${lesson.id}`));
+  const withConnectors = explanatoryEntries.filter(entry => ROMAN_HINDI.test(translated(entry.source) || ''));
+  assert.ok(withConnectors.length >= lessons.length, 'a substantial set of explanations uses light everyday Hindi rather than the whole course silently falling back');
+  const lessonsWithConnectors = lessons.filter(lesson => [lesson.definition, lesson.why, lesson.example, lesson.answer, ...(lesson.details || []).map(detail => detail.body)].some(source => ROMAN_HINDI.test(translated(source) || '')));
+  assert.ok(lessonsWithConnectors.length >= Math.ceil(lessons.length / 2), 'light Hindi support spans the course rather than a handful of examples');
 });
 
 test('English is a lossless default and missing Hinglish text falls back without dropping content', () => {
@@ -81,7 +84,8 @@ test('English is a lossless default and missing Hinglish text falls back without
   assert.equal(localizeValue(lessons, 'en', dictionary), lessons);
   assert.equal(translateText('Unknown teaching sentence.', 'hinglish', dictionary), 'Unknown teaching sentence.');
   assert.equal(translateText('Title', 'hinglish', { Title: '' }), 'Title');
-  assert.equal(translateText('  Continue\n', 'hinglish', { Continue: 'Aage badhein' }), '  Aage badhein\n');
+  assert.equal(translateText('  Continue\n', 'hinglish', { Continue: 'Aage badhein' }), '  Continue\n');
+  assert.equal(translateText('  A transaction groups related changes.\n', 'hinglish', { 'A transaction groups related changes.': 'A transaction groups related changes, bas together.' }), '  A transaction groups related changes, bas together.\n');
   assert.equal(translateText(42, 'hinglish', dictionary), 42);
   assert.equal(localizeValue(null, 'hinglish', dictionary), null);
 });
@@ -93,18 +97,22 @@ test('localization preserves identifiers, routing, code, correct answers, and st
     src: '/illustration.svg', icon: 'server', code: 'const total_minor = 25000;', language: 'javascript',
     currency: 'INR', variant: 'shirt_demo', store: 'Fieldstore', correct: 2, start: ['request', 'commit'],
     orderStart: ['commit', 'request'], layer: 'server', category: 'browser', target: 'test', targetId: 'cart_demo',
-    title: 'Continue', nested: { id: 'cart_demo', title: 'Continue', href: '#part/13' },
+    title: 'Continue', name: 'Fieldstore', label: 'Explore', module_title: 'Data foundations', term: 'Transaction', nodes: ['Browser', 'Server'],
+    definition: 'A cart stores the intended items.', nested: { id: 'cart_demo', title: 'Continue', body: 'A cart stores the intended items.', href: '#part/13' },
     links: ['https://example.invalid/docs', '#lesson/64', '#part/13'],
   };
   const poisoned = Object.fromEntries([
     ...Object.values(input).filter(value => typeof value === 'string').map(value => [value, 'BAD_STRUCTURAL_TRANSLATION']),
     ['01', 'BAD_ID'], ['02', 'BAD_ID'], ['request', 'BAD_REQUEST'], ['commit', 'BAD_COMMIT'], ['cart_demo', 'BAD_CART'], ['Continue', 'Aage badhein'],
+    ['A cart stores the intended items.', 'A cart stores the intended items, bas purchase abhi complete nahi hai.'],
   ]);
   const before = structuredClone(input);
   const output = localizeValue(input, 'hinglish', poisoned);
-  for (const key of Object.keys(input)) if (!['title', 'nested', 'links'].includes(key)) assert.deepEqual(output[key], input[key], key);
-  assert.equal(output.title, 'Aage badhein');
-  assert.equal(output.nested.title, 'Aage badhein');
+  for (const key of Object.keys(input)) if (!['definition', 'nested', 'links'].includes(key)) assert.deepEqual(output[key], input[key], key);
+  assert.equal(output.title, 'Continue');
+  assert.equal(output.nested.title, 'Continue');
+  assert.equal(output.definition, 'A cart stores the intended items, bas purchase abhi complete nahi hai.');
+  assert.equal(output.nested.body, output.definition);
   assert.equal(output.nested.id, 'cart_demo');
   assert.equal(output.nested.href, '#part/13');
   assert.deepEqual(output.links, input.links);
@@ -119,8 +127,11 @@ test('all108 localized lessons retain technical implementations, source URLs, an
     const original = lessons[index];
     const result = localized[index];
     assert.equal(result.id, original.id);
+    assert.equal(result.title, original.title, 'lesson headings remain English');
+    assert.equal(result.module_title, original.module_title, 'chapter headings remain English');
     assert.equal(result.module_id, original.module_id);
     assert.equal(result.visual.kind, original.visual.kind);
+    assert.deepEqual(result.visual.nodes, original.visual.nodes, 'technical diagram labels remain English');
     assert.equal(result.implementation?.code, original.implementation?.code);
     assert.equal(result.implementation?.language, original.implementation?.language);
     assert.deepEqual(result.sources.map(source => source.url), original.sources.map(source => source.url));
@@ -132,6 +143,15 @@ test('all108 localized lessons retain technical implementations, source URLs, an
     assert.equal(localizedQuiz[key].choices.length, interactions[key].choices.length);
   }
   assert.equal(JSON.stringify(lessons), before);
+});
+
+test('navigation and learning-stage labels stay familiar English even when a dictionary suggests Hindi', () => {
+  const labels = ['Foundation', 'Language', 'Understand', 'Explore', 'Solve', 'Apply', 'Continue', 'Settings'];
+  const overriding = Object.fromEntries(labels.map(label => [label, 'UNWANTED_HINDI_LABEL']));
+  for (const label of labels) {
+    assert.equal(translateText(label, 'hinglish', overriding), label);
+    assert.equal(translateText(label.toUpperCase(), 'hinglish', overriding), label.toUpperCase());
+  }
 });
 
 test('critical stock arithmetic and auth identifiers survive the translated prose', () => {

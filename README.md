@@ -63,6 +63,7 @@ Tutor questions, recent conversation and retrieved excerpts are sent to the sele
 - **Three labs:** inventory/reservations, payments/retries and request validation.
 - **Prompt workshop:** compose seven ingredients into a prompt, copy it or save it as text.
 - **Reference desk:** prework, glossary, official documentation and optional advanced study.
+- **Language settings:** English labels and headings, with a choice of English or light Hinglish explanations. Hinglish keeps English sentence structure and technical terms, adding a few familiar Hindi words in English letters.
 
 All parts remain available for exploration. There are no timers or forced waiting. Keyboard controls, focus mode, responsive layouts and reduced-motion settings support different learning preferences.
 
@@ -142,7 +143,9 @@ The original `backend-fieldguide-v1` browser storage key remains compatible. Old
 - Marking a lesson incomplete removes its 20 XP while retaining its passed quiz and self-check records for review.
 - Lesson progress, mission completion and arcade medals are separate. Optional advanced tracks do not change course totals.
 
-Saved state includes completed lessons, passed quiz IDs, practical self-checks, mission completions, arcade achievements, lesson notes, last visited lesson, the Prompt workshop draft and the reduced-animation setting.
+Saved state includes completed lessons, passed quiz IDs, practical self-checks, mission completions, arcade achievements, lesson notes, last visited lesson, the Prompt workshop draft, language preference and the reduced-animation setting.
+
+Choose your language in **Settings**. The bundled Hinglish dictionary loads when selected; explanatory content uses English as a fallback when a translation is unavailable. Switching languages does not change lesson IDs, answer keys, completion records, code, URLs or your own notes and drafts. Language selection makes no AI translation request.
 
 Use **Export** in the sidebar to download `backend-fieldguide-progress.json`. **Import replaces saved course state** and resets the current view's temporary state; it does not merge two learners' histories. Exports contain notes and prompt drafts, so inspect them before sharing.
 
@@ -170,6 +173,8 @@ Use **Tab**, **Enter** and **Space** to navigate controls. Ordering activities p
 | `lib/tutor-server.mjs`, `lib/ai-providers.mjs` | Tutor input/access checks, grounded prompts, provider adapters and bounded failover. |
 | `lib/course.mjs` | Course metadata, ID sets, navigation helpers and reward calculations. |
 | `lib/progress.mjs` | Saved-state defaults, validation and compatibility. |
+| `components/LanguageProvider.js`, `lib/language.mjs`, `lib/interface-labels.json` | Shared language setting, English interface labels and safe content localization. |
+| `lib/hinglish.json` | Bundled explanations in light Hinglish, loaded on demand. |
 | `lib/simulations.mjs` | Pure state transitions for local practice experiments. |
 | `lib/lessons.json`, `lib/interactions.json` | Lesson content, prompts, checks, quiz answers and diagram explanations. |
 | `lib/reference.json`, `lib/activities.json` | Part metadata, glossary, sources, advanced tracks and practical missions. |

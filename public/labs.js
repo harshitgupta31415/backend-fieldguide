@@ -35,7 +35,9 @@
   }
 
   function write(panel, selector, value) {
-    read(panel, selector).textContent = translated(panel, value);
+    var target = read(panel, selector);
+    var isCode = target.matches("pre, code") && typeof value === "string" && /^\s*[\[{]/.test(value);
+    target.textContent = isCode ? value : translated(panel, value);
   }
 
   function showLog(target, entries) {

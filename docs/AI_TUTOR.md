@@ -4,6 +4,8 @@ Backend Fieldguide includes an optional tutor that answers questions using retri
 
 Open the tutor at `#tutor`, or use a lesson's **Ask the tutor** link. Ask a specific question, inspect its lesson references, and compare the answer with the lesson. The tutor explains and proposes; it cannot run code, inspect your private repository, access commerce accounts or establish that an integration works.
 
+**Settings → Language** selects English or light Hinglish. Interface labels and technical terms stay English. Hinglish explanations keep mostly English sentences with a few familiar Hindi words written in English letters; the tutor receives the same language preference. The course's bundled translations need no provider request, while submitting a tutor question still calls the configured model.
+
 ## Local setup
 
 1. Copy the project's [`.env.example`](../.env.example) to `.env.local` beside `package.json`.
@@ -109,10 +111,11 @@ The API also limits each server process to **10 accepted requests per minute** a
 | Question | 1–2,000 characters. |
 | History | At most six `user`/`assistant` entries, each up to 4,000 characters. |
 | Lesson context | An existing integer lesson ID, if supplied. |
+| Language | `en` or `hinglish`; defaults to `en`. |
 
 `GET /api/tutor` reports whether a provider is configured, provider names and whether an access code is required. It does not expose keys or test account validity, credit balance or model availability.
 
-`POST /api/tutor` accepts `question`, optional `lessonId`, `history` and `accessCode`. Success returns `answer`, `sources`, `provider` and `model`; failure returns an explanatory `error` and `code`. The returned model is the configured identifier. With `openrouter/free`, it is not the identity of the underlying model selected by the router.
+`POST /api/tutor` accepts `question`, optional `lessonId`, `history`, `language` and `accessCode`. Success returns `answer`, `sources`, `provider` and `model`; failure returns an explanatory `error` and `code`. The returned model is the configured identifier. With `openrouter/free`, it is not the identity of the underlying model selected by the router.
 
 ## Privacy and persistence
 

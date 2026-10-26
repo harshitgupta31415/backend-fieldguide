@@ -1,8 +1,8 @@
-/* Light neon: quiet surfaces, vivid wayfinding, and deep ink for reading. */
+/* Flat cream: vivid wayfinding, pastel cards, and deep ink for reading. */
 :root {
   --ink: #29253f;
   --muted: #66637b;
-  --paper: #faf9ff;
+  --paper: #fffaf0;
   --white: #fff;
   --teal: #7150d5;
   --teal-dark: #5734b5;
@@ -21,10 +21,8 @@
 html { color-scheme: light; }
 body {
   background:
-    radial-gradient(ellipse at 94% 4%, #c6fbff66, transparent 38%),
-    radial-gradient(ellipse at 32% 25%, #f2d7ff44, transparent 42%),
-    #faf9ff;
-  background-attachment: fixed;
+    #fffaf0;
+  background-attachment: scroll;
   color: var(--ink);
 }
 ::selection { background: #e7d7ff; color: #3b225f; }
@@ -42,14 +40,14 @@ body {
 /* The navigation stays light, with a distinct color for each destination. */
 .app-shell .sidebar {
   color: #625a79;
-  background: linear-gradient(170deg, #f2eaff 0%, #fcfaff 44%, #eafbff 100%);
+  background: #fffdf5;
   border-right: 1px solid #e2d8f3;
   box-shadow: 5px 0 24px #7c65a707;
   scrollbar-color: #c9bae1 transparent;
 }
 .app-shell .brand { color: #332547; }
 .app-shell .brand-symbol {
-  background: linear-gradient(145deg, #c2b0ff, #e6c3ff 55%, #b2f1f5);
+  background: #dec8fb;
   border-color: #c3afe9;
   color: #4d327d;
   box-shadow: 0 3px 15px #a481dc24;
@@ -87,7 +85,7 @@ body {
 .app-shell .sidebar-progress strong { color: #8350bd; }
 .app-shell .sidebar-progress small, .app-shell .sidebar-author small { color: #8d819d; }
 .app-shell .progress-track { background: #e1d8ec; }
-.app-shell .progress-track span { background: linear-gradient(90deg, #9d7ce9, #e79bc7, #8ddde8); }
+.app-shell .progress-track span { background: #bc93e7; }
 .app-shell .progress-actions button { color: #8a61aa; }
 .app-shell .sidebar-author { color: #695775; }
 .app-shell .avatar { background: #ead9fa; color: #7d4d9d; border: 1px solid #d6bfea; }
@@ -135,13 +133,13 @@ body {
 .app-shell .journey-xp>span { color: #9884a3; border-color: #e6d9ee; }
 .app-shell .journey-hero h1 { color: #302440; }
 .app-shell .journey-hero h1 span { color: #8a53cf; }
-.app-shell .journey-hero h1 span:after { background: linear-gradient(90deg, #d9c6ff, #bff4ef, #ffd4e9); }
+.app-shell .journey-hero h1 span:after { background: #dfff9b; }
 .app-shell .journey-hero-copy>p { color: #817187; }
 .app-shell .journey-hero-facts { color: #9b88a2; }
 .app-shell .journey-hero-facts strong { color: #80608e; }
 .app-shell .journey-hero-facts>i { background: #d6bddf; }
 .app-shell .journey-system {
-  background: linear-gradient(140deg, #f6ebff, #eefcff 72%, #fef7ff);
+  background: #f1edff;
   border-color: #ded0ed;
   box-shadow: 0 10px 38px #a077bd0e, inset 0 0 35px #ffffff8a;
 }
@@ -169,7 +167,7 @@ body {
 .app-shell .journey-trace-button>span { color: #aa8cb9; }
 .app-shell .journey-trace-button:hover { background: #f0e2fa; }
 .app-shell .journey-next {
-  background: linear-gradient(110deg, #eee3ff 0%, #fff1fa 57%, #e8faff 100%);
+  background: #eee3ff;
   border: 1px solid #ddcbef;
   box-shadow: 0 9px 28px #c89ce916;
   color: #65427e;
@@ -204,7 +202,7 @@ body {
 .app-shell .journey-stage-heading h3, .app-shell .journey-stage-heading>span { color: #a08aaa; }
 .app-shell .journey-part, .app-shell .studio-card {
   --card-bg: #f6efff; --card-line: #e4d1f4; --card-accent: #8050a5; --card-soft: #edddfc;
-  background: linear-gradient(135deg, #ffffffeb, var(--card-bg));
+  background: var(--card-bg);
   border-color: var(--card-line);
   box-shadow: var(--neon-shadow);
 }
@@ -241,7 +239,7 @@ body {
 .app-shell .journey-badge.is-earned { background: #e5f8c7; color: #5358b6; border-color: #d3e9a9; }
 .app-shell .journey-badge.is-earned small { color: #7658aa; }
 .app-shell .journey-achievements>div>p { color: #a08aa9; }
-.app-shell .journey-chapter-hero { background: linear-gradient(115deg, #f1e6ff, #e8faff); border-color: #dfd2f0; }
+.app-shell .journey-chapter-hero { background: #fff0df; border-color: #dfd2f0; }
 .app-shell .journey-chapter-hero p, .app-shell .journey-chapter-progress>span { color: #987ea8; }
 .app-shell .journey-chapter-lessons>button { background: #fffdfefa; border-color: #e6d8ef; box-shadow: var(--neon-shadow); }
 .app-shell .journey-chapter-lessons>button:nth-child(3n+2) { background: #f3fdff; }
@@ -264,7 +262,7 @@ body {
 .app-shell .lesson-steps>button:nth-child(4).is-current { background: #e3f3bd; color: #4a4e9b; border-color: #cde39f; }
 .app-shell .step-index, .app-shell .is-current .step-index { background: #ffffff9c; color: inherit; border-color: currentColor; }
 .app-shell .lesson-stage-progress { background: #eee4f7; }
-.app-shell .lesson-stage-progress>span { background: linear-gradient(90deg, #c298eb, #f6b2d8, #9adfe7); }
+.app-shell .lesson-stage-progress>span { background: #92dce7; }
 .app-shell .stage-caption { color: #a98bb7; }
 .app-shell .idea-grid>section { background: #f9f3ff; border-color: #e6d8f1; }
 .app-shell .idea-grid>section.why-card { background: #effcff; border-color: #d1edf3; }
@@ -296,7 +294,7 @@ body {
 .app-shell .quiz-feedback.success { color: #775fa0; background: #f0f8e1; border-color: #dceac7; }
 .app-shell .challenge-note { color: #bd9bc9; }
 .app-shell .topic-prompt, .app-shell .compiled-prompt {
-  background: linear-gradient(135deg, #f4e8ff, #fff1fa 90%);
+  background: #f4e8ff;
   border: 1px solid #dfc9ef;
   color: #946cab;
   box-shadow: var(--neon-shadow);
@@ -310,7 +308,7 @@ body {
 .app-shell .notes-section small { color: #b59ac3; }
 .app-shell .lesson-completion { background: #f3f9e8; border-color: #dbe9c8; }
 .app-shell .lesson-completion p { color: #686ba1; }
-.app-shell .lesson-celebration { background: linear-gradient(135deg, #f3e5ff, #e9fbfa, #f5fbdc); border-color: #dcc7ed; box-shadow: 0 10px 45px #a884c31a; }
+.app-shell .lesson-celebration { background: #ffedf8; border-color: #dcc7ed; box-shadow: 0 10px 45px #a884c31a; }
 .app-shell .celebration-medal { background: #e6d0ff; color: #ad80c7; border-color: #d0ace9; }
 .app-shell .celebration-sparkles i:nth-child(3n+1) { background: #c5a1ef; }
 .app-shell .celebration-sparkles i:nth-child(3n+2) { background: #9de3ea; }
@@ -333,7 +331,7 @@ body {
 .app-shell .studio-card>div:first-child>span:last-child, .app-shell .studio-card small { color: var(--card-accent); }
 .app-shell .studio-case, .app-shell .studio-board, .app-shell .studio-experiment { background: #ffffffd9; border-color: #e4d8ed; box-shadow: var(--neon-shadow); }
 .app-shell .studio-case-progress { background: #f1e6fa; }
-.app-shell .studio-case-progress>span { background: linear-gradient(90deg, #b99be7, #e8add6, #9ddfe5); }
+.app-shell .studio-case-progress>span { background: #d5a6e5; }
 .app-shell .studio-case-steps>span { background: #fbf7ff; border-color: #e4d1ef; color: #bba2c9; }
 .app-shell .studio-case-steps>span.is-current { background: #e5d1fa; border-color: #cfafe5; color: #a57fba; }
 .app-shell .studio-case-steps>span.is-done { background: #eef8d5; border-color: #d5e8b0; color: #6467a5; }
@@ -361,7 +359,7 @@ body {
 .app-shell .studio-stats>div:nth-child(3n+3), .app-shell .lab-stat:nth-child(3n+3) { background: #fff0f8; border-color: #efd6e5; }
 .app-shell .studio-stats strong, .app-shell .lab-stat strong { color: #ad8fc0; }
 .app-shell .studio-stats small, .app-shell .lab-stat>span { color: #b7a0c3; }
-.app-shell .studio-finish { background: linear-gradient(120deg, #f3e5ff, #e9fbff, #f2fbdc); border-color: #ddcbed; }
+.app-shell .studio-finish { background: #eff8d9; border-color: #ddcbed; }
 .app-shell .studio-responsibilities>div { background: #f6efff; border-color: #dbc3ed; }
 .app-shell .studio-responsibilities dt, .app-shell .studio-responsibilities dd { color: #b59ac3; }
 .app-shell .lab-panel { background: #fffdfedb; border-color: #e4d7ef; box-shadow: var(--neon-shadow); }
@@ -376,7 +374,7 @@ body {
 .app-shell .game-arcade { --ga-ink: #483258; --ga-muted: #a18aaf; --ga-teal: #aa7bc7; --ga-dark: #614073; --ga-cream: #fffaff; --ga-lime: #e2f9c0; --ga-line: #e6d5ef; }
 .app-shell .ga-status-dot { background: #bb90d7; box-shadow: 0 0 0 4px #ead9f547; }
 .app-shell .ga-hero h1 em { color: #b384d1; }
-.app-shell .ga-medal-counter { background: linear-gradient(145deg, #f1dcff, #e9f8ef); border-color: #e0c9ef; }
+.app-shell .ga-medal-counter { background: #f1dcff; border-color: #e0c9ef; }
 .app-shell .ga-medal-counter>strong, .app-shell .ga-counter-symbol { color: #ad81c6; }
 .app-shell .ga-medal-counter>strong>span, .app-shell .ga-medal-counter>small { color: #c3a9d1; }
 .app-shell .ga-mini-medals>span { border-color: #dbc4eb; color: #cdb4da; }
@@ -384,9 +382,9 @@ body {
 .app-shell .ga-game-card { background: #fffaff; border-color: #e6d1f4; box-shadow: 0 5px 0 #f0e0fa; }
 .app-shell .ga-game-card-trust { background: #f4fdff; border-color: #ceeff4; box-shadow: 0 5px 0 #e0f5f8; }
 .app-shell .ga-game-card-detective { background: #fff6f8; border-color: #f1d8e1; box-shadow: 0 5px 0 #fae5ed; }
-.app-shell .ga-card-illustration { background-color: #f0e2fc; background-image: radial-gradient(#d4b8e98f .8px,transparent .8px); }
-.app-shell .ga-game-card-trust .ga-card-illustration { background-color: #e5f9fc; background-image: radial-gradient(#bee8ed .8px,transparent .8px); }
-.app-shell .ga-game-card-detective .ga-card-illustration { background-color: #fff0e6; background-image: radial-gradient(#f0d5c4 .8px,transparent .8px); }
+.app-shell .ga-card-illustration { background-color: #f0e2fc; background-image: none; }
+.app-shell .ga-game-card-trust .ga-card-illustration { background-color: #e5f9fc; background-image: none; }
+.app-shell .ga-game-card-detective .ga-card-illustration { background-color: #fff0e6; background-image: none; }
 .app-shell .ga-art-node { background: #fff9ff; color: #bc96d2; border-color: #d8bceb; box-shadow: 0 4px 0 #e1ccef; }
 .app-shell .ga-art-node:nth-of-type(2) { background: #e7ccff; }
 .app-shell .ga-card-illustration>b { color: #ceade1; }
@@ -403,7 +401,7 @@ body {
 .app-shell .ga-button-secondary:hover { background: #f5eaff; }
 .app-shell .ga-game-label>span:first-child { background: #f2e3ff; color: #bc95d2; border-color: #dfc6ee; }
 .app-shell .ga-round-progress>div[role=progressbar] { background: #f0e6f8; }
-.app-shell .ga-round-progress>div[role=progressbar]>span { background: linear-gradient(90deg, #c6a6e8, #e8b7d9, #addfe7); }
+.app-shell .ga-round-progress>div[role=progressbar]>span { background: #addfe7; }
 .app-shell .ga-instruction { background: #edfaff; border-color: #d8edf5; }
 .app-shell .ga-instruction>span, .app-shell .ga-instruction>p { color: #a0bec9; }
 .app-shell .ga-pipeline>li { background: #fffaff; border-color: #e8d6f1; box-shadow: 0 3px 0 #f3e9fa; }
@@ -497,5 +495,19 @@ body {
   scroll-behavior: auto !important;
 }
 
-.app-shell .concept-svg marker path{fill:#a492d9}.settings-page select{width:100%;max-width:480px;padding:15px 18px;border:1px solid #d8ccf5;border-radius:14px;background:#fff;color:#34264f;font:inherit;margin:12px 0 20px}.settings-page .resource-section{background:linear-gradient(120deg,#f4eeff,#e9fbff 55%,#fff0f8);border:1px solid #e2d7fa;border-radius:22px;padding:30px}.settings-page label{display:block}
+/* The shared canvas stays warm cream on every route and screen size. */
+:root { --paper: #fffaf0; }
+html, body, .app-shell, .app-shell .workspace, .app-shell main { background: #fffaf0; }
+.app-shell .sidebar { background: #fffdf5; }
+.app-shell .topbar { background: #fffdf5; backdrop-filter: none; }
+.app-shell .searchbox { background: #fffefa; }
+.app-shell :is(.lesson-stage,.concept-diagram,.quiz-section,.practical-details,.completion-checklist,.studio-case,.studio-board,.studio-experiment,.lab-panel) { background: #fffefa; }
+.app-shell .journey-part, .app-shell .studio-card { background: var(--card-bg); }
+.app-shell .journey-part:nth-child(5n+1), .app-shell .studio-card:nth-child(5n+1) { background: #f6efff; }
+.app-shell .journey-part:nth-child(5n+2), .app-shell .studio-card:nth-child(5n+2) { background: #ebfbff; }
+.app-shell .journey-part:nth-child(5n+3), .app-shell .studio-card:nth-child(5n+3) { background: #fff0f8; }
+.app-shell .journey-part:nth-child(5n+4), .app-shell .studio-card:nth-child(5n+4) { background: #f4fbe9; }
+.app-shell .journey-part:nth-child(5n+5), .app-shell .studio-card:nth-child(5n+5) { background: #fff5ec; }
+
+.app-shell .concept-svg marker path{fill:#a492d9}.settings-page select{width:100%;max-width:480px;padding:15px 18px;border:1px solid #d8ccf5;border-radius:14px;background:#fff;color:#34264f;font:inherit;margin:12px 0 20px}.settings-page .resource-section{background:#eefaff;border:1px solid #e2d7fa;border-radius:22px;padding:30px}.settings-page label{display:block}
 

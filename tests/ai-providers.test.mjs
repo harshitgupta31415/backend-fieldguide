@@ -4,7 +4,7 @@ import { createProviderRouter, readAIConfig } from '../lib/ai-providers.mjs';
 
 const messages = [{ role: 'system', content: 'Use course facts.' }, { role: 'user', content: 'Explain payment verification.' }];
 const config = readAIConfig({ OPENROUTER_API_KEYS: 'first,second', GEMINI_API_KEY: 'third', GROQ_API_KEY: 'fourth' });
-const ok = () => Response.json({ choices: [{ message: { content: 'Verified by the server. [Lesson 37]' } }] });
+const ok = () => Response.json({ choices: [{ message: { content: 'The payment is verified by the trusted server before fulfillment. [Lesson 37]' } }] });
 
 test('configuration deduplicates bounded key pools and never accepts inherited provider names', () => {
   const result = readAIConfig({ AI_PROVIDER_ORDER: 'toString,groq,groq,gemini', GROQ_API_KEYS: 'abc,abc,def', GEMINI_API_KEY: 'replace_me', AI_MAX_OUTPUT_TOKENS: '99999' });
@@ -53,9 +53,9 @@ test('model configuration errors stop without retrying and never echo upstream b
 });
 
 test('bad credentials are cooled down and another configured provider can answer', async () => {
-  const generate = createProviderRouter({ fetchImpl: async url => url.includes('googleapis.com') ? Response.json({ candidates: [{ content: { parts: [{ thought: true, text: 'hidden' }, { text: 'Grounded answer' }] } }] }) : new Response('', { status: 401 }) });
+  const generate = createProviderRouter({ fetchImpl: async url => url.includes('googleapis.com') ? Response.json({ candidates: [{ content: { parts: [{ thought: true, text: 'hidden' }, { text: 'A grounded answer that explains why server verification matters.' }] } }] }) : new Response('', { status: 401 }) });
   const result = await generate(messages, config);
-  assert.equal(result.provider, 'gemini'); assert.equal(result.answer, 'Grounded answer');
+  assert.equal(result.provider, 'gemini'); assert.equal(result.answer, 'A grounded answer that explains why server verification matters.');
 });
 
 test('all unavailable providers fail within four attempts with a safe error', async () => {
@@ -87,4 +87,11 @@ test('Free.ai uses its documented chat endpoint and bearer authentication', asyn
   assert.equal(result.provider, 'freeai'); assert.equal(seen.url, 'https://api.free.ai/v1/chat/');
   assert.equal(seen.options.headers.Authorization, 'Bearer local-test-key');
   assert.equal(JSON.parse(seen.options.body).model, 'qwen7b');
+});
+
+test('a classifier label is not accepted as a teaching answer', async () => {
+  let calls = 0;
+  const generate = createProviderRouter({ fetchImpl: async () => ++calls === 1 ? Response.json({ choices: [{ message: { content: 'User Safety: safe' } }] }) : ok() });
+  assert.ok((await generate(messages, config)).answer.includes('trusted server'));
+  assert.equal(calls, 2);
 });

@@ -1,5 +1,5 @@
 /* The shared learning surface: deliberate movement, readable content, clear progress. */
-:root{--paper:#f7f8f2;--teal:#1a1e63;--teal-dark:#131546;--lime:#d9f279;--ink:#25173c;--muted:#62746c;--line:#dce5d9;--sidebar:252px}
+:root{--paper:#fffaf0;--teal:#1a1e63;--teal-dark:#131546;--lime:#d9f279;--ink:#25173c;--muted:#62746c;--line:#dce5d9;--sidebar:252px}
 body{background:var(--paper)}
 .sidebar{background:#22133d;padding-top:30px}
 .brand-symbol{border-radius:14px;background:#d9f279;color:#2c1b49;border-color:#d9f279;transform:rotate(-5deg)}
