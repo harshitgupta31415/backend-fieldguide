@@ -4,6 +4,10 @@ An interactive ecommerce backend course by [harshitgupta31415](https://github.co
 
 Understand what happens behind the storefront, connect the services, investigate failures, and guide AI with precise instructions. **28 parts · 108 lessons · 16 practical missions · 3 games · 3 labs.**
 
+**[Open the live course](https://backend-fieldguide.vercel.app/) · [Try the payment retry lab](https://backend-fieldguide.vercel.app/#labs/payments)**
+
+The lessons, games, and simulations work in the browser without an account. To try the payment lab, run steps 1–4, then select **Repeat success event** and check the paid-transition counter.
+
 ![Backend Fieldguide learning interface](docs/preview.jpg)
 
 Designed for learners who already understand their intended UI/UX and want to understand the backend well enough to direct, inspect and verify its implementation. You can start without memorizing syntax. The course teaches responsibilities, data, permissions, money, stock, failure recovery and evidence.
